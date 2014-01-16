@@ -1,0 +1,18 @@
+
+# Compile Sources
+bin/
+.obj
+*.o
+*.so
+
+# Build Directory
+build/
+
+# ROOT files
+*.root
+
+# Temp files
+*~
+*.swp
+*.swo
+
