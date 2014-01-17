@@ -66,13 +66,12 @@ bool SvtCalibrations::loadCalibrations(std::string baseline_path)
     	baseline_map[daq_pair][channel] = baseline;
     	noise_map[daq_pair][channel] = noise;
 
+		/*
 		std::cout << "FPGA: " << fpga << " Hybrid: " << hybrid 
 				  << " Channel: " << channel 
 				  << " Baseline: " << baseline_map[daq_pair][channel] 
 				  << std::endl;
-
-//    	std::cout << "fpga: " << fpga << " hybrid: " << hybrid << " channel: " << channel << " baseline: " << baseline << " noise " << noise << std::endl;
-
+		*/
     }
 
     std::cout << "Calibrations have been loaded." << std::endl;
