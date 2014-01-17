@@ -39,19 +39,12 @@ bool SvtCalibrations::loadCalibrations(std::string baseline_path)
     	std::cerr << "First sample will be used as the pedestal." << std::endl;
     	return false;
     }
-
-    // Prepare the map
-    for(int fpga = 0; fpga < 7; ++fpga){
-    	for(int hybrid = 0; hybrid < 3; ++hybrid){
-    		baseline_map[std::make_pair(fpga, hybrid)] = std::vector<double>(640);
-    		noise_map[std::make_pair(fpga, hybrid)] = std::vector<double>(640);
-    	}
-    }
-
-    // Loop through each line in the calibration file
+    
+	// Loop through each line in the calibration file
     std::string line;
     int fpga, hybrid, channel;
     double baseline, noise;
+	std::map<std::pair<int, int>, std::vector<double> >::iterator baseline_it;
     while(std::getline(baseline_file,line)){
 
     	// If an line is commented out, skip it
@@ -61,10 +54,22 @@ bool SvtCalibrations::loadCalibrations(std::string baseline_path)
     	std::istringstream stream(line);
     	stream >> fpga >> hybrid >> channel >> baseline >> noise;
 
+		// Check if the maps contain the correct fpga/hybrid pair
     	// Load the baseline and noise maps with the calibration variables
     	std::pair<int, int> daq_pair = std::make_pair(fpga, hybrid);
+		baseline_it = baseline_map.find(daq_pair); 
+		if(baseline_it == baseline_map.end()){
+    		baseline_map[daq_pair] = std::vector<double>(640);
+    		noise_map[daq_pair] = std::vector<double>(640);
+		}
+
     	baseline_map[daq_pair][channel] = baseline;
     	noise_map[daq_pair][channel] = noise;
+
+		std::cout << "FPGA: " << fpga << " Hybrid: " << hybrid 
+				  << " Channel: " << channel 
+				  << " Baseline: " << baseline_map[daq_pair][channel] 
+				  << std::endl;
 
 //    	std::cout << "fpga: " << fpga << " hybrid: " << hybrid << " channel: " << channel << " baseline: " << baseline << " noise " << noise << std::endl;
 
