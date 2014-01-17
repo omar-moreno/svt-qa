@@ -272,6 +272,7 @@ int main(int argc, char **argv)
 
 				read_config = false;
 
+				file_path = output_path + "/plots";
 
 				if(r_file == NULL){ 
 					// Setup the file names to output the plots to
@@ -293,14 +294,12 @@ int main(int argc, char **argv)
 
 					// If a "plots" folder does not exist, create it. This folder will be used
 					// to store any ROOT files generated along with all plots.
-					file_path = output_path + "/plots";
 					if(stat(file_path.c_str(), &sb) == -1){
 						mkdir(file_path.c_str(), 0777);
 					}
 
 					cout << "Files will be saved to " << file_path << endl;
 					cout << "Saving to file " << output_file_name << endl;
-
 
 					// Open a ROOT file to save some simple calibration variables
 					r_file = new TFile((file_path + "/" + output_file_name + ".root").c_str(), "recreate");
@@ -408,7 +407,7 @@ int main(int argc, char **argv)
 
 	}
 
-	PlotUtils::adjust2DPlotRange(h_amplitude, 0);
+	PlotUtils::adjust2DPlotRange(h_amplitude, 1);
 	h_amplitude->Draw("colz");
 	PlotUtils::set2DPlotStyle(h_amplitude, "Physical Channel #", "Pedestal Subtracted Amplitude [ADC Counts]");
 	canvas->Print((file_path + "/" + output_file_name + output_file_ext + "(").c_str());
@@ -417,7 +416,7 @@ int main(int argc, char **argv)
 	g_mean_amplitude->GetXaxis()->SetRangeUser(0, 640);  
 	canvas->Print((file_path + "/" + output_file_name + output_file_ext + "(").c_str());
 
-	PlotUtils::adjust2DPlotRange(h_tp, 0); 
+	PlotUtils::adjust2DPlotRange(h_tp, 1); 
 	h_tp->Draw("colz"); 
 	PlotUtils::set2DPlotStyle(h_tp, "Physical Channel #", "t_{p} [ns]");
 	canvas->Print((file_path + "/" + output_file_name + output_file_ext + "(").c_str());
@@ -426,7 +425,7 @@ int main(int argc, char **argv)
 	g_mean_tp->GetXaxis()->SetRangeUser(0, 640);
 	canvas->Print((file_path + "/" + output_file_name + output_file_ext + "(").c_str());
 
-	PlotUtils::adjust2DPlotRange(h_t0, 0); 
+	PlotUtils::adjust2DPlotRange(h_t0, 1); 
 	h_t0->Draw("colz"); 
 	PlotUtils::set2DPlotStyle(h_t0, "Physical Channel #", "t_{0} [ns]");
 	canvas->Print((file_path + "/" + output_file_name + output_file_ext + "(").c_str());
