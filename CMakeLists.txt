@@ -30,9 +30,10 @@ include_directories("${TRACKER_HDR_DIR}")
 set(GENERIC_HDR_DIR "$ENV{DAQ_HOME}/generic")
 include_directories("${GENERIC_HDR_DIR}")
 
-
 # Include the ROOT headers
 include_directories("$ENV{ROOTSYS}/include")
+
+include_directories("/usr/include/libxml2")
 
 # Add the utils subdirectory to the build
 add_subdirectory("${SVT_DAQ_ANALYSIS_SOURCE_DIR}/src/utils")
