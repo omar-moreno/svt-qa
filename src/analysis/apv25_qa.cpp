@@ -134,6 +134,10 @@ int main(int argc, char **argv)
 		files.push_back(input_file_name); 
 	} else if(input_file_list_name.length() > 0){
 		ifstream input_file_list(input_file_list_name.c_str(), ifstream::in);
+		if(!input_file_list.is_open()){
+			cerr << "Failed to open file " << input_file_list << "!" << endl;
+			return EXIT_FAILURE; 
+		}
 		while(input_file_list >> file){
 			files.push_back(file); 
 		}
