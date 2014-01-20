@@ -13,6 +13,8 @@ find_library(ROOT_CINT_LIB Cint $ENV{ROOTSYS}/lib)
 find_library(ROOT_THREAD_LIB Thread $ENV{ROOTSYS}/lib)
 find_library(ROOT_SQLIO_LIB SQLIO $ENV{ROOTSYS}/lib)
 find_library(ROOT_NET_LIB Net $ENV{ROOTSYS}/lib)
+find_library(ROO_FIT_LIB RooFit $ENV{ROOTSYS}/lib)
+find_library(ROO_FIT_CORE_LIB RooFitCore $ENV{ROOTSYS}/lib)
 
 # Find the required SVT DAQ files
 LIST(APPEND CMAKE_FIND_LIBRARY_SUFFIXES ".o")
@@ -33,3 +35,6 @@ target_link_libraries(apv25_qa ${ROOT_TREE_LIB} ${ROOT_CORE_LIB} ${ROOT_RIO_LIB}
 
 add_executable(apv25_gain apv25_gain.cxx)
 target_link_libraries(apv25_gain ${ROOT_TREE_LIB} ${ROOT_CORE_LIB} ${ROOT_RIO_LIB} ${ROOT_PHYSICS_LIB} PlotUtils ${TRACKER_EVENT_LIB} ${TRACKER_SAMPLE_LIB} ${DATA_READ_LIB} ${DATA_LIB} ${ROOT_GPAD_LIB} ${ROOT_HIST_LIB} ${ROOT_GRAF_LIB} ${ROOT_MATHCORE_LIB} ${XMLVARIABLES_LIB} ${ROOT_MATRIX_LIB} ${ROOT_CINT_LIB} ${ROOT_THREAD_LIB} ${ROOT_SQLIO_LIB} ${XML_LIB} ${ROOT_NET_LIB}) 
+
+add_executable(source_analysis source_analysis.cxx)
+target_link_libraries(source_analysis ${ROOT_TREE_LIB} ${ROOT_CORE_LIB} ${ROOT_RIO_LIB} ${ROOT_PHYSICS_LIB} PlotUtils ${TRACKER_EVENT_LIB} ${TRACKER_SAMPLE_LIB} ${DATA_READ_LIB} ${DATA_LIB} ${ROOT_GPAD_LIB} ${ROOT_HIST_LIB} ${ROOT_GRAF_LIB} ${ROOT_MATHCORE_LIB} ${XMLVARIABLES_LIB} ${ROOT_MATRIX_LIB} ${ROOT_CINT_LIB} ${ROOT_THREAD_LIB} ${ROOT_SQLIO_LIB} ${XML_LIB} ${ROOT_NET_LIB} SvtCalibrations ${ROO_FIT_LIB} ${ROO_FIT_CORE_LIB} Apv25Utils) 
