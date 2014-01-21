@@ -12,6 +12,7 @@
 #include <fstream>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <iomanip>
 
 //--- DAQ ---//
 //---------------//
@@ -409,21 +410,37 @@ int main(int argc, char **argv)
 	canvas->Print((file_path + "/" + output_file_name + "_ch_signal_samples" + output_file_ext + "]").c_str());
 
 
+	ofstream output_amplitude; 
+	output_amplitude.open((file_path + "/" + output_file_name + ".amplitude").c_str()); 
 	canvas->Print((file_path + "/" + output_file_name + "_ch_signal_amplitude" + output_file_ext + "[").c_str());
 	double entries = 0; 
-	double error = 0; 
+	double error = 0;
+	double mean = 0; 
+	double rms = 0; 	
 	for(channel = 0; channel < 640; ++channel){
 		entries = sig_amps[channel]->GetEntries(); 
 		if(entries == 0) continue;
 		sig_amps[channel]->Fit("gaus", "q");
-		g_n_events->SetPoint(channel, channel, entries); 
-		g_mean_sig_amp->SetPoint(channel, channel, sig_amps[channel]->GetFunction("gaus")->GetParameter(1));
-		error = sig_amps[channel]->GetFunction("gaus")->GetParameter(2)/sqrt(entries); 
+		g_n_events->SetPoint(channel, channel, entries);
+		mean = sig_amps[channel]->GetFunction("gaus")->GetParameter(1); 
+		rms = sig_amps[channel]->GetFunction("gaus")->GetParameter(2); 	
+		g_mean_sig_amp->SetPoint(channel, channel, mean);
+		error = rms/sqrt(entries); 
 		g_mean_sig_amp->SetPointError(channel, 0, error); 	
 		sig_amps[channel]->Draw();
+		PlotUtils::set1DPlotStyle(sig_amps[channel], "Signal Amplitude [ADC Counts]"); 
 		//		PlotUtils::set2DPlotStyle(signal_samples[channel], "Sample Number", "Amplitude [ADC Counts]");
 		canvas->Print((file_path + "/" + output_file_name + "_ch_signal_amplitude" + output_file_ext + "(").c_str());
 
+		if(output_amplitude.is_open()){
+			output_amplitude << setw(15) << fpga 
+				<< setw(15) << hybrid
+				<< setw(15) << channel
+				<< fixed
+				<< setw(15) << setprecision(5) << mean 
+				<< setw(15) << setprecision(5) << rms << "\n"; 
+		}
+	
 	}
 	canvas->Print((file_path + "/" + output_file_name + "_ch_signal_amplitude" + output_file_ext + "]").c_str());
 
@@ -550,6 +567,9 @@ int main(int argc, char **argv)
 	h_four_above_thresh->Draw("same"); 
 
 	canvas->Print((file_path + "/" + output_file_name + output_file_ext + ")").c_str());
+
+
+	output_amplitude.close(); 
 
 	return EXIT_SUCCESS;
 }
