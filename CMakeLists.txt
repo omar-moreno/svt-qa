@@ -39,5 +39,5 @@ include_directories("/usr/include/libxml2")
 add_subdirectory("${SVT_DAQ_ANALYSIS_SOURCE_DIR}/src/utils")
 
 # Add the analysis subdirectory to the build
-add_subdirectory("${SVT_DAQ_ANALYSIS_SOURCE_DIR}/src/analysis")
+add_subdirectory("${SVT_DAQ_ANALYSIS_SOURCE_DIR}/src/qa")
 
