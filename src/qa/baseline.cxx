@@ -139,10 +139,10 @@ int main(int argc, char **argv)
 	PlotUtils::setupCanvas(canvas);
 	PlotUtils::setContours();  
 
-	TH2F* h_pedestal = new TH2F("baseline", "Baseline", 640, 0, 640, 8000, 2000, 10000);
+	TH2F* h_pedestal = new TH2F("baseline", "Baseline", 640, 0, 640, 16384, 0, 16384);
 	h_pedestal->SetStats(0);
 	vector<TH2F*> h_pedestal_sample;
-	PlotUtils::initMulti2DPlots(6, h_pedestal_sample, "Baseline_Sample", 640, 0, 640, 8000, 2000, 10000);
+	PlotUtils::initMulti2DPlots(6, h_pedestal_sample, "Baseline_Sample", 640, 0, 640, 16384, 0, 16384);
 	TGraph* g_mean  = new TGraph();
 	g_mean->SetMarkerSize(0.4);
 	g_mean->SetMarkerColor(kBlue-4);
@@ -379,6 +379,7 @@ int main(int argc, char **argv)
 	h_pedestal->Draw("colz");
 	PlotUtils::set2DPlotStyle(h_pedestal, "Physical Channel #", "Baseline [ADC Counts]");
 	h_pedestal->SetTitle(title_prefix.c_str());
+	h_pedestal->Write(); 
 	canvas->Print((file_path + "/" + output_file_name + output_file_ext + "(").c_str());
 
 	canvas->Clear();
@@ -387,6 +388,7 @@ int main(int argc, char **argv)
 	PlotUtils::set2DPlotStyle(g_mean, "Physical Channel #", "Mean Baseline [ADC Counts]"); 
 	//g_mean->SetTitle(title_prefix.c_str());
 	//g_mean->GetYaxis()->SetRangeUser(5000, 7000);
+	g_mean->Write(); 
 	canvas->Print((file_path + "/" + output_file_name + output_file_ext + "(").c_str());
 
 	canvas->Clear();
@@ -396,6 +398,7 @@ int main(int argc, char **argv)
 	mg_mean_baseline->SetTitle(title_prefix.c_str());
 	//mg_mean_baseline->GetYaxis()->SetRangeUser(5000, 7000);
 	legend->Draw();
+	mg_mean_baseline->Write(); 
 	canvas->Print((file_path + "/" + output_file_name + output_file_ext + "(").c_str());
 
 	canvas->Clear();
@@ -404,6 +407,7 @@ int main(int argc, char **argv)
 	PlotUtils::set2DPlotStyle(mg_mean_baseline_diff, "Physical Channel #", "Difference [ADC Counts]");
 	mg_mean_baseline_diff->SetTitle(title_prefix.c_str());
 	legend->Draw();
+	mg_mean_baseline_diff->Write(); 
 	canvas->Print((file_path + "/" + output_file_name + output_file_ext + "(").c_str());
 
 
@@ -412,7 +416,7 @@ int main(int argc, char **argv)
 	g_noise->GetXaxis()->SetRangeUser(0, 639);
 	PlotUtils::set2DPlotStyle(g_noise, "Physical Channel #", "Noise [ADC Counts]");
 	g_noise->SetTitle(title_prefix.c_str());
-	//g_noise->GetYaxis()->SetRangeUser(0, 100);
+	g_noise->Write(); 
 	canvas->Print((file_path + "/" + output_file_name + output_file_ext + "(").c_str());
 
 	canvas->Clear();
@@ -420,8 +424,8 @@ int main(int argc, char **argv)
 	mg_noise->GetXaxis()->SetRangeUser(0, 639);
 	PlotUtils::set2DPlotStyle(mg_noise, "Physical Channel #", "Noise [ADC Counts]");
 	mg_noise->SetTitle(title_prefix.c_str());
-	//mg_noise->GetYaxis()->SetRangeUser(0, 100);
 	legend->Draw();
+	mg_noise->Write(); 
 	canvas->Print((file_path + "/" + output_file_name + output_file_ext + "(").c_str());
 
 	canvas->Clear();
@@ -430,6 +434,7 @@ int main(int argc, char **argv)
 	PlotUtils::set2DPlotStyle(mg_noise_diff, "Physical Channel #", "Difference [ADC Counts]");
 	mg_noise_diff->SetTitle(title_prefix.c_str());
 	legend->Draw();
+	mg_noise_diff->Write(); 
 	canvas->Print((file_path + "/" + output_file_name + output_file_ext + ")").c_str());
 
 	baseline_file_name.close();
