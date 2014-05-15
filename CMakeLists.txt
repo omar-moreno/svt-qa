@@ -18,10 +18,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${SVT_DAQ_ANALYSIS_BINARY_DIR}/bin")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${SVT_DAQ_ANALYSIS_BINARY_DIR}/lib")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${SVT_DAQ_ANALYSIS_BINARY_DIR}/lib")
 
-# Include utils headers
-set(UTILS_HDR_DIR "${SVT_DAQ_ANALYSIS_SOURCE_DIR}/include/utils")
-include_directories("${UTILS_HDR_DIR}")
-
 # Include tracker headers
 set(TRACKER_HDR_DIR "$ENV{DAQ_HOME}/tracker")
 include_directories("${TRACKER_HDR_DIR}")
@@ -29,6 +25,14 @@ include_directories("${TRACKER_HDR_DIR}")
 # Include generic headers
 set(GENERIC_HDR_DIR "$ENV{DAQ_HOME}/generic")
 include_directories("${GENERIC_HDR_DIR}")
+
+# Include utils headers
+set(UTILS_HDR_DIR "${SVT_DAQ_ANALYSIS_SOURCE_DIR}/include/utils")
+include_directories("${UTILS_HDR_DIR}")
+
+# 
+set(QA_HDR_DIR "${SVT_DAQ_ANALYSIS_SOURCE_DIR}/include/qa")
+include_directories("${QA_HDR_DIR}")
 
 # Include the ROOT headers
 include_directories("$ENV{ROOTSYS}/include")

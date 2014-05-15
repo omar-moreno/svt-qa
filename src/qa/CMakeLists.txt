@@ -33,6 +33,9 @@ find_library(RT_LIB rt /usr/lib)
 # Find bz2 libraries
 find_library(BZ2_LIB bz2 /usr/lib)
 
+add_library(BaselineAnalysis BaselineAnalysis.cxx)
+target_link_libraries(BaselineAnalysis ${TRACKER_SAMPLE_LIB} ${ROOT_HIST_LIB} ${ROOT_GPAD_LIB})
+
 add_executable(baseline baseline.cxx)
 target_link_libraries(baseline ${ROOT_TREE_LIB} ${ROOT_CORE_LIB} ${ROOT_RIO_LIB} ${ROOT_PHYSICS_LIB} PlotUtils Apv25Utils ${TRACKER_EVENT_LIB} ${TRACKER_SAMPLE_LIB} ${DATA_READ_LIB} ${DATA_LIB} ${ROOT_GPAD_LIB} ${ROOT_HIST_LIB} ${ROOT_GRAF_LIB} ${ROOT_MATHCORE_LIB} ${XMLVARIABLES_LIB} ${ROOT_MATRIX_LIB} ${ROOT_CINT_LIB} ${ROOT_THREAD_LIB} ${ROOT_SQLIO_LIB} ${XML_LIB} ${ROOT_NET_LIB} ${RT_LIB} ${BZ2_LIB}) 
 
@@ -46,4 +49,4 @@ add_executable(source_analysis source_analysis.cxx)
 target_link_libraries(source_analysis ${ROOT_TREE_LIB} ${ROOT_CORE_LIB} ${ROOT_RIO_LIB} ${ROOT_PHYSICS_LIB} PlotUtils ${TRACKER_EVENT_LIB} ${TRACKER_SAMPLE_LIB} ${DATA_READ_LIB} ${DATA_LIB} ${ROOT_GPAD_LIB} ${ROOT_HIST_LIB} ${ROOT_GRAF_LIB} ${ROOT_MATHCORE_LIB} ${XMLVARIABLES_LIB} ${ROOT_MATRIX_LIB} ${ROOT_CINT_LIB} ${ROOT_THREAD_LIB} ${ROOT_SQLIO_LIB} ${XML_LIB} ${ROOT_NET_LIB} SvtCalibrations ${ROO_FIT_LIB} ${ROO_FIT_CORE_LIB} Apv25Utils ${RT_LIB} ${BZ2_LIB}) 
 
 add_executable(svt_qa svt_qa.cxx)
-target_link_libraries(svt_qa ${TRACKER_EVENT_LIB} ${TRACKER_SAMPLE_LIB} ${DATA_READ_LIB} ${DATA_LIB} ${XMLVARIABLES_LIB} ${XML_LIB} ${RT_LIB} ${BZ2_LIB})
+target_link_libraries(svt_qa ${TRACKER_EVENT_LIB} ${DATA_READ_LIB} ${DATA_LIB} ${XMLVARIABLES_LIB} ${XML_LIB} ${RT_LIB} ${BZ2_LIB} BaselineAnalysis Apv25Utils)
