@@ -11,14 +11,20 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-//--- DAQ ---//
-//-----------//
+//--- SVT DAQ ---//
+//---------------//
 #include <TrackerEvent.h>
 #include <TrackerSample.h>
 #include <DataRead.h>
 #include <Data.h>
 
+//--- SVT QA ---//
+//--------------//
+#include <BaselineAnalysis.h>
+
 using namespace std; 
+
+void displayUsage(); 
 
 int main(int argc, char **argv)
 {
@@ -37,14 +43,15 @@ int main(int argc, char **argv)
 			case 'b': 
 				run_baseline = true; 
 				break;
-			default: 
+			default:
+               displayUsage();  
 				break;
 		}
 	}
 
 	// If an input file (binary or EVIO) was not specified, exit the program
 	if(input_file_name.length() == 0){
-		cerr << "\nPlease specify a file to process." << endl;
+		cerr << "\nPlease specify a file to process.\n" << endl;
 		return EXIT_FAILURE; 
 	}
 
@@ -61,6 +68,14 @@ int main(int argc, char **argv)
 
 	cout << "Processing file " << input_file_name << endl;
 
+    // TODO: All analyses should be loaded dynamically
+    BaselineAnalysis* baseline_ana = new BaselineAnalysis(); 
+    
+    if(run_baseline){
+        cout << "Running baseline analysis" << endl;
+        baseline_ana->initialize();
+    } 
+
 	int event_number = 0; 
 	int channel;
 	// Loop through all of the events until the end of file is reached
@@ -75,10 +90,22 @@ int main(int argc, char **argv)
 			// Get the samples
 			samples = event->sample(samples_n); 
 
-			if(run_baseline){
-			}	
+			if(run_baseline) baseline_ana->processEvent(samples);
 		}
 	}
 
+    if(run_baseline) baseline_ana->finalize(); 
+
 	return EXIT_FAILURE;
+}
+
+void displayUsage()
+{
+    cout << "\nUsage: svt_qa [OPTIONS] -i [INPUT_FILE]" << endl;
+    cout << "Either a binary or EVIO INPUT_FILE must be specified.\n" << endl;
+    cout << "OPTIONS:\n"
+         << "\t -i Input binary or EVIO file name \n"
+         << "\t -b Run the baseline analysis \n"
+         << "\t --help Display this help and exit \n"
+         << endl; 
 }
