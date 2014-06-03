@@ -34,6 +34,7 @@
 #include <TTree.h>
 #include <TFile.h>
 #include <TLegend.h>
+#include <TStyle.h>
 
 //--- Utils ---//
 //-------------//
@@ -48,27 +49,26 @@ int main(int argc, char **argv)
 {
 
 	string input_file_name; 
-	//string output_file_name = "baseline.pdf";
 	string output_path = ".";
-	uint fpga = 0;
-	uint hybrid = -1; 
+
+	int fpga = -1;
+	int hybrid = -1; 
+
+	int half_module_id = -1; 
 	int option_char; 
 	int number_events = 0; 
 	int run = -1;
-	bool short_hybrid = false;
+
 	// Parse any command line arguments. If there are no valid command line
 	// arguments given, print the usage.
-	while((option_char = getopt(argc, argv, "i:h:un:r:p:s")) != -1){
+	while((option_char = getopt(argc, argv, "i:h:un:r:p:m:")) != -1){
 		switch(option_char){
 			case 'i':
 				input_file_name = optarg;
 				break;
-				// case 'o':
-				//     output_file_name = optarg;
-				//     break;
-				// case 'f':
-				//     fpga = atoi(optarg); 
-				//     break; 
+			case 'm': 
+				half_module_id = atoi(optarg);
+				break;	
 			case 'h': 
 				hybrid = atoi(optarg); 
 				break; 
@@ -80,9 +80,6 @@ int main(int argc, char **argv)
 				break;
 			case 'p':
 				output_path = optarg;
-				break;
-			case 's':
-				short_hybrid = true; 
 				break;
 			case 'u':
 				displayUsage(); 
@@ -105,16 +102,21 @@ int main(int argc, char **argv)
 	  return EXIT_FAILURE;  
 	  }*/
 
-	// If a valid hybrid address was not specified, exit the program
-	if(hybrid <= uint(0)){
-		cout << "\nPlease specify a valid hybrid address."
-			<< "\n Use '-h' flag for usage.\n" << endl;
+	// If a valid hybrid or half-module id was not specified, exit the program
+	if(hybrid <= 0 && half_module_id <= 0){
+		cerr << "\n\tPlease specify the hybrid or half-module ID of the device under test"
+			<< "\n\tUse '-h' option to see usage.\n" << endl;
+		return EXIT_FAILURE;
+	} else if(hybrid > 0 && half_module_id > 0){
+		cerr << "\n\tCannot specify both a hybrid and half-module ID!"
+			<< "\n\tUse '-h' option to see usage.\n" << endl;
 		return EXIT_FAILURE;
 	}
 
+	// If a run number has not been set, exit the program
 	if(run <= 0){ 
-		cerr << "\nPlease specify a valid run number."
-			<< "\nUse '-h' flag for usage.\n" << endl;
+		cerr << "\n\tPlease specify a run number."
+			<< "\n\tUse '-h' option for usage.\n" << endl;
 		return EXIT_FAILURE; 
 	}
 
@@ -135,7 +137,12 @@ int main(int argc, char **argv)
 	//--- Setup Histograms ---//
 	//------------------------//
 	gErrorIgnoreLevel = kWarning; 
-	TCanvas *canvas = new TCanvas("canvas", "canvas", 500, 500);
+	gStyle->SetPadTopMargin(0.08); 
+	gStyle->SetPadRightMargin(0.12); 
+	gStyle->SetPadBottomMargin(0.12); 
+	gStyle->SetPadLeftMargin(0.12); 	
+
+	TCanvas *canvas = new TCanvas("canvas", "canvas", 600, 600);
 	PlotUtils::setupCanvas(canvas);
 	PlotUtils::setContours();  
 
@@ -195,6 +202,7 @@ int main(int argc, char **argv)
 	int channel;
 	int event_number = 0; 
 	double noise, baseline;
+	int old_apv; 
 
 	// Loop through all of the events until the end of file is reached 
 	while(dataRead->next(event)){
@@ -220,14 +228,16 @@ int main(int argc, char **argv)
 			//if(hybrid != samples->hybrid()) continue; 
 
 			// Get the physical channel 
-			channel = Apv25Utils::getPhysicalChannel(samples->apv(), samples->channel());
+			//old_apv = Apv25Utils::getOldApv(samples->apv()); 
+			old_apv = samples->apv(); 
+			channel = Apv25Utils::getPhysicalChannel(old_apv, samples->channel());
 
 			// For source test, comment out otherwise
 			/*if((samples->value(1) > samples->value(0) && samples->value(2) > samples->value(1)) ||
 			  (samples->value(2) > samples->value(1) && samples->value(3) > samples->value(2)) ||
 			  (samples->value(3) > samples->value(2) && samples->value(4) > samples->value(3)) ||
 			  (samples->value(4) > samples->value(3) && samples->value(5) > samples->value(4))) continue; 
-			 */
+			  */
 			for(int sample = 0; sample < 6; ++sample){
 				h_pedestal->Fill(channel, double(samples->value(sample)));
 				h_pedestal_sample[sample]->Fill(channel, double(samples->value(sample)));
@@ -240,16 +250,36 @@ int main(int argc, char **argv)
 	// Setup the output file names
 	string file_path, output_file_name;
 	string output_file_ext = ".pdf";
-	if(short_hybrid){
-		output_file_name = "hybrid_s"; 
-	} else { 
-		output_file_name = "hybrid"; 
+	string png_file_name = ""; 
+	if(hybrid > 0){
+		output_file_name = "hybrid";
+		png_file_name = "hybrid"; 	
+		if(hybrid < 10){
+			output_file_name += "0"; 
+			png_file_name += "0"; 
+		}
+		output_file_name += PlotUtils::convertToString(hybrid); 
+		png_file_name += PlotUtils::convertToString(hybrid); 
+	} else if(half_module_id > 0){ 
+		output_file_name = "hm";
+		png_file_name = "hm";
+		if(half_module_id < 10){
+			output_file_name += "0"; 
+			png_file_name += "0"; 
+		}
+		output_file_name += PlotUtils::convertToString(half_module_id); 	
+		png_file_name += PlotUtils::convertToString(half_module_id); 	
 	}
-	if(hybrid < 10) output_file_name += "0" + PlotUtils::convertToString(hybrid);
-	else output_file_name += PlotUtils::convertToString(hybrid); 
+
 	output_file_name += "_baseline_dtrig_run";
-	if(run < 10) output_file_name += "0" + PlotUtils::convertToString(run); 
-	else output_file_name += PlotUtils::convertToString(run); 
+	png_file_name += "_run"; 
+
+	if(run < 10){
+		output_file_name += "0";
+		png_file_name += "0"; 	
+	}
+	output_file_name	+= PlotUtils::convertToString(run); 
+	png_file_name	+= PlotUtils::convertToString(run) + "_"; 
 
 	// If a "baseline" folder does not exist, create it.  The channels
 	// baselines in text form will be stored here.
@@ -308,19 +338,28 @@ int main(int argc, char **argv)
 	g_mean->Set(639);
 	g_noise->Set(639);
 
+	TF1 *gaussian = new TF1("gaussian", "gaus"); 
+	double mean, rms; 	
 	for(channel = 0; channel < 640; channel++){
 
 		h_pedestal_proj = h_pedestal->ProjectionY(("Channel: " + PlotUtils::convertToString(channel)).c_str(), channel+1, channel+1, "e");
 		if(h_pedestal_proj->GetEntries() == 0) continue;
+		mean = h_pedestal_proj->GetMean();
+		rms = h_pedestal_proj->GetRMS(); 
 		PlotUtils::adjust1DPlotRange(h_pedestal_proj, 1); 
 		PlotUtils::set1DPlotStyle(h_pedestal_proj, "Baseline [ADC Counts]"); 
-		h_pedestal_proj->Fit("gaus", "q"); 
-		baseline = h_pedestal_proj->GetFunction("gaus")->GetParameter(1); 
-		noise = h_pedestal_proj->GetFunction("gaus")->GetParameter(2); 
+		//gaussian = new TF1("gaussian", "gaus", mean - 2*rms, mean + 2*rms);
+		gaussian->SetRange(mean - 3*rms, mean + 3*rms); 
+		h_pedestal_proj->Fit("gaussian", "RQ"); 
+		baseline = gaussian->GetParameter(1); 
+		noise = gaussian->GetParameter(2); 
+		//baseline = h_pedestal_proj->GetFunction("ga")->GetParameter(1); 
+		//noise = h_pedestal_proj->GetFunction("gaus")->GetParameter(2); 
 		g_mean->SetPoint(channel, channel, baseline);
 		g_noise->SetPoint(channel, channel, noise);
 		h_pedestal_proj->Draw("");  
 		canvas->Print((file_path + "/" + output_file_name + "_ch_plots" + output_file_ext + "(").c_str());
+		//delete gaussian; 
 
 		if(baseline_file_name.is_open()){
 			baseline_file_name << setw(15) << fpga
@@ -348,11 +387,16 @@ int main(int argc, char **argv)
 			title = "Channel: " + PlotUtils::convertToString(channel) + " Sample: " + PlotUtils::convertToString(sample);
 			h_pedestal_proj = h_pedestal_sample[sample]->ProjectionY(title.c_str(), channel+1, channel+1, "e");
 			if(h_pedestal_proj->GetEntries() == 0) continue;
-			PlotUtils::adjust1DPlotRange(h_pedestal_proj, 2);
+			mean = h_pedestal_proj->GetMean(); 
+			rms = h_pedestal_proj->GetRMS(); 
+			PlotUtils::adjust1DPlotRange(h_pedestal_proj, 1);
 			PlotUtils::set1DPlotStyle(h_pedestal_proj, "Baseline [ADC Counts]");
-			h_pedestal_proj->Fit("gaus", "q");
-			baseline = h_pedestal_proj->GetFunction("gaus")->GetParameter(1);
-			noise = h_pedestal_proj->GetFunction("gaus")->GetParameter(2);
+			gaussian->SetRange(mean - 3*rms, mean + 3*rms); 
+			h_pedestal_proj->Fit("gaussian", "RQ");
+			baseline = gaussian->GetParameter(1); 
+			noise = gaussian->GetParameter(2); 
+			//baseline = h_pedestal_proj->GetFunction("gaus")->GetParameter(1);
+			//noise = h_pedestal_proj->GetFunction("gaus")->GetParameter(2);
 			((TGraph*) g_baseline_list->At(sample))->SetPoint(channel, channel, baseline);
 			((TGraph*) g_noise_list->At(sample))->SetPoint(channel, channel, noise);
 			h_pedestal_proj->Draw("");
@@ -371,71 +415,83 @@ int main(int argc, char **argv)
 	//--- Save Summary Histograms ---//
 	//-------------------------------//
 
-	string title_prefix = "FPGA: " + PlotUtils::convertToString(fpga) + " Hybrid: " + PlotUtils::convertToString(hybrid);
+	string title_prefix = ""; 
+	if(fpga >= 0){
+		title_prefix += "FPGA: " + PlotUtils::convertToString(fpga) + " ";
+	}
+	if(hybrid >= 0){
+		title_prefix += "Hybrid: " + PlotUtils::convertToString(hybrid); + " "; 
+	}
 	output_file_name += "_summary";
 
 	PlotUtils::adjust2DPlotRange(h_pedestal, 0);  
 	canvas->Clear();
 	h_pedestal->Draw("colz");
 	PlotUtils::set2DPlotStyle(h_pedestal, "Physical Channel #", "Baseline [ADC Counts]");
-	h_pedestal->SetTitle(title_prefix.c_str());
+	//h_pedestal->SetTitle(title_prefix.c_str());
 	h_pedestal->Write(); 
 	canvas->Print((file_path + "/" + output_file_name + output_file_ext + "(").c_str());
+	canvas->SaveAs((png_file_name + "baseline.png").c_str());
+
 
 	canvas->Clear();
 	g_mean->Draw("A*");
 	g_mean->GetXaxis()->SetRangeUser(0, 639);
 	PlotUtils::set2DPlotStyle(g_mean, "Physical Channel #", "Mean Baseline [ADC Counts]"); 
-	//g_mean->SetTitle(title_prefix.c_str());
-	//g_mean->GetYaxis()->SetRangeUser(5000, 7000);
 	g_mean->Write(); 
 	canvas->Print((file_path + "/" + output_file_name + output_file_ext + "(").c_str());
+	canvas->SaveAs((png_file_name + "mean_baseline.png").c_str());
 
 	canvas->Clear();
 	mg_mean_baseline->Draw("A*");
 	mg_mean_baseline->GetXaxis()->SetRangeUser(0, 639);
-	PlotUtils::set2DPlotStyle(mg_mean_baseline, "Physical Channel #", "Mean Baseline [ADC Counts]");
-	mg_mean_baseline->SetTitle(title_prefix.c_str());
-	//mg_mean_baseline->GetYaxis()->SetRangeUser(5000, 7000);
+	PlotUtils::set2DPlotStyle(mg_mean_baseline, "Physical Channel #", "Sample Mean Baseline [ADC Counts]");
+	//mg_mean_baseline->SetTitle(title_prefix.c_str());
 	legend->Draw();
 	mg_mean_baseline->Write(); 
 	canvas->Print((file_path + "/" + output_file_name + output_file_ext + "(").c_str());
+	canvas->SaveAs((png_file_name + "sample_mean_baseline.png").c_str());
 
 	canvas->Clear();
 	mg_mean_baseline_diff->Draw("A*");
 	mg_mean_baseline_diff->GetXaxis()->SetRangeUser(0, 639);
-	PlotUtils::set2DPlotStyle(mg_mean_baseline_diff, "Physical Channel #", "Difference [ADC Counts]");
-	mg_mean_baseline_diff->SetTitle(title_prefix.c_str());
+	PlotUtils::set2DPlotStyle(mg_mean_baseline_diff, "Physical Channel #", "Baseline Sample-to-Sample Variation [ADC Counts]");
+	//	PlotUtils::set2DPlotStyle(mg_mean_baseline_diff, "Physical Channel #", "Difference [ADC Counts]");
+	//mg_mean_baseline_diff->SetTitle(title_prefix.c_str());
 	legend->Draw();
 	mg_mean_baseline_diff->Write(); 
 	canvas->Print((file_path + "/" + output_file_name + output_file_ext + "(").c_str());
-
+	canvas->SaveAs((png_file_name + "sts_var_baseline.png").c_str());
 
 	canvas->Clear();
 	g_noise->Draw("A*");
 	g_noise->GetXaxis()->SetRangeUser(0, 639);
 	PlotUtils::set2DPlotStyle(g_noise, "Physical Channel #", "Noise [ADC Counts]");
-	g_noise->SetTitle(title_prefix.c_str());
+	//g_noise->SetTitle(title_prefix.c_str());
 	g_noise->Write(); 
 	canvas->Print((file_path + "/" + output_file_name + output_file_ext + "(").c_str());
+	canvas->SaveAs((png_file_name + "noise_zoom.png").c_str());
 
 	canvas->Clear();
 	mg_noise->Draw("A*");
 	mg_noise->GetXaxis()->SetRangeUser(0, 639);
-	PlotUtils::set2DPlotStyle(mg_noise, "Physical Channel #", "Noise [ADC Counts]");
-	mg_noise->SetTitle(title_prefix.c_str());
+	PlotUtils::set2DPlotStyle(mg_noise, "Physical Channel #", "Sample Noise [ADC Counts]");
+	//mg_noise->SetTitle(title_prefix.c_str());
 	legend->Draw();
 	mg_noise->Write(); 
 	canvas->Print((file_path + "/" + output_file_name + output_file_ext + "(").c_str());
+	canvas->SaveAs((png_file_name + "sample_noise.png").c_str());
+
 
 	canvas->Clear();
 	mg_noise_diff->Draw("A*");
 	mg_noise_diff->GetXaxis()->SetRangeUser(0, 639);
-	PlotUtils::set2DPlotStyle(mg_noise_diff, "Physical Channel #", "Difference [ADC Counts]");
-	mg_noise_diff->SetTitle(title_prefix.c_str());
+	PlotUtils::set2DPlotStyle(mg_noise_diff, "Physical Channel #", "Noise Sample-to-Sample Variation [ADC Counts]");
+	//mg_noise_diff->SetTitle(title_prefix.c_str());
 	legend->Draw();
 	mg_noise_diff->Write(); 
 	canvas->Print((file_path + "/" + output_file_name + output_file_ext + ")").c_str());
+	canvas->SaveAs((png_file_name + "sts_var_noise.png").c_str());
 
 	baseline_file_name.close();
 
@@ -450,13 +506,11 @@ void displayUsage()
 {
 	cout << "Usage: baseline [OPTIONS] ..."                 << endl;
 	cout << "Example: baseline -i input_file.bin"           << endl;
-	cout << "\n\t -i    Input file to be processed"         << endl;
-	//cout << "\t -o    Optional output file name. By default," 
-	//     << " all output is written to default.pdf"         << endl;
-	//cout << "\t -f    FPGA address in the range of 0-6"     << endl;
-	cout << "\t -h    Hybrid address in the range of 0-2"   << endl;
+	cout << "\n\t -i  Input file to be processed"         << endl;
+	cout << "\t -h    Hybrid ID of the device under test"   << endl;
 	cout << "\t -r    Run number. Used if ROOT output is enabled" << endl;
 	cout << "\t -p    Path to save all output files to"     << endl;
+	cout << "\t -m 	  Half-module ID of the device under test" << endl;
 	cout << "\t -u    Show this usage \n"                   << endl;
 	exit(EXIT_FAILURE);
 }
