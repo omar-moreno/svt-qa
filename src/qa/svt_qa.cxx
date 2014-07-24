@@ -13,8 +13,8 @@
 
 //--- SVT DAQ ---//
 //---------------//
-#include <TrackerEvent.h>
-#include <TrackerSample.h>
+#include <TriggerEvent.h>
+#include <TriggerSample.h>
 #include <DataRead.h>
 #include <Data.h>
 
@@ -56,8 +56,8 @@ int main(int argc, char **argv)
 	}
 
 	// 
-	TrackerEvent *event = new TrackerEvent(); 
-	TrackerSample *samples = NULL; 
+	TriggerEvent* trigger_event = new TriggerEvent();
+    TriggerSample* trigger_samples = new TriggerSample(); 
 	DataRead *data_reader = new DataRead(); 
 
 	// Open the input file.  If the input file can't be opened, exit.
@@ -76,21 +76,21 @@ int main(int argc, char **argv)
         baseline_ana->initialize();
     } 
 
-	int event_number = 0; 
+    int event_number = 0; 
 	int channel;
 	// Loop through all of the events until the end of file is reached
-	while(data_reader->next(event)){
+	while(data_reader->next(trigger_event)){
 	
 		++event_number;
 		if(event_number%500 == 0) cout << "Processing event " << event_number << endl;
 
-		// Loop through all the channels that have samples
-		for(uint samples_n = 0; samples_n < event->count(); samples_n++){
+		// Loop through all sets of samples in the event container
+		for(uint sample_set_n = 0; sample_set_n < trigger_event->count(); samples_set_n++){
 					
 			// Get the samples
-			samples = event->sample(samples_n); 
+			trigger_samples = trigger_event->sample(samples_set_n); 
 
-			if(run_baseline) baseline_ana->processEvent(samples);
+			if(run_baseline) baseline_ana->processEvent(trigger_samples);
 		}
 	}
 
