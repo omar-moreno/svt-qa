@@ -11,6 +11,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-u", "--user", help="Database user name")
 parser.add_argument("-p", "--password", help="Password")
 parser.add_argument("-c", "--host", help="Hostname")
+#parser.add_argument("
 args = parser.parse_args()
 
 # If a hostname is not specified, notify the user and exit
@@ -30,6 +31,13 @@ if not args.password:
 	print "\nPlease specify the password used to access the database."
 	print "Use the -h flag for usage.\n"
 	sys.exit(2)
+
+# Set some "constants"
+TOTAL_SENSORS = 36
+TOTAL_CHANNELS_PER_HYBRID = 640
+TOTAL_SVT_CHANNEL_IDS = TOTAL_CHANNELS_PER_HYBRID*TOTAL_SENSORS
+TOTAL_FEB = 10
+MAX_HYBRIDS_PER_FEB = 4
 
 # Connect to the database
 print "Connecting to the database hps_conditions_dev ..."
@@ -86,20 +94,21 @@ daq_list = [
 
 # If the first collection (collection_id = 0) exist, delete it and 
 # load new defaults
-sql_query = "SELECT * FROM eng_run_svt_daq_map WHERE collection_id = '%i'" % (0) 
+sql_query = "SELECT * FROM svt_daq_map WHERE collection_id = '%i'" % (0) 
 
 try:
 	cursor.execute(sql_query)
 	results = cursor.fetchall()
 
 	if len(results) != 0:
-		sql_query = "DELETE FROM eng_run_svt_daq_map WHERE collection_id = '%i'" % (0)
+		sql_query = "DELETE FROM svt_daq_map WHERE collection_id = '%i'" % (0)
 		print "Deleting current SVT DAQ map defaults ..."
 		cursor.execute(sql_query)
+		database.commit()
 	
 	print "Loading default DAQ map ..."
 	for daq_item in daq_list: 
-		sql_query = "INSERT INTO eng_run_svt_daq_map(id,\
+		sql_query = "INSERT INTO svt_daq_map(id,\
 					collection_id,\
 					feb_id, feb_hybrid_id,\
 					hybrid_id,\
@@ -107,10 +116,10 @@ try:
 					layer,\
 					orientation)\
 					VALUES('%i', '%i', '%i', '%i', '%i', '%s', '%i', '%s')" % daq_item 
-		
 		cursor.execute(sql_query)
-		database.commit()
+	database.commit()
 except: 
+	print "[ERROR]: Unable to load SVT DAQ map."
 	database.rollback()
 
 #--------------------------------#
@@ -120,34 +129,166 @@ except:
 
 # If the first collection (collection_id = 0) exist, delete it and 
 # load new defaults
-sql_query = "SELECT * FROM eng_run_svt_channels WHERE collection_id = '%i'" % (0) 
+sql_query = "SELECT * FROM svt_channels WHERE collection_id = '%i'" % (0) 
 
 try:
 	cursor.execute(sql_query)
 	results = cursor.fetchall()
 
 	if len(results) != 0:
-		sql_query = "DELETE FROM eng_run_svt_channels WHERE collection_id = '%i'" % (0)
+		sql_query = "DELETE FROM svt_channels WHERE collection_id = '%i'" % (0)
 		print "Deleting current default SVT channel map ..."
 		cursor.execute(sql_query)
+		database.commit()
 	
 	print "Loading default SVT channel map ..."
 	channel_id = 0
-	for feb_id in range(0, 10):
-		for feb_hybrid_id in range(0, 4):
+	for feb_id in range(0, TOTAL_FEB):
+		for feb_hybrid_id in range(0, MAX_HYBRIDS_PER_FEB):
 			if (feb_id == 0 or feb_id == 1 or feb_id == 5 or feb_id == 6) and (feb_hybrid_id == 3): continue
-			for channel in range(0, 640):
-				channel_id += 1
-				#print "Channel ID: " + str(channel_id) + " FEB ID: " + str(feb_id) + " FEB Hybrid ID: " + str(feb_hybrid_id) + " Channel: " + str(channel)
-				sql_query = "INSERT INTO eng_run_svt_channels(id, collection_id,\
+			for channel in range(0, TOTAL_CHANNELS_PER_HYBRID):
+				sql_query = "INSERT INTO svt_channels(id, collection_id, channel_id,\
 						feb_id,\
 						feb_hybrid_id,\
 						channel)\
-						VALUES('%i', '%i', '%i', '%i', '%i')" % (channel_id, 0, feb_id, feb_hybrid_id, channel)
-						
+						VALUES('%i', '%i', '%i', '%i', '%i', '%i')" % (channel_id+1, 0, channel_id, feb_id, feb_hybrid_id, channel)
 				cursor.execute(sql_query)
-				database.commit()
-except: 
+				channel_id += 1
+	database.commit()
+except:
+	print "[ERROR]: Unable to load SVT channel ID map."
+	database.rollback()
+
+#--- Load default values of pedestal and noise for all SVT channels ---#
+#----------------------------------------------------------------------#
+
+# If the first collection (collection_id = 0) exist, delete it and load new 
+# defaults
+sql_query = "SELECT * FROM svt_calibrations WHERE collection_id = '%i'" % (0) 
+
+try:
+	cursor.execute(sql_query)
+	results = cursor.fetchall()
+
+	if len(results) != 0:
+		sql_query = "DELETE FROM svt_calibrations WHERE collection_id = '%i'" % (0)
+		print "Deleting existing default values of pedestal and noise for all all SVT channels ..."
+		cursor.execute(sql_query)
+		database.commit()
+	
+	print "Loading default values of pedestal and noise for all SVT channels ..."
+	pedestal = 4500.
+	noise = 30.
+	for svt_channel_id in range(0, TOTAL_SVT_CHANNEL_IDS):
+		sql_query = "INSERT INTO svt_calibrations(id, collection_id, svt_channel_id,\
+				pedestal_0, pedestal_1, pedestal_2, pedestal_3, pedestal_4, pedestal_5,\
+				noise_0, noise_1, noise_2, noise_3, noise_4, noise_5)\
+				VALUES('%i', '%i', '%i', '%f', '%f', '%f', '%f', '%f', '%f', '%f', '%f', '%f', '%f', '%f', '%f')"\
+				% (svt_channel_id+1, 0, svt_channel_id,\
+				pedestal, pedestal, pedestal, pedestal, pedestal, pedestal,\
+				noise, noise, noise, noise, noise, noise)
+
+		cursor.execute(sql_query)
+	database.commit()
+except:
+	print "[ERROR]: Unable to load pedestal and noise values."
+	database.rollback()
+
+#--- Load default values of gain and offset for all SVT channels ---#
+#-------------------------------------------------------------------#
+
+# If the first collection (collection_id = 0) exist, delete it and load new 
+# defaults
+sql_query = "SELECT * FROM svt_gains WHERE collection_id = '%i'" % (0) 
+
+try:
+	cursor.execute(sql_query)
+	results = cursor.fetchall()
+
+	if len(results) != 0:
+		sql_query = "DELETE FROM svt_gains WHERE collection_id = '%i'" % (0)
+		print "Deleting existing default values of gain and offset for all all SVT channels ..."
+		cursor.execute(sql_query)
+		database.commit()
+	
+	print "Loading default values of gain and offset for all SVT channels ..."
+	gain = 0.1
+	offset = 0 
+	for svt_channel_id in range(0, TOTAL_SVT_CHANNEL_IDS):
+		sql_query = "INSERT INTO svt_gains(id, collection_id, svt_channel_id,\
+				gain, offset)\
+				VALUES('%i', '%i', '%i', '%f', '%f')"\
+				% (svt_channel_id+1, 0, svt_channel_id, gain, offset)
+		cursor.execute(sql_query)
+	database.commit()
+except:
+	print "[ERROR]: Unable to load gain and offset values."
+	database.rollback()
+
+#--- Load default values of shape fit parameters for all SVT channels ---#
+#------------------------------------------------------------------------#
+
+# If the first collection (collection_id = 0) exist, delete it and load new 
+# defaults
+sql_query = "SELECT * FROM svt_shape_fit_parameters WHERE collection_id = '%i'" % (0) 
+
+try:
+	cursor.execute(sql_query)
+	results = cursor.fetchall()
+
+	if len(results) != 0:
+		sql_query = "DELETE FROM svt_shape_fit_parameters WHERE collection_id = '%i'" % (0)
+		print "Deleting existing default shape fit parameters for all all SVT channels ..."
+		cursor.execute(sql_query)
+		database.commit()
+	
+	print "Loading default shape fit parameters for all SVT channels ..."
+	amplitude = 2500
+	t0 = 10
+	tp = 50
+	for svt_channel_id in range(0, TOTAL_SVT_CHANNEL_IDS):
+		sql_query = "INSERT INTO svt_shape_fit_parameters(id, collection_id, svt_channel_id,\
+				amplitude, t0, tp)\
+				VALUES('%i', '%i', '%i', '%f', '%f', '%f')"\
+				% (svt_channel_id+1, 0, svt_channel_id, amplitude, t0, tp)
+		cursor.execute(sql_query)
+	database.commit()
+except:
+	print "[ERROR]: Unable to load shape fit parameters."
+	database.rollback()
+
+#--- Load default values of t0 shifts ---#
+#----------------------------------------#
+
+# If the first collection (collection_id = 0) exist, delete it and load new 
+# defaults
+sql_query = "SELECT * FROM svt_t0_shifts WHERE collection_id = '%i'" % (0) 
+
+try:
+	cursor.execute(sql_query)
+	results = cursor.fetchall()
+
+	if len(results) != 0:
+		sql_query = "DELETE FROM svt_t0_shifts WHERE collection_id = '%i'" % (0)
+		print "Deleting existing default t0 shift values ..."
+		cursor.execute(sql_query)
+		database.commit()
+	
+	print "Loading default t0 shift values ..."
+	key = 1;
+	t0_shift = 0;
+	for feb_id in range(0, TOTAL_FEB):
+		for feb_hybrid_id in range(0, MAX_HYBRIDS_PER_FEB):
+			if (feb_id == 0 or feb_id == 1 or feb_id == 5 or feb_id == 6) and (feb_hybrid_id == 3): continue
+			sql_query = "INSERT INTO svt_t0_shifts(id, collection_id,\
+					feb_id, feb_hybrid_id, t0_shift)\
+					VALUES('%i', '%i', '%i', '%i', '%f')"\
+					% (key, 0, feb_id, feb_hybrid_id, t0_shift)
+			key += 1
+			cursor.execute(sql_query)
+	database.commit()
+except:
+	print "[ERROR]: Unable to load t0 values."
 	database.rollback()
 
 database.close()
