@@ -1,0 +1,3 @@
+
+add_executable(CalibrationWriterTest CalibrationWriterTest.cxx)
+target_link_libraries(CalibrationWriterTest CalibrationWriter)
