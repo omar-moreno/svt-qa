@@ -39,9 +39,16 @@ include_directories("$ENV{ROOTSYS}/include")
 
 include_directories("/usr/include/libxml2")
 
+set(XML_HDR_DIR "${SVT_DAQ_ANALYSIS_SOURCE_DIR}/include/xml")
+include_directories("${XML_HDR_DIR}")
+
+# 
+add_subdirectory("${SVT_DAQ_ANALYSIS_SOURCE_DIR}/src/xml")
+
 # Add the utils subdirectory to the build
 add_subdirectory("${SVT_DAQ_ANALYSIS_SOURCE_DIR}/src/utils")
 
 # Add the analysis subdirectory to the build
 add_subdirectory("${SVT_DAQ_ANALYSIS_SOURCE_DIR}/src/qa")
 
+add_subdirectory("${SVT_DAQ_ANALYSIS_SOURCE_DIR}/test")
