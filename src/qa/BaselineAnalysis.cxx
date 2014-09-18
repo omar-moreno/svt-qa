@@ -10,7 +10,8 @@
 #include <BaselineAnalysis.h>
 
 BaselineAnalysis::BaselineAnalysis()
-	: canvas(NULL), baseline_h(NULL)
+	: canvas(NULL), baseline_h(NULL),
+	  class_name("BaselineAnalysis")
 {}
 
 BaselineAnalysis::~BaselineAnalysis()
@@ -45,6 +46,12 @@ void BaselineAnalysis::finalize()
     baseline_h->Draw("colz");
 	canvas->Print("baseline_run_summary.pdf(");
     canvas->Print("baseline_run_summary.pdf]");
+}
+
+std::string BaselineAnalysis::toString()
+{
+	std::string string_buffer = "Class Name: " + class_name; 
+	return string_buffer; 	
 }
 
 

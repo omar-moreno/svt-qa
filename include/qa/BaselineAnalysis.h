@@ -10,6 +10,10 @@
 #ifndef __BASELINE_ANALYSIS_H__
 #define __BASELINE_ANALYSIS_H__
 
+//--- StdLib ---//
+//--------------//
+#include <string>
+
 //--- SVT QA ---//
 //--------------//
 #include <QAAnalysis.h>
@@ -30,13 +34,15 @@ class BaselineAnalysis : public QAAnalysis {
         void initialize();
 		void processEvent(TriggerSample*); 
         void finalize();
+		std::string toString(); 
 
     private: 
 
         // TODO: Use a histogram factory to handle booking of histograms directly
         TCanvas* canvas;
-        TH2F* baseline_h;  
+        TH2F* baseline_h; 
 
+		std::string class_name; 
 };
 
 #endif // __BASELINE_ANALYIS_H__

@@ -22,7 +22,8 @@ class QAAnalysis {
 
         virtual void initialize() = 0; 
         virtual void processEvent(TriggerSample* samples) = 0;
-        virtual void finalize() = 0;  
+        virtual void finalize() = 0; 
+		virtual std::string toString() = 0; 
 
 }; // QAAanalysis
 
