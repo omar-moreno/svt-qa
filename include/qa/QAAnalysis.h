@@ -12,7 +12,7 @@
 
 //--- SVT DAQ ---//
 //---------------//
-#include <TrackerSample.h>
+#include <TriggerSample.h>
 
 class QAAnalysis { 
 
@@ -21,7 +21,7 @@ class QAAnalysis {
         virtual ~QAAnalysis(){}; 
 
         virtual void initialize() = 0; 
-        virtual void processEvent(TrackerSample* samples) = 0;
+        virtual void processEvent(TriggerSample* samples) = 0;
         virtual void finalize() = 0;  
 
 }; // QAAanalysis
