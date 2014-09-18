@@ -17,12 +17,15 @@ find_library(ROO_FIT_LIB RooFit $ENV{ROOTSYS}/lib)
 find_library(ROO_FIT_CORE_LIB RooFitCore $ENV{ROOTSYS}/lib)
 
 # Find the required SVT DAQ files
-LIST(APPEND CMAKE_FIND_LIBRARY_SUFFIXES ".o")
-find_library(TRACKER_EVENT_LIB TrackerEvent.o $ENV{DAQ_HOME}/.obj)
+list(APPEND CMAKE_FIND_LIBRARY_SUFFIXES ".o")
+find_library(TRIGGER_SAMPLE_LIB TriggerSample.o $ENV{DAQ_HOME}/.obj)
+find_library(TRIGGER_EVENT_LIB TriggerEvent.o $ENV{DAQ_HOME}/.obj)
+find_library(TRACKER_EVENT_LIB TrackEvent.o $ENV{DAQ_HOME}/.obj)
 find_library(TRACKER_SAMPLE_LIB TrackerSample.o $ENV{DAQ_HOME}/.obj)
 find_library(DATA_READ_LIB DataRead.o $ENV{DAQ_HOME}/.obj)
 find_library(DATA_LIB Data.o $ENV{DAQ_HOME}/.obj)
 find_library(XMLVARIABLES_LIB XmlVariables.o $ENV{DAQ_HOME}/.obj)
+
 
 # Find xml libraries
 find_library(XML_LIB xml2 /usr/lib)
@@ -34,22 +37,26 @@ find_library(RT_LIB rt /usr/lib)
 find_library(BZ2_LIB bz2 /usr/lib)
 
 add_library(BaselineAnalysis BaselineAnalysis.cxx)
-target_link_libraries(BaselineAnalysis ${TRACKER_SAMPLE_LIB} ${ROOT_HIST_LIB} ${ROOT_GPAD_LIB})
+target_link_libraries(BaselineAnalysis ${ROOT_CORE_LIB} ${ROOT_HIST_LIB} ${ROOT_GPAD_LIB})
+target_link_libraries(BaselineAnalysis QAUtils)
 
-add_executable(baseline baseline.cxx)
-target_link_libraries(baseline ${ROOT_TREE_LIB} ${ROOT_CORE_LIB} ${ROOT_RIO_LIB} ${ROOT_PHYSICS_LIB} PlotUtils Apv25Utils ${TRACKER_EVENT_LIB} ${TRACKER_SAMPLE_LIB} ${DATA_READ_LIB} ${DATA_LIB} ${ROOT_GPAD_LIB} ${ROOT_HIST_LIB} ${ROOT_GRAF_LIB} ${ROOT_MATHCORE_LIB} ${XMLVARIABLES_LIB} ${ROOT_MATRIX_LIB} ${ROOT_CINT_LIB} ${ROOT_THREAD_LIB} ${ROOT_SQLIO_LIB} ${XML_LIB} ${ROOT_NET_LIB} ${RT_LIB} ${BZ2_LIB}) 
+#add_executable(baseline baseline.cxx)
+#target_link_libraries(baseline ${ROOT_TREE_LIB} ${ROOT_CORE_LIB} ${ROOT_RIO_LIB} ${ROOT_PHYSICS_LIB} PlotUtils Apv25Utils ${TRACKER_EVENT_LIB} ${TRACKER_SAMPLE_LIB} ${DATA_READ_LIB} ${DATA_LIB} ${ROOT_GPAD_LIB} ${ROOT_HIST_LIB} ${ROOT_GRAF_LIB} ${ROOT_MATHCORE_LIB} ${XMLVARIABLES_LIB} ${ROOT_MATRIX_LIB} ${ROOT_CINT_LIB} ${ROOT_THREAD_LIB} ${ROOT_SQLIO_LIB} ${XML_LIB} ${ROOT_NET_LIB} ${RT_LIB} ${BZ2_LIB}) 
 
-add_executable(baseline_feb baseline_feb.cxx)
-target_link_libraries(baseline_feb ${ROOT_TREE_LIB} ${ROOT_CORE_LIB} ${ROOT_RIO_LIB} ${ROOT_PHYSICS_LIB} PlotUtils Apv25Utils ${TRACKER_EVENT_LIB} ${TRACKER_SAMPLE_LIB} ${DATA_READ_LIB} ${DATA_LIB} ${ROOT_GPAD_LIB} ${ROOT_HIST_LIB} ${ROOT_GRAF_LIB} ${ROOT_MATHCORE_LIB} ${XMLVARIABLES_LIB} ${ROOT_MATRIX_LIB} ${ROOT_CINT_LIB} ${ROOT_THREAD_LIB} ${ROOT_SQLIO_LIB} ${XML_LIB} ${ROOT_NET_LIB} ${RT_LIB} ${BZ2_LIB}) 
+#add_executable(baseline_feb baseline_feb.cxx)
+#target_link_libraries(baseline_feb ${ROOT_TREE_LIB} ${ROOT_CORE_LIB} ${ROOT_RIO_LIB} ${ROOT_PHYSICS_LIB} PlotUtils Apv25Utils ${TRACKER_EVENT_LIB} ${TRACKER_SAMPLE_LIB} ${DATA_READ_LIB} ${DATA_LIB} ${ROOT_GPAD_LIB} ${ROOT_HIST_LIB} ${ROOT_GRAF_LIB} ${ROOT_MATHCORE_LIB} ${XMLVARIABLES_LIB} ${ROOT_MATRIX_LIB} ${ROOT_CINT_LIB} ${ROOT_THREAD_LIB} ${ROOT_SQLIO_LIB} ${XML_LIB} ${ROOT_NET_LIB} ${RT_LIB} ${BZ2_LIB}) 
 
-add_executable(apv25_qa apv25_qa.cxx)
-target_link_libraries(apv25_qa ${ROOT_TREE_LIB} ${ROOT_CORE_LIB} ${ROOT_RIO_LIB} ${ROOT_PHYSICS_LIB} PlotUtils Apv25Utils ${TRACKER_EVENT_LIB} ${TRACKER_SAMPLE_LIB} ${DATA_READ_LIB} ${DATA_LIB} ${ROOT_GPAD_LIB} ${ROOT_HIST_LIB} ${ROOT_GRAF_LIB} ${ROOT_MATHCORE_LIB} ${XMLVARIABLES_LIB} ${ROOT_MATRIX_LIB} ${ROOT_CINT_LIB} ${ROOT_THREAD_LIB} ${ROOT_SQLIO_LIB} ${XML_LIB} ${ROOT_NET_LIB} SvtCalibrations ${RT_LIB} ${BZ2_LIB}) 
+#add_executable(apv25_qa apv25_qa.cxx)
+#target_link_libraries(apv25_qa ${ROOT_TREE_LIB} ${ROOT_CORE_LIB} ${ROOT_RIO_LIB} ${ROOT_PHYSICS_LIB} PlotUtils Apv25Utils ${TRACKER_EVENT_LIB} ${TRACKER_SAMPLE_LIB} ${DATA_READ_LIB} ${DATA_LIB} ${ROOT_GPAD_LIB} ${ROOT_HIST_LIB} ${ROOT_GRAF_LIB} ${ROOT_MATHCORE_LIB} ${XMLVARIABLES_LIB} ${ROOT_MATRIX_LIB} ${ROOT_CINT_LIB} ${ROOT_THREAD_LIB} ${ROOT_SQLIO_LIB} ${XML_LIB} ${ROOT_NET_LIB} SvtCalibrations ${RT_LIB} ${BZ2_LIB}) 
 
-add_executable(apv25_gain apv25_gain.cxx)
-target_link_libraries(apv25_gain ${ROOT_TREE_LIB} ${ROOT_CORE_LIB} ${ROOT_RIO_LIB} ${ROOT_PHYSICS_LIB} PlotUtils ${TRACKER_EVENT_LIB} ${TRACKER_SAMPLE_LIB} ${DATA_READ_LIB} ${DATA_LIB} ${ROOT_GPAD_LIB} ${ROOT_HIST_LIB} ${ROOT_GRAF_LIB} ${ROOT_MATHCORE_LIB} ${XMLVARIABLES_LIB} ${ROOT_MATRIX_LIB} ${ROOT_CINT_LIB} ${ROOT_THREAD_LIB} ${ROOT_SQLIO_LIB} ${XML_LIB} ${ROOT_NET_LIB} ${RT_LIB} ${BZ2_LIB})
+#add_executable(apv25_gain apv25_gain.cxx)
+#target_link_libraries(apv25_gain ${ROOT_TREE_LIB} ${ROOT_CORE_LIB} ${ROOT_RIO_LIB} ${ROOT_PHYSICS_LIB} PlotUtils ${TRACKER_EVENT_LIB} ${TRACKER_SAMPLE_LIB} ${DATA_READ_LIB} ${DATA_LIB} ${ROOT_GPAD_LIB} ${ROOT_HIST_LIB} ${ROOT_GRAF_LIB} ${ROOT_MATHCORE_LIB} ${XMLVARIABLES_LIB} ${ROOT_MATRIX_LIB} ${ROOT_CINT_LIB} ${ROOT_THREAD_LIB} ${ROOT_SQLIO_LIB} ${XML_LIB} ${ROOT_NET_LIB} ${RT_LIB} ${BZ2_LIB})
 
-add_executable(source_analysis source_analysis.cxx)
-target_link_libraries(source_analysis ${ROOT_TREE_LIB} ${ROOT_CORE_LIB} ${ROOT_RIO_LIB} ${ROOT_PHYSICS_LIB} PlotUtils ${TRACKER_EVENT_LIB} ${TRACKER_SAMPLE_LIB} ${DATA_READ_LIB} ${DATA_LIB} ${ROOT_GPAD_LIB} ${ROOT_HIST_LIB} ${ROOT_GRAF_LIB} ${ROOT_MATHCORE_LIB} ${XMLVARIABLES_LIB} ${ROOT_MATRIX_LIB} ${ROOT_CINT_LIB} ${ROOT_THREAD_LIB} ${ROOT_SQLIO_LIB} ${XML_LIB} ${ROOT_NET_LIB} SvtCalibrations ${ROO_FIT_LIB} ${ROO_FIT_CORE_LIB} Apv25Utils ${RT_LIB} ${BZ2_LIB}) 
+#add_executable(source_analysis source_analysis.cxx)
+#target_link_libraries(source_analysis ${ROOT_TREE_LIB} ${ROOT_CORE_LIB} ${ROOT_RIO_LIB} ${ROOT_PHYSICS_LIB} PlotUtils ${TRACKER_EVENT_LIB} ${TRACKER_SAMPLE_LIB} ${DATA_READ_LIB} ${DATA_LIB} ${ROOT_GPAD_LIB} ${ROOT_HIST_LIB} ${ROOT_GRAF_LIB} ${ROOT_MATHCORE_LIB} ${XMLVARIABLES_LIB} ${ROOT_MATRIX_LIB} ${ROOT_CINT_LIB} ${ROOT_THREAD_LIB} ${ROOT_SQLIO_LIB} ${XML_LIB} ${ROOT_NET_LIB} SvtCalibrations ${ROO_FIT_LIB} ${ROO_FIT_CORE_LIB} Apv25Utils ${RT_LIB} ${BZ2_LIB}) 
 
 add_executable(svt_qa svt_qa.cxx)
-target_link_libraries(svt_qa ${TRACKER_EVENT_LIB} ${DATA_READ_LIB} ${DATA_LIB} ${XMLVARIABLES_LIB} ${XML_LIB} ${RT_LIB} ${BZ2_LIB} BaselineAnalysis Apv25Utils)
+target_link_libraries(svt_qa ${TRIGGER_EVENT_LIB} ${TRACKER_EVENT_LIB} ${TRACKER_SAMPLE_LIB})
+target_link_libraries(svt_qa ${TRIGGER_SAMPLE_LIB} ${DATA_READ_LIB} ${DATA_LIB})
+target_link_libraries(svt_qa ${XMLVARIABLES_LIB} ${XML_LIB} ${RT_LIB} ${BZ2_LIB})
+target_link_libraries(svt_qa BaselineAnalysis)

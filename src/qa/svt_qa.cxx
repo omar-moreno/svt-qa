@@ -56,7 +56,7 @@ int main(int argc, char **argv)
 	}
 
 	// 
-	TriggerEvent* trigger_event = new TriggerEvent();
+	TriggerEvent trigger_event;
     TriggerSample* trigger_samples = new TriggerSample(); 
 	DataRead *data_reader = new DataRead(); 
 
@@ -66,37 +66,32 @@ int main(int argc, char **argv)
 		return EXIT_FAILURE; 
 	}
 
-	cout << "Processing file " << input_file_name << endl;
+	cout << "[SVT QA]: Processing file: " << input_file_name << endl;
 
     // TODO: All analyses should be loaded dynamically
-    BaselineAnalysis* baseline_ana = new BaselineAnalysis(); 
-    
+    BaselineAnalysis* baseline_analysis = new BaselineAnalysis(); 
+	
+   	
     if(run_baseline){
-        cout << "Running baseline analysis" << endl;
-        baseline_ana->initialize();
-    } 
+        cout << "[SVT QA]: Running baseline analysis" << endl;
+        baseline_analysis->initialize();
+    }
 
     int event_number = 0; 
 	int channel;
-	// Loop through all of the events until the end of file is reached
-	while(data_reader->next(trigger_event)){
-	
+	while(data_reader->next(&trigger_event)){
 		++event_number;
-		if(event_number%500 == 0) cout << "Processing event " << event_number << endl;
+		if(event_number%500 == 0) cout << "[SVT QA]: Processing event " << event_number << endl;
 
-		// Loop through all sets of samples in the event container
-		for(uint sample_set_n = 0; sample_set_n < trigger_event->count(); samples_set_n++){
-					
-			// Get the samples
-			trigger_samples = trigger_event->sample(samples_set_n); 
-
-			if(run_baseline) baseline_ana->processEvent(trigger_samples);
+		for(uint sample_set_n = 0; sample_set_n < trigger_event.count(); ++sample_set_n){
+			trigger_event.sample(sample_set_n, trigger_samples);
+			baseline_analysis->processEvent(trigger_samples);
 		}
 	}
+    
+	if(run_baseline) baseline_analysis->finalize(); 
 
-    if(run_baseline) baseline_ana->finalize(); 
-
-	return EXIT_FAILURE;
+	return EXIT_SUCCESS;
 }
 
 void displayUsage()

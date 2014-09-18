@@ -10,6 +10,7 @@
 #include <BaselineAnalysis.h>
 
 BaselineAnalysis::BaselineAnalysis()
+	: canvas(NULL), baseline_h(NULL)
 {}
 
 BaselineAnalysis::~BaselineAnalysis()
@@ -26,15 +27,15 @@ void BaselineAnalysis::initialize()
     
 }
 
-void BaselineAnalysis::processEvent(TrackerSample* samples)
+void BaselineAnalysis::processEvent(TriggerSample* samples)
 {
-
+	
 	// Get the physical channel number corresponding to the APV25 channel
 	// number.
-	int physical_channel = Apv25Utils::getPhysicalChannel(samples->apv(), samples->channel()); 
-
+	int physical_channel = QAUtils::getPhysicalChannel(samples->apv(), samples->channel()); 
+	
 	for(int sample_n = 0; sample_n < 6; ++sample_n){
-	    baseline_h->Fill(physical_channel, double(samples->value(sample_n)));     
+		baseline_h->Fill(physical_channel, double(samples->value(sample_n)));
 	}
 }
 
@@ -42,6 +43,7 @@ void BaselineAnalysis::finalize()
 {
     canvas->Print("baseline_run_summary.pdf[");
     baseline_h->Draw("colz");
+	canvas->Print("baseline_run_summary.pdf(");
     canvas->Print("baseline_run_summary.pdf]");
 }
 

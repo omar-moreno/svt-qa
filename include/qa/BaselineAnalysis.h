@@ -13,8 +13,7 @@
 //--- SVT QA ---//
 //--------------//
 #include <QAAnalysis.h>
-
-#include <Apv25Utils.h>
+#include <QAUtils.h>
 
 //--- ROOT ---//
 //------------//
@@ -29,7 +28,7 @@ class BaselineAnalysis : public QAAnalysis {
 		~BaselineAnalysis(); 
 
         void initialize();
-		void processEvent(TrackerSample*); 
+		void processEvent(TriggerSample*); 
         void finalize();
 
     private: 
