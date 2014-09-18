@@ -10,6 +10,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <unistd.h>
+#include <list>
 
 //--- SVT DAQ ---//
 //---------------//
@@ -66,17 +67,22 @@ int main(int argc, char **argv)
 		return EXIT_FAILURE; 
 	}
 
+	// Container to hold all analyses 
+	list<QAAnalysis*> analyses; 
+
 	cout << "[SVT QA]: Processing file: " << input_file_name << endl;
 
     // TODO: All analyses should be loaded dynamically
-    BaselineAnalysis* baseline_analysis = new BaselineAnalysis(); 
-	
-   	
-    if(run_baseline){
-        cout << "[SVT QA]: Running baseline analysis" << endl;
-        baseline_analysis->initialize();
-    }
+	if(run_baseline){
+		analyses.push_back(new BaselineAnalysis());  
+	}
 
+	// Add all analyses to the list of analyses to be processed	
+	for(list<QAAnalysis*>::iterator analysis = analyses.begin(); analysis != analyses.end(); ++analysis){
+        cout << "[SVT QA]: Initializing analysis: " << (*analysis)->toString() << endl;
+		(*analysis)->initialize(); 
+	}	
+   	
     int event_number = 0; 
 	int channel;
 	while(data_reader->next(&trigger_event)){
@@ -85,11 +91,19 @@ int main(int argc, char **argv)
 
 		for(uint sample_set_n = 0; sample_set_n < trigger_event.count(); ++sample_set_n){
 			trigger_event.sample(sample_set_n, trigger_samples);
-			baseline_analysis->processEvent(trigger_samples);
+
+						
+			for(list<QAAnalysis*>::iterator analysis = analyses.begin(); analysis != analyses.end(); ++analysis){
+				(*analysis)->processEvent(trigger_samples); 
+			}	
 		}
 	}
-    
-	if(run_baseline) baseline_analysis->finalize(); 
+  
+	for(list<QAAnalysis*>::iterator analysis = analyses.begin(); analysis != analyses.end(); ++analysis){
+		(*analysis)->finalize(); 
+		delete *analysis; 
+	}	
+	analyses.clear();
 
 	return EXIT_SUCCESS;
 }
