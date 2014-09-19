@@ -177,8 +177,8 @@ try:
 		database.commit()
 	
 	print "Loading default values of pedestal and noise for all SVT channels ..."
-	pedestal = 4500.
-	noise = 30.
+	pedestal = 4300.
+	noise = 84.69
 	for svt_channel_id in range(0, TOTAL_SVT_CHANNEL_IDS):
 		sql_query = "INSERT INTO svt_calibrations(id, collection_id, svt_channel_id,\
 				pedestal_0, pedestal_1, pedestal_2, pedestal_3, pedestal_4, pedestal_5,\
@@ -212,8 +212,8 @@ try:
 		database.commit()
 	
 	print "Loading default values of gain and offset for all SVT channels ..."
-	gain = 0.1
-	offset = 0 
+	gain = 0.09
+	offset = 100
 	for svt_channel_id in range(0, TOTAL_SVT_CHANNEL_IDS):
 		sql_query = "INSERT INTO svt_gains(id, collection_id, svt_channel_id,\
 				gain, offset)\
@@ -244,8 +244,8 @@ try:
 	
 	print "Loading default shape fit parameters for all SVT channels ..."
 	amplitude = 2500
-	t0 = 10
-	tp = 50
+	t0 = 20
+	tp = 35
 	for svt_channel_id in range(0, TOTAL_SVT_CHANNEL_IDS):
 		sql_query = "INSERT INTO svt_shape_fit_parameters(id, collection_id, svt_channel_id,\
 				amplitude, t0, tp)\
