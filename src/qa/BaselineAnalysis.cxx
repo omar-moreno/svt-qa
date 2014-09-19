@@ -11,8 +11,15 @@
 
 BaselineAnalysis::BaselineAnalysis()
 	: canvas(NULL), baseline_h(NULL),
-	  class_name("BaselineAnalysis")
+	  class_name("BaselineAnalysis"), 
+	  feb_id(0), hybrid_id(0)
 {}
+
+BaselineAnalysis::BaselineAnalysis(int feb_id, int hybrid_id)
+{
+	this->feb_id = feb_id; 
+	this->hybrid_id = hybrid_id; 
+}
 
 BaselineAnalysis::~BaselineAnalysis()
 {
@@ -29,8 +36,10 @@ void BaselineAnalysis::initialize()
 }
 
 void BaselineAnalysis::processEvent(TriggerSample* samples)
-{
-	
+{	
+	if(samples->febAddress() != feb_id) return; 
+	if(samples->hybrid()  != hybrid_id) return; 
+
 	// Get the physical channel number corresponding to the APV25 channel
 	// number.
 	int physical_channel = QAUtils::getPhysicalChannel(samples->apv(), samples->channel()); 
@@ -42,6 +51,7 @@ void BaselineAnalysis::processEvent(TriggerSample* samples)
 
 void BaselineAnalysis::finalize()
 {
+
     canvas->Print("baseline_run_summary.pdf[");
     baseline_h->Draw("colz");
 	canvas->Print("baseline_run_summary.pdf(");
@@ -53,5 +63,7 @@ std::string BaselineAnalysis::toString()
 	std::string string_buffer = "Class Name: " + class_name; 
 	return string_buffer; 	
 }
+
+
 
 

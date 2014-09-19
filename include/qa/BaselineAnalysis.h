@@ -28,7 +28,8 @@ class BaselineAnalysis : public QAAnalysis {
 
 	public: 
 
-		BaselineAnalysis(); 
+		BaselineAnalysis();	
+		BaselineAnalysis(int, int);	
 		~BaselineAnalysis(); 
 
         void initialize();
@@ -42,7 +43,10 @@ class BaselineAnalysis : public QAAnalysis {
         TCanvas* canvas;
         TH2F* baseline_h; 
 
-		std::string class_name; 
+		std::string class_name;
+
+		int feb_id; 
+		int hybrid_id;	
 };
 
 #endif // __BASELINE_ANALYIS_H__
