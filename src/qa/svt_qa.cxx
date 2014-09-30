@@ -61,9 +61,12 @@ int main(int argc, char **argv)
 			case 'b': 
 				run_baseline = true; 
 				break;
+            case 'u':
+                displayUsage();
+                return EXIT_SUCCESS;
 			default:
                displayUsage();  
-				break;
+				return EXIT_FAILURE;
 		}
 	}
 
@@ -148,5 +151,5 @@ void displayUsage()
          << "\t -i Input binary or EVIO file name \n"
          << "\t -b Run the baseline analysis \n"
          << "\t --help Display this help and exit \n"
-         << endl; 
+         << endl;
 }
