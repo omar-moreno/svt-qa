@@ -30,7 +30,11 @@ include_directories("${GENERIC_HDR_DIR}")
 set(UTILS_HDR_DIR "${SVT_DAQ_ANALYSIS_SOURCE_DIR}/include/utils")
 include_directories("${UTILS_HDR_DIR}")
 
-# 
+# Include EVIO headers
+set(EVIO_HDR_DIR "$ENV{CODA}/Linux-x86_64/include")
+include_directories("${EVIO_HDR_DIR}")
+
+#  
 set(QA_HDR_DIR "${SVT_DAQ_ANALYSIS_SOURCE_DIR}/include/qa")
 include_directories("${QA_HDR_DIR}")
 
@@ -42,6 +46,9 @@ include_directories("/usr/include/libxml2")
 set(XML_HDR_DIR "${SVT_DAQ_ANALYSIS_SOURCE_DIR}/include/xml")
 include_directories("${XML_HDR_DIR}")
 
+set(DAQ_HDR_DIR "${SVT_DAQ_ANALYSIS_SOURCE_DIR}/include/daq")
+include_directories("${DAQ_HDR_DIR}")
+
 # 
 add_subdirectory("${SVT_DAQ_ANALYSIS_SOURCE_DIR}/src/xml")
 
@@ -50,5 +57,7 @@ add_subdirectory("${SVT_DAQ_ANALYSIS_SOURCE_DIR}/src/utils")
 
 # Add the analysis subdirectory to the build
 add_subdirectory("${SVT_DAQ_ANALYSIS_SOURCE_DIR}/src/qa")
+
+add_subdirectory("${SVT_DAQ_ANALYSIS_SOURCE_DIR}/src/daq")
 
 add_subdirectory("${SVT_DAQ_ANALYSIS_SOURCE_DIR}/test")
