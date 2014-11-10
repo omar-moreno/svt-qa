@@ -1,7 +1,9 @@
 
 #include <DataReadEvio.h>
+#include <TestRunSvtEvent.h>
 #include <getopt.h>
 #include <stdlib.h>
+#include <Data.h>
 
 using namespace std; 
 
@@ -38,5 +40,11 @@ int main(int argc, char **argv)
 	
 	DataReadEvio* data_reader = new DataReadEvio();
 	data_reader->open(evio_file_name, false);
+	TestRunSvtEvent* data = new TestRunSvtEvent(); 
+
+	while(data_reader->next(data)){
+	  cout << "Fpga: " << data->fpgaAddress() << endl;	
+		
+	}
 	data_reader->close();
 }
