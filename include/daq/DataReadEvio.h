@@ -10,10 +10,14 @@
 #ifndef __DATA_READ_EVIO_H__
 #define __DATA_READ_EVIO_H__
 
+#include <stdint.h>
+
 #include <DataRead.h>
+#include <TestRunSvtEvent.h>
 
 #include <evioFileChannel.hxx>
 #include <evioException.hxx>
+#include <evioUtil.hxx>
 
 using namespace evio; 
 
@@ -27,10 +31,20 @@ class DataReadEvio : public DataRead {
 		bool next(Data*);
 		bool open(string, bool);
 		void close(); 
-
+	
 	private: 
 
-		evioFileChannel* file_channel;  
+		//TestRunSvtEvent* processDataBank(uint16_t, std::vector<uint32_t>*);
+		void processDataBank(Data*, uint16_t, std::vector<uint32_t>*);
+
+		evioDOMTree* event;
+		evioFileChannel* file_channel;
+		evioDOMNodeListP fpga_banks;
+		evioDOMNodeList::iterator fpga_iterator;
+		
+		std::list<TestRunSvtEvent*> data_list;
+
+		int event_n;	
 
 }; // DataReadEvio
 
