@@ -30,8 +30,16 @@ class DataReadEvio : public DataRead {
 
 		bool next(Data*);
 		bool open(string, bool);
-		void close(); 
-	
+		void close();
+
+		evioDOMTree* getPhysicsEvent();
+
+		// Event Constants
+		// TODO: These constants should eventually be moved to an external 
+		//		 header file.
+		static const int PHYSICS_EVENT_TAG;
+		static const int SVT_BANK_TAG;
+
 	private: 
 
 		//TestRunSvtEvent* processDataBank(uint16_t, std::vector<uint32_t>*);
@@ -41,7 +49,7 @@ class DataReadEvio : public DataRead {
 		evioFileChannel* file_channel;
 		evioDOMNodeListP fpga_banks;
 		evioDOMNodeList::iterator fpga_iterator;
-		
+
 		std::list<TestRunSvtEvent*> data_list;
 
 		int event_n;	

@@ -9,6 +9,9 @@
 
 #include <DataReadEvio.h>
 
+const int DataReadEvio::PHYSICS_EVENT_TAG = 1;
+const int DataReadEvio::SVT_BANK_TAG = 2;
+
 DataReadEvio::DataReadEvio()
 	: file_channel(NULL), event(NULL), fpga_banks(new evioDOMNodeList), event_n(0)
 {
@@ -19,10 +22,27 @@ DataReadEvio::~DataReadEvio()
 	delete file_channel;
 }
 
+evioDOMTree* DataReadEvio::getPhysicsEvent()
+{
+	// TODO: Check that the file channel is open before beginning to process 
+	// events.  If it's not open, an exception should be thrown.
+	while(true) {
+		
+		// Read an event from the EVIO channel.  If the end of the EVIO file 
+		// has been reached, return NULL
+		if(!file_channel->read()) return NULL;
+
+		// Create the event tree from the contents of the channel
+		evioDOMTree* event = new evioDOMTree(file_channel);
+
+		// If the event is a physics event, return a pointer to the event tree.
+		// Otherwise, destroy the object.
+		if((event->getFirstNode(tagEquals(PHYSICS_EVENT_TAG))) != NULL) return event; 
+	}
+}
+
 bool DataReadEvio::next(Data *data)
 {
-
-	std::cout << "[ DataReadEvio ]: Processing Data " << std::endl;
 
 	if(!fpga_banks->empty()) { 
 		std::cout << "[ DataReadEvio ]: Processing FPGA Bank " << (*fpga_iterator)->tag << std::endl;
@@ -35,44 +55,21 @@ bool DataReadEvio::next(Data *data)
 
 	try { 
 
-		// Check if the event has a physics bank
-		evioDOMNodeP physics_bank = NULL;
-		while(physics_bank == NULL){ 
-			
-			// Read an event from the channel	
-			if(!file_channel->read()){
-				std::cout << "[ DataReadEvio ]: Reached EOF." << std::endl;
-				data_list.clear();
-				return false; 
-			}
-	
-			evioDOMTree tmp_event(file_channel);	
-			physics_bank = tmp_event.getFirstNode(tagEquals(1));
-		}
 
-		if(event != NULL) delete event;
-		event = new evioDOMTree(file_channel);	
-		//evioDOMTree event(file_channel);
-
+		if((event = this->getPhysicsEvent()) == NULL) return false;
 		std::cout << "[ DataReadEvio ]: --------------------------------------" << std::endl;
-		std::cout << "[ DataReadEvio ]: Processing event " << ++event_n << std::endl;
-		std::cout << "[ DataReadEvio ]: Found physics bank " << std::endl;
+		std::cout << "[ DataReadEvio ]:\tProcessing event " << ++event_n << std::endl;
 
-		physics_bank = event->getFirstNode(tagEquals(1));
+		evioDOMNodeP physics_bank = event->getFirstNode(tagEquals(PHYSICS_EVENT_TAG));
+		std::cout << "[ DataReadEvio ]:\tFound physics event " << std::endl;
 
-		if(physics_bank->isContainer()){ 
-			std::cout << "[ DataReadEvio ]: Physics bank is a container "<< std::endl;
-		}
-
-		std::cout << physics_bank->toString() << std::endl;
-		
 		evioDOMNodeListP crate_banks = physics_bank->getChildren();
-		std::cout << "[ DataReadEvio ]: Total number of crate banks " << crate_banks->size() << std::endl;
+		std::cout << "[ DataReadEvio ]: \tTotal number of crate banks " << crate_banks->size() << std::endl;
 
-		evioDOMNodeListP svt_banks = physics_bank->getChildren(tagEquals(2));
-		std::cout << "[ DataReadEvio ]: Total number of SVT banks " << svt_banks->size() << std::endl;
+		evioDOMNodeListP svt_banks = physics_bank->getChildren(tagEquals(SVT_BANK_TAG));
+		std::cout << "[ DataReadEvio ]: \tTotal number of SVT banks " << svt_banks->size() << std::endl;
 		fpga_banks = svt_banks->front()->getChildren();
-		std::cout << "[ DataReadEvio ]: Total number of FPGA banks " << fpga_banks->size() << std::endl;
+		std::cout << "[ DataReadEvio ]: \tTotal number of FPGA banks " << fpga_banks->size() << std::endl;
 		fpga_iterator = fpga_banks->begin();
 		data_list.clear();
 		std::cout << "[ DataReadEvio ]: --------------------------------------" << std::endl;
@@ -119,8 +116,8 @@ void DataReadEvio::processDataBank(Data* data_obj, uint16_t tag, std::vector<uin
 	unsigned short fpga; 
 	fpga = tag&0xFFFF;
 	data->insert(data->begin(), fpga);
-	std::cerr << "[ DataReadEvio ]: tag " << tag << std::endl; 
-	std::cerr << "[ DataReadEvio ]: fpga " << fpga << std::endl; 
+	std::cout << "[ DataReadEvio ]: tag " << tag << std::endl; 
+	std::cout << "[ DataReadEvio ]: fpga " << fpga << std::endl; 
 	
 	data_obj->copy(&(*data)[0], data->size());
 	//data_list.push_back(tracker_event);
