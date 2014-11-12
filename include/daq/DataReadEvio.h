@@ -42,13 +42,12 @@ class DataReadEvio : public DataRead {
 
 	private: 
 
-		//TestRunSvtEvent* processDataBank(uint16_t, std::vector<uint32_t>*);
 		void processDataBank(Data*, uint16_t, std::vector<uint32_t>*);
 
 		evioDOMTree* event;
 		evioFileChannel* file_channel;
-		evioDOMNodeListP fpga_banks;
-		evioDOMNodeList::iterator fpga_iterator;
+		evioDOMNodeListP data_banks;
+		evioDOMNodeList::iterator data_iterator;
 
 		std::list<TestRunSvtEvent*> data_list;
 
