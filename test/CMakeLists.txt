@@ -11,6 +11,8 @@ list(APPEND CMAKE_FIND_LIBRARY_SUFFIXES ".o")
 find_library(DATAREAD_LIB DataRead.o $ENV{DAQ_HOME}/.obj)
 find_library(XMLVARIABLES_LIB XmlVariables.o $ENV{DAQ_HOME}/.obj)
 find_library(DATA_LIB Data.o $ENV{DAQ_HOME}/.obj)
+find_library(TESTRUN_SVT_EVENT_LIB TestRunSvtEvent.o $ENV{DAQ_HOME}/.obj)
+find_library(TRACKER_SAMPLE_LIB TestRunSvtTrackerSample.o $ENV{DAQ_HOME}/.obj)
 
 # Find bz2 libraries
 find_library(BZ2_LIB bz2 /usr/lib)
@@ -26,6 +28,8 @@ find_library(EXPAT_LIB expat /usr/lib64)
 
 add_executable(DataReadEvioTest DataReadEvioTest.cxx)
 target_link_libraries(DataReadEvioTest DataReadEvio)
+target_link_libraries(DataReadEvioTest ${TRACKER_SAMPLE_LIB})
+target_link_libraries(DataReadEvioTest ${TESTRUN_SVT_EVENT_LIB})
 target_link_libraries(DataReadEvioTest ${DATA_LIB})
 target_link_libraries(DataReadEvioTest ${DATAREAD_LIB})
 target_link_libraries(DataReadEvioTest ${XMLVARIABLES_LIB})
