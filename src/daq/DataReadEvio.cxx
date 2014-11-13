@@ -1,5 +1,7 @@
 /**
  *
+ * @file	DataReadEvio.cxx
+ * @brief	EVIO to TestRunSvtEvent converter.
  * @author: Omar Moreno <omoreno1@ucsc.edu>
  *          Santa Cruz Institute for Particle Physics
  *          University of California, Santa Cruz
@@ -108,9 +110,7 @@ void DataReadEvio::processDataBank(Data* data_obj, uint16_t tag, std::vector<uin
 	unsigned short fpga; 
 	fpga = tag & 0xFFFF;
 	data->insert(data->begin(), fpga);
-
-
-
+	
 	// Copy the data to the data object
 	data_obj->copy(&(*data)[0], data->size());
 }
