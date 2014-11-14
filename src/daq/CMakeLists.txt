@@ -1,4 +1,3 @@
-
 # Find the EVIO libraries
 find_library(EVIO_LIB evio $ENV{CODA}/Linux-x86_64/lib)
 find_library(EVIOXX_LIB evioxx $ENV{CODA}/Linux-x86_64/lib)
@@ -13,8 +12,14 @@ add_library(TestRunSvtSample TestRunSvtSample.cxx)
 add_library(TestRunSvtEvent TestRunSvtEvent.cxx)
 target_link_libraries(TestRunSvtEvent ${DATA_LIB})
 
+add_library(AbstractDataReadEvio AbstractDataReadEvio.cxx)
+target_link_libraries(AbstractDataReadEvio ${DATAREAD_LIB})
+target_link_libraries(AbstractDataReadEvio ${DATA_LIB})
+target_link_libraries(AbstractDataReadEvio ${EVIOXX_LIB})
+target_link_libraries(AbstractDataReadEvio ${EVIO_LIB})
+
 add_library(DataReadEvio DataReadEvio.cxx)
-target_link_libraries(DataReadEvio ${DATAREAD_LIB})
-target_link_libraries(DataReadEvio ${DATA_LIB})
-target_link_libraries(DataReadEvio ${EVIOXX_LIB})
-target_link_libraries(DataReadEvio ${EVIO_LIB})
+target_link_libraries(DataReadEvio AbstractDataReadEvio)
+
+add_library(TestRunDataReadEvio TestRunDataReadEvio.cxx)
+target_link_libraries(TestRunDataReadEvio AbstractDataReadEvio)
