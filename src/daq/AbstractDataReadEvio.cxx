@@ -13,7 +13,7 @@
 #include <AbstractDataReadEvio.h>
 
 AbstractDataReadEvio::AbstractDataReadEvio(int physics_event_tag, int svt_bank_tag)
-	:	file_channel(NULL), event(NULL), event_n(0),
+	:	file_channel(NULL), event(NULL), data_banks(new evioDOMNodeList), event_n(0),
 		physics_event_tag(physics_event_tag), svt_bank_tag(svt_bank_tag)
 {
 }
@@ -55,6 +55,16 @@ void AbstractDataReadEvio::close()
 
 bool AbstractDataReadEvio::next(Data* data)
 {
+
+	if(!data_banks->empty()) { 
+		std::cout << "[ DataReadEvio ]:\tProcessing data bank " << (*data_iterator)->tag << std::endl;
+		// Use the data enclosed by the data bank to create a Data object 
+		this->processDataBank(data, (*data_iterator)->tag, (*data_iterator)->getVector<uint32_t>());
+		// Remove the data bank from the list of data banks
+		data_iterator = data_banks->erase(data_iterator); 
+		return true;
+	}
+
 	try { 
 
 		// Get a physics event.  If the physics event is NULL, the end of the EVIO file was reached.
