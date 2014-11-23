@@ -1,4 +1,7 @@
 
+
+add_definitions("-std=c++11")
+
 # Find the required ROOT libraries
 find_library(ROOT_TREE_LIB Tree $ENV{ROOTSYS}/lib)
 find_library(ROOT_CORE_LIB Core $ENV{ROOTSYS}/lib)
@@ -37,7 +40,11 @@ find_library(RT_LIB rt /usr/lib)
 find_library(BZ2_LIB bz2 /usr/lib)
 
 add_library(BaselineAnalysis BaselineAnalysis.cxx)
-target_link_libraries(BaselineAnalysis ${ROOT_CORE_LIB} ${ROOT_HIST_LIB} ${ROOT_GPAD_LIB})
+target_link_libraries(BaselineAnalysis ${ROOT_RIO_LIB})
+target_link_libraries(BaselineAnalysis ${ROOT_TREE_LIB})
+target_link_libraries(BaselineAnalysis ${ROOT_CORE_LIB}) 
+target_link_libraries(BaselineAnalysis ${ROOT_HIST_LIB})
+target_link_libraries(BaselineAnalysis ${ROOT_GPAD_LIB})
 target_link_libraries(BaselineAnalysis QAUtils CalibrationWriter)
 
 #add_executable(baseline baseline.cxx)

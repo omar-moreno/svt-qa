@@ -13,19 +13,34 @@
 //--- StdLib ---//
 //--------------//
 #include <string>
+#include <unordered_map>
+#include <vector>
 
 //--- SVT QA ---//
 //--------------//
 #include <QAAnalysis.h>
 #include <QAUtils.h>
 #include <CalibrationWriter.h>
+#include <PlotUtils.h>
 
 //--- ROOT ---//
 //------------//
 #include <TCanvas.h>
 #include <TH2F.h>
-#include <TF1.h>
 #include <TH1D.h>
+
+class pairHash { 	
+
+	public: 
+		//template <typename T, typename U> 
+		//std::size_t operator() (const std::pair <T, U> &p) const {
+		std::size_t operator() (const std::pair <int, int> &p) const {
+				// This is just a copy of what boost::hash does.  
+				size_t seed = std::hash<int>()(p.first);
+				return std::hash<int>()(p.second) + 0x9e3779b9 + (seed<<6) + (seed>>2);	
+			}
+};
+
 
 class BaselineAnalysis : public QAAnalysis { 
 
@@ -40,16 +55,15 @@ class BaselineAnalysis : public QAAnalysis {
         void finalize();
 		std::string toString(); 
 
-        void findCalibrations(TH1*, double &, double &);
+        //void findCalibrations(TH1*, double &, double &);
 
     private: 
 
-        // TODO: Use a histogram factory to handle booking of histograms directly
         TCanvas* canvas;
-        TH2F* baseline_h; 
-        TF1* gaussian;         
 
         CalibrationWriter* writer; 
+		
+		std::unordered_map <std::pair <int, int>, TH2F*, pairHash> baseline_map; 
 
 		std::string class_name;
 
@@ -58,3 +72,4 @@ class BaselineAnalysis : public QAAnalysis {
 };
 
 #endif // __BASELINE_ANALYIS_H__
+
