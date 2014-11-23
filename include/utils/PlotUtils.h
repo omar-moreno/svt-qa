@@ -26,7 +26,7 @@
 namespace PlotUtils { 
 
     template <typename T>
-        std::string convertToString(const T value)
+        std::string toString(const T value)
         {
             std::stringstream ss; 
             ss << value; 
@@ -38,7 +38,7 @@ namespace PlotUtils {
 		{
             std::string h_name; 
             for(int plot_n = 0; plot_n < n_plots; ++plot_n){
-                h_name = hist_name + "_" + convertToString<int>(plot_n); 
+                h_name = hist_name + "_" + toString<int>(plot_n); 
                 plots.push_back(new T(h_name.c_str(), h_name.c_str(), bins_x, x_min, x_max));          
             }
 		
@@ -57,7 +57,7 @@ namespace PlotUtils {
     	{
     		std::string h_name;
     		for(int plot_n = 0; plot_n < n_plots; ++plot_n){
-    			h_name = hist_name + "_" + convertToString<int>(plot_n);
+    			h_name = hist_name + "_" + toString<int>(plot_n);
     			plots.push_back(new T(h_name.c_str(), h_name.c_str(), bins_x, x_min, x_max, bins_y, y_min, y_max));
     		}
     	}
