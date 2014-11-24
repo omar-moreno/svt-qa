@@ -1,38 +1,55 @@
-/*
- *
- *
+/**
+ *	@file	PlottingUtils.h
+ *	@brief	A compilation of plotting utilities.
+ *	@author Omar Moreno <omoreno1@ucsc.edu>
+ *			Santa Cruz Institute for Paritcle Physics
+ *			University of California, Santa Cruz
+ *	@date	2013
  *
  */
 
-#ifndef _PLOT_UTILS_
-#define _PLOT_UTILS_
+#ifndef __PLOTTING_UTILS_H__
+#define __PLOTTING_UTILS_H__
 
-//--- C++ ---//
 #include <iostream>
 #include <sstream>
 #include <typeinfo>
 
 //--- ROOT ---//
-#include <TH1F.h>
-#include <TH2F.h>
-#include <TCanvas.h>
-#include <TGraphErrors.h>
-#include <TGraph.h>
-#include <TF1.h>
 #include <TColor.h>
 #include <TStyle.h>
 
 
-namespace PlotUtils { 
+namespace PlottingUtils { 
 
+
+	/**
+	 *	Setup the color palette used by ROOT
+	 */
+    void setPalette(); 
+   
+	/**
+	 *
+	 */
+	TStyle* getStyle(); 
+
+	/**
+	 *	Convert a numerical value to a string.  This method should only be 
+	 *	used when the C++11 to_string function is not available.
+	 *
+	 *	@parameter value Numerical value.
+	 *	@return A string object representation of value
+	 */
     template <typename T>
-        std::string toString(const T value)
-        {
+        std::string toString(const T value) {
             std::stringstream ss; 
             ss << value; 
             return ss.str(); 
         } 
 
+	/**
+	 *
+	 */
 	template <typename T>
 		void initMulti1DPlots(int n_plots, std::vector<T*> &plots, std::string hist_name, int bins_x, int x_min, int x_max)
 		{
@@ -44,6 +61,9 @@ namespace PlotUtils {
 		
 		}	
 
+	/**
+	 *
+	 */
     template <typename T> 
         void initMulti1DPlots(int n_plots, std::vector<T*> &plots, std::string hist_name, int x_min, int x_max)
         {        
@@ -51,6 +71,9 @@ namespace PlotUtils {
 			initMulti1DPlots(n_plots, plots, hist_name, bins_x, x_min, x_max); 
 	   	}
 
+	/**
+	 *
+	 */
     template <typename T>
     	void initMulti2DPlots(int n_plots, std::vector<T*> &plots, std::string hist_name,
     							 int bins_x, int x_min, int x_max, int bins_y, int y_min, int y_max)
@@ -62,6 +85,9 @@ namespace PlotUtils {
     		}
     	}
 
+	/**
+	 *
+	 */
     template <typename T>
         void initMulti2DPlots(int n_plots, std::vector<T*> &plots, std::string hist_name, int x_min, int x_max, int y_min, int y_max)
         {
@@ -70,6 +96,9 @@ namespace PlotUtils {
             initMulti2DPlots(n_plots, plots, hist_name, bins_x, x_min, x_max, bins_y, y_min, y_max);
         }
 
+	/**
+	 *
+	 */
     template <typename T>
         void adjust1DPlotRange(T* &plot, int bin_threshold)
         {
@@ -79,6 +108,9 @@ namespace PlotUtils {
             plot->GetXaxis()->SetRange(histo_min, histo_max);
         }
 
+	/**
+	 *
+	 */
     template <typename T>
         void adjust2DPlotRange(T* &plot, int bin_threshold)
         {
@@ -93,6 +125,9 @@ namespace PlotUtils {
 
         }
 
+	/**
+	 *
+	 */
     template <typename T>
         void set1DPlotStyle(T* &plot, std::string x_axis_title)
         {
@@ -106,6 +141,9 @@ namespace PlotUtils {
             plot->SetTitle("");
         }
 
+	/**
+	 *
+	 */
     template <typename T>
         void set2DPlotStyle(T* &plot, std::string x_axis_title, std::string y_axis_title)
         {
@@ -114,41 +152,7 @@ namespace PlotUtils {
 
         }
 
-    void setContours(); 
-    void setupCanvas(TCanvas* &); 
 
-};
+}; // PlottingUtils
 
-#endif // _PLOT_UTILS_
-
-/* 
-   template <typename T> 
-   static void initialize2DPlot(T* &, string, int, int, string, int, int, string);
-   template <typename T> 
-   static void initialize2DPlots(int, vector<T*> &, string, int, int, string, int, int, string);
-   template<typename T>
-   void drawHistogram(T*);         
-   template<typename T>
-   void draw2DPlot(T*);
-   template<typename T>
-   void drawMulti2DPlot(vector<T*> &);
-
-//--- Setters ---//
-//---------------//
-void setPlotOptions(string);
-void setBinThreshold(int, int, int); 
-static void setPlotSavePath(string);
-//        void setFileType(string);
-
-static void savePlots(bool);
-
-private:
-
-static string plot_path;
-string options;
-//       string file_type;
-int bin_threshold[3];
-
-static bool save_plots; 
-static TCanvas *canvas;
-*/
+#endif // __PLOTTING_UTILS_H__

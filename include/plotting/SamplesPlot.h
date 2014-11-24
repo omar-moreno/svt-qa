@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 
-#include <PlotUtils.h>
+#include <PlottingUtils.h>
 
 #include <TH2F.h>
 

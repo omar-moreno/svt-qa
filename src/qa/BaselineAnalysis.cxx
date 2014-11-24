@@ -61,8 +61,8 @@ void BaselineAnalysis::processEvent(TriggerSample* samples) {
 		//std::string plot_name = "baseline_feb" + PlotUtils::toString(samples->febAddress()) +
 		//   	"_hybrid" + PlotUtils::toString(samples->hybrid());	
 		//baseline_map[daq_pair] = new TH2F(plot_name.c_str(), "Baseline", 640, 0, 640, 16384, 0, 16384);
-		std::string plot_title = "FEB: " + PlotUtils::toString(samples->febAddress()) + 
-			" Hybrid: " + PlotUtils::toString(samples->hybrid()) + " Baseline"; 
+		std::string plot_title = "FEB: " + PlottingUtils::toString(samples->febAddress()) + 
+			" Hybrid: " + PlottingUtils::toString(samples->hybrid()) + " Baseline"; 
 		baseline_map[daq_pair] = new SamplesPlot(plot_title);
 		//baseline_map.at(daq_pair)->SetTitle(plot_title.c_str()); 
 		std::cout << "[ BaselineAnalysis ]: Created baseline histogram for FEB: "	

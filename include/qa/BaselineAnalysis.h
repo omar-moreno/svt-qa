@@ -21,7 +21,7 @@
 #include <QAAnalysis.h>
 #include <QAUtils.h>
 #include <CalibrationWriter.h>
-#include <PlotUtils.h>
+#include <PlottingUtils.h>
 #include <SamplesPlot.h>
 
 //--- ROOT ---//
@@ -29,6 +29,7 @@
 #include <TCanvas.h>
 #include <TH2F.h>
 #include <TH1D.h>
+#include <TGraphErrors.h>
 
 class pairHash { 	
 

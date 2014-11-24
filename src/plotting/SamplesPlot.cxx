@@ -14,7 +14,7 @@ SamplesPlot::SamplesPlot(std::string name)
 	
 	for (int sample_n = 0; sample_n < 6; ++sample_n) { 
 	
-		std::string histo_name = this->getName() + " - Sample " + PlotUtils::toString(sample_n);
+		std::string histo_name = this->getName() + " - Sample " + PlottingUtils::toString(sample_n);
 		plots.push_back(new TH2F(histo_name.c_str(), histo_name.c_str(), 640, 0, 640, 16384, 0, 16384));	
 	}
 

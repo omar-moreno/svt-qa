@@ -10,8 +10,11 @@ find_library(ROOT_RIO_LIB RIO $ENV{ROOTSYS}/lib)
 find_library(ROOT_PHYSICS_LIB Physics $ENV{ROOTSYS}/lib)
 
 # Create the PlotUtils library
-add_library(PlotUtils PlotUtils.cxx)
-target_link_libraries(PlotUtils ${ROOT_TREE_LIB} ${ROOT_CORE_LIB} ${ROOT_RIO_LIB} ${ROOT_PHYSICS_LIB})
+add_library(PlottingUtils PlottingUtils.cxx)
+target_link_libraries(PlottingUtils ${ROOT_TREE_LIB})
+target_link_libraries(PlottingUtils ${ROOT_CORE_LIB})
+target_link_libraries(PlottingUtils ${ROOT_RIO_LIB})
+target_link_libraries(PlottingUtils ${ROOT_PHYSICS_LIB})
 
 # Create the Apv25Utils library
 add_library(Apv25Utils Apv25Utils.cxx)
