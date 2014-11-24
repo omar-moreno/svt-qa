@@ -46,6 +46,7 @@ target_link_libraries(BaselineAnalysis ${ROOT_CORE_LIB})
 target_link_libraries(BaselineAnalysis ${ROOT_HIST_LIB})
 target_link_libraries(BaselineAnalysis ${ROOT_GPAD_LIB})
 target_link_libraries(BaselineAnalysis QAUtils CalibrationWriter)
+target_link_libraries(BaselineAnalysis SamplesPlot)
 
 #add_executable(baseline baseline.cxx)
 #target_link_libraries(baseline ${ROOT_TREE_LIB} ${ROOT_CORE_LIB} ${ROOT_RIO_LIB} ${ROOT_PHYSICS_LIB} PlotUtils Apv25Utils ${TRACKER_EVENT_LIB} ${TRACKER_SAMPLE_LIB} ${DATA_READ_LIB} ${DATA_LIB} ${ROOT_GPAD_LIB} ${ROOT_HIST_LIB} ${ROOT_GRAF_LIB} ${ROOT_MATHCORE_LIB} ${XMLVARIABLES_LIB} ${ROOT_MATRIX_LIB} ${ROOT_CINT_LIB} ${ROOT_THREAD_LIB} ${ROOT_SQLIO_LIB} ${XML_LIB} ${ROOT_NET_LIB} ${RT_LIB} ${BZ2_LIB}) 

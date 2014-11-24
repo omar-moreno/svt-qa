@@ -22,6 +22,7 @@
 #include <QAUtils.h>
 #include <CalibrationWriter.h>
 #include <PlotUtils.h>
+#include <SamplesPlot.h>
 
 //--- ROOT ---//
 //------------//
@@ -63,7 +64,8 @@ class BaselineAnalysis : public QAAnalysis {
 
         CalibrationWriter* writer; 
 		
-		std::unordered_map <std::pair <int, int>, TH2F*, pairHash> baseline_map; 
+		//std::unordered_map <std::pair <int, int>, TH2F*, pairHash> baseline_map; 
+		std::unordered_map <std::pair <int, int>, SamplesPlot*, pairHash> baseline_map; 
 
 		std::string class_name;
 

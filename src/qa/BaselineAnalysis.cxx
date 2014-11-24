@@ -58,57 +58,68 @@ void BaselineAnalysis::processEvent(TriggerSample* samples) {
 	if (baseline_map.find(daq_pair) == baseline_map.end()) {
 		
 		//
-		std::string plot_name = "baseline_feb" + PlotUtils::toString(samples->febAddress()) +
-		   	"_hybrid" + PlotUtils::toString(samples->hybrid());	
-		baseline_map[daq_pair] = new TH2F(plot_name.c_str(), "Baseline", 640, 0, 640, 16384, 0, 16384);
+		//std::string plot_name = "baseline_feb" + PlotUtils::toString(samples->febAddress()) +
+		//   	"_hybrid" + PlotUtils::toString(samples->hybrid());	
+		//baseline_map[daq_pair] = new TH2F(plot_name.c_str(), "Baseline", 640, 0, 640, 16384, 0, 16384);
 		std::string plot_title = "FEB: " + PlotUtils::toString(samples->febAddress()) + 
 			" Hybrid: " + PlotUtils::toString(samples->hybrid()) + " Baseline"; 
-		baseline_map.at(daq_pair)->SetTitle(plot_title.c_str()); 
+		baseline_map[daq_pair] = new SamplesPlot(plot_title);
+		//baseline_map.at(daq_pair)->SetTitle(plot_title.c_str()); 
 		std::cout << "[ BaselineAnalysis ]: Created baseline histogram for FEB: "	
 			<< samples->febAddress() << " Hybrid: " << samples->hybrid() << std::endl;
 	}
-	TH2F* baseline_plot = baseline_map.at(daq_pair);
-	
+	//TH2F* baseline_plot = baseline_map.at(daq_pair);
+	SamplesPlot* baseline_plot = baseline_map.at(daq_pair); 
+
 	// Get the physical channel number corresponding to the APV25 channel
 	// number.
 	int physical_channel =  QAUtils::getPhysicalChannel(samples->apv(), samples->channel());
 	
 	for (int sample_n = 0; sample_n < 6; ++sample_n) {
-		baseline_plot->Fill(physical_channel, double(samples->value(sample_n)));
+		//baseline_plot->Fill(physical_channel, double(samples->value(sample_n)));
+		baseline_plot->fill(sample_n, physical_channel, samples->value(sample_n));
 	} 
 }
 
 void BaselineAnalysis::finalize()
 {
+
 	
-	std::unordered_map <std::pair <int, int>, TH2F*, pairHash>::iterator plot_it = baseline_map.begin(); 
+	//std::unordered_map <std::pair <int, int>, TH2F*, pairHash>::iterator plot_it = baseline_map.begin(); 
+	std::unordered_map <std::pair <int, int>, SamplesPlot*, pairHash>::iterator plot_it = baseline_map.begin(); 
 	canvas->Print("baseline_run_summary.pdf[");
     TH1D* projection = NULL;
-	TH2F* baseline_plot = NULL;
+	//TH2F* baseline_plot = NULL;
+	SamplesPlot* baseline_plot = NULL;
 	TGraphErrors* mean = NULL;
 	TGraphErrors* noise = NULL;
 	for (plot_it; plot_it != baseline_map.end(); ++plot_it) { 
+		
 		baseline_plot = plot_it->second;
-		baseline_plot->Draw("colz"); 		
-		canvas->Print("baseline_run_summary.pdf(");
-		mean = new TGraphErrors(640);
-		noise = new TGraphErrors(640); 	
-		for (int channel = 0; channel < 640; ++channel) { 
-			projection = baseline_plot->ProjectionY("", channel+1, channel+1);
-			mean->SetPoint(channel,channel, projection->GetMean()); 
-			mean->SetPointError(channel, 0, projection->GetMeanError()); 
-			noise->SetPoint(channel, channel, projection->GetRMS()); 
+
+		for(int sample_n = 0; sample_n < 6; ++sample_n) { 
+
+			//baseline_plot->getPlot(sample_n)->Draw("colz"); 
+			//canvas->Print("baseline_run_summary.pdf(");
+			mean = new TGraphErrors(640);
+			noise = new TGraphErrors(640); 	
+			for (int channel = 0; channel < 640; ++channel) { 
+				projection = baseline_plot->getPlot(sample_n)->ProjectionY("", channel+1, channel+1);
+				mean->SetPoint(channel,channel, projection->GetMean()); 
+				mean->SetPointError(channel, 0, projection->GetMeanError()); 
+				noise->SetPoint(channel, channel, projection->GetRMS()); 
+			}
+			mean->Draw("A*e");
+			canvas->Print("baseline_run_summary.pdf(");
+			noise->Draw("A*"); 
+			canvas->Print("baseline_run_summary.pdf(");
+			delete mean;
+			delete noise; 	
 		}
-		mean->Draw("A*e");
-		canvas->Print("baseline_run_summary.pdf(");
-		noise->Draw("A*"); 
-		canvas->Print("baseline_run_summary.pdf(");
-		delete mean;
-		delete noise; 	
+		//baseline_plot->Draw("colz"); 		
 	}	
 	canvas->Print("baseline_run_summary.pdf]");
-	//
-	
+
 	baseline_map.clear();
 
     //writer->writeBaseline(feb_id, hybrid_id, 0, channel, 0, baseline);  
