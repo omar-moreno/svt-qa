@@ -34,6 +34,9 @@ include_directories("${UTILS_HDR_DIR}")
 set(QA_HDR_DIR "${SVT_DAQ_ANALYSIS_SOURCE_DIR}/include/qa")
 include_directories("${QA_HDR_DIR}")
 
+set(PLOTTING_HDR_DIR "${SVT_DAQ_ANALYSIS_SOURCE_DIR}/include/plotting")
+include_directories("${PLOTTING_HDR_DIR}")
+
 # Include the ROOT headers
 include_directories("$ENV{ROOTSYS}/include")
 
@@ -47,6 +50,8 @@ add_subdirectory("${SVT_DAQ_ANALYSIS_SOURCE_DIR}/src/xml")
 
 # Add the utils subdirectory to the build
 add_subdirectory("${SVT_DAQ_ANALYSIS_SOURCE_DIR}/src/utils")
+
+add_subdirectory("${SVT_DAQ_ANALYSIS_SOURCE_DIR}/src/plotting")
 
 # Add the analysis subdirectory to the build
 add_subdirectory("${SVT_DAQ_ANALYSIS_SOURCE_DIR}/src/qa")
