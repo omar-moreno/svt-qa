@@ -23,7 +23,7 @@ class SamplesPlot {
 
 		/**
 		 */
-		SamplesPlot(std::string);	
+		SamplesPlot(int, std::string);	
 		
 		/**
 		 */
@@ -40,16 +40,6 @@ class SamplesPlot {
 		/**
 		 *
 		 */
-		void setXAxisTitle(int, std::string);
-
-		/**
-		 *
-		 */
-		void setYAxisTitle(int, std::string); 
-
-		/**
-		 *
-		 */
 		void setXAxisTitles(std::string);
 
 		/**
@@ -60,17 +50,33 @@ class SamplesPlot {
 		/**
 		 *
 		 */
-		TH2F* getPlot(int); 
+		TH2F* getPlot(int);
+
+		/**
+		 *
+		 */	
+		TH2F* getSumOfPlots();
 
 		/**
 		 */
 		std::string getName() const { return name; };
+
+		/**
+		 *
+		 */
+		int getNumberOfPlots() const { return n_plots; };
 	
 	private:
 
-		std::vector <TH2F*> plots;	
 
+		TH2F* sum_plot; 	
+		std::vector <TH2F*> plots;
+		
 		std::string name;
+		std::string x_axis_title;
+		std::string y_axis_title;
+
+		int n_plots; 
 
 }; // SamplesPlot
 
