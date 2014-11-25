@@ -35,7 +35,27 @@ class SamplesPlot {
 		
 		/**
 		 */	
-		void setName(const std::string name) { this->name = name; }; 	
+		void setName(const std::string name) { this->name = name; }; 
+
+		/**
+		 *
+		 */
+		void setXAxisTitle(int, std::string);
+
+		/**
+		 *
+		 */
+		void setYAxisTitle(int, std::string); 
+
+		/**
+		 *
+		 */
+		void setXAxisTitles(std::string);
+
+		/**
+		 *
+		 */
+		void setYAxisTitles(std::string); 	
 
 		/**
 		 *
