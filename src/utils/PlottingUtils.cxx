@@ -24,17 +24,40 @@ void PlottingUtils::setPalette() {
         gStyle->SetNumberContours(n_cont); 
 }
 
-TStyle* PlottingUtils::getStyle() { 
+void PlottingUtils::setStyle() { 
 	
-	TStyle* style = new TStyle("Clean", "Clean Style");
-
 	// Set frame attributes
-	style->SetFrameBorderMode(0);
-	style->SetFrameBorderSize(0);
-	style->SetFrameFillColor(0);
+	gStyle->SetFrameBorderMode(0);
+	gStyle->SetFrameBorderSize(0);
+	gStyle->SetFrameFillColor(0);
 
 	// Set canvas attributes
-	style->SetCanvasBorderMode(0);
-	style->SetCanvasBorderSize(0);
-	style->SetCanvasColor(0);	
+	gStyle->SetCanvasBorderMode(0);
+	gStyle->SetCanvasBorderSize(0);
+	gStyle->SetCanvasColor(0);
+
+	// Set axis attributes
+	int font = 42;
+	double font_size = 0.03;
+	double offset = 1.29;
+	gStyle->SetLabelFont(font, "x");
+	gStyle->SetLabelSize(font_size, "x"); 
+	gStyle->SetTitleFont(font, "x");
+	gStyle->SetTitleSize(font_size, "x");
+	gStyle->SetTitleOffset(offset, "x");	
+	gStyle->SetLabelFont(font, "y");
+	gStyle->SetLabelSize(font_size, "y"); 
+	gStyle->SetTitleFont(font, "y");
+	gStyle->SetTitleSize(font_size, "y"); 
+	gStyle->SetTitleOffset(offset, "y");	
+	gStyle->SetLabelFont(font, "z");
+	gStyle->SetTitleFont(font, "y");
+
+	// Enable tick marks on the top and right of plots
+	gStyle->SetPadTickX(1);
+	gStyle->SetPadTickY(1); 
+
+	// Set marker attributes
+	gStyle->SetMarkerStyle(20); 
+	gStyle->SetMarkerSize(.2);	
 }	

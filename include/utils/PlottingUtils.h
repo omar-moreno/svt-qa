@@ -31,7 +31,7 @@ namespace PlottingUtils {
 	/**
 	 *
 	 */
-	TStyle* getStyle(); 
+	void setStyle(); 
 
 	/**
 	 *	Convert a numerical value to a string.  This method should only be 
@@ -114,8 +114,6 @@ namespace PlottingUtils {
     template <typename T>
         void adjust2DPlotRange(T* &plot, int bin_threshold)
         {
-
-
             int histo_x_min = plot->FindFirstBinAbove(bin_threshold, 1);
             int histo_x_max = plot->FindLastBinAbove(bin_threshold, 1);
             int histo_y_min = plot->FindFirstBinAbove(bin_threshold, 2);
@@ -124,34 +122,6 @@ namespace PlottingUtils {
             plot->GetYaxis()->SetRange(histo_y_min, histo_y_max);
 
         }
-
-	/**
-	 *
-	 */
-    template <typename T>
-        void set1DPlotStyle(T* &plot, std::string x_axis_title)
-        {
-            plot->GetXaxis()->SetLabelSize(0.03);
-            plot->GetXaxis()->SetTitleSize(0.04);
-            plot->GetXaxis()->SetTitleOffset(1.0);
-            plot->GetYaxis()->SetLabelSize(0.03);
-            plot->GetYaxis()->SetTitleSize(0.04);
-            plot->GetYaxis()->SetTitleOffset(1.29);
-            plot->GetXaxis()->SetTitle(x_axis_title.c_str());
-            plot->SetTitle("");
-        }
-
-	/**
-	 *
-	 */
-    template <typename T>
-        void set2DPlotStyle(T* &plot, std::string x_axis_title, std::string y_axis_title)
-        {
-            set1DPlotStyle(plot, x_axis_title); 
-            plot->GetYaxis()->SetTitle(y_axis_title.c_str());
-
-        }
-
 
 }; // PlottingUtils
 
