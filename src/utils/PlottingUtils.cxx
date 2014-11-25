@@ -49,7 +49,7 @@ void PlottingUtils::setStyle() {
 	gStyle->SetLabelSize(font_size, "y"); 
 	gStyle->SetTitleFont(font, "y");
 	gStyle->SetTitleSize(font_size, "y"); 
-	gStyle->SetTitleOffset(offset, "y");	
+	gStyle->SetTitleOffset(offset + .50, "y");	
 	gStyle->SetLabelFont(font, "z");
 	gStyle->SetTitleFont(font, "y");
 
@@ -59,5 +59,11 @@ void PlottingUtils::setStyle() {
 
 	// Set marker attributes
 	gStyle->SetMarkerStyle(20); 
-	gStyle->SetMarkerSize(.2);	
+	gStyle->SetMarkerSize(.15);
+
+	gStyle->SetOptStat(0);
+
+	// Set margin attributes
+	gStyle->SetPadLeftMargin(.12);	
+	gStyle->SetPadRightMargin(.12);	
 }	
