@@ -10,7 +10,7 @@
 #include <BaselineAnalysis.h>
 
 BaselineAnalysis::BaselineAnalysis()
-	: canvas(NULL),
+	: canvas(NULL), 
       writer(new CalibrationWriter()),
 	  class_name("BaselineAnalysis"), 
 	  feb_id(-1), hybrid_id(-1)
@@ -23,18 +23,18 @@ BaselineAnalysis::BaselineAnalysis(int feb_id, int hybrid_id)
 	  feb_id(feb_id), hybrid_id(feb_id) 
 {}
 
-BaselineAnalysis::~BaselineAnalysis()
-{
+BaselineAnalysis::~BaselineAnalysis() {
     delete canvas; 
     delete writer;  
 }
 
-void BaselineAnalysis::initialize()
-{
-
+void BaselineAnalysis::initialize() {	
+	PlottingUtils::setPalette(); 
+	PlottingUtils::setStyle(); 
+	
 	canvas = new TCanvas("canvas", "canvas", 300, 300);
-
-    writer->openDocument("test.xml");
+	
+	writer->openDocument("test.xml");
     // TODO: Add method to writer that checks whether a specific FEB and Hybrid 
     //       node have been created.
     //writer->addFeb(feb_id);
@@ -57,18 +57,17 @@ void BaselineAnalysis::processEvent(TriggerSample* samples) {
 	// FEB and hybrid.
 	if (baseline_map.find(daq_pair) == baseline_map.end()) {
 		
-		//
-		//std::string plot_name = "baseline_feb" + PlotUtils::toString(samples->febAddress()) +
-		//   	"_hybrid" + PlotUtils::toString(samples->hybrid());	
-		//baseline_map[daq_pair] = new TH2F(plot_name.c_str(), "Baseline", 640, 0, 640, 16384, 0, 16384);
-		std::string plot_title = "FEB: " + PlottingUtils::toString(samples->febAddress()) + 
-			" Hybrid: " + PlottingUtils::toString(samples->hybrid()) + " Baseline"; 
+		std::string plot_title = "FEB: " + std::to_string(samples->febAddress()) + 
+								 " Hybrid: " + std::to_string(samples->hybrid()) + 
+								 " Baseline"; 
 		baseline_map[daq_pair] = new SamplesPlot(plot_title);
-		//baseline_map.at(daq_pair)->SetTitle(plot_title.c_str()); 
+		baseline_map.at(daq_pair)->setXAxisTitles("Physical Channel");
+		baseline_map.at(daq_pair)->setYAxisTitles("Baseline [ADC Counts]");
+	
 		std::cout << "[ BaselineAnalysis ]: Created baseline histogram for FEB: "	
-			<< samples->febAddress() << " Hybrid: " << samples->hybrid() << std::endl;
+				  << samples->febAddress() << " Hybrid: " << samples->hybrid()
+				  << std::endl;
 	}
-	//TH2F* baseline_plot = baseline_map.at(daq_pair);
 	SamplesPlot* baseline_plot = baseline_map.at(daq_pair); 
 
 	// Get the physical channel number corresponding to the APV25 channel
@@ -76,49 +75,17 @@ void BaselineAnalysis::processEvent(TriggerSample* samples) {
 	int physical_channel =  QAUtils::getPhysicalChannel(samples->apv(), samples->channel());
 	
 	for (int sample_n = 0; sample_n < 6; ++sample_n) {
-		//baseline_plot->Fill(physical_channel, double(samples->value(sample_n)));
 		baseline_plot->fill(sample_n, physical_channel, samples->value(sample_n));
 	} 
 }
 
-void BaselineAnalysis::finalize()
-{
+void BaselineAnalysis::finalize() {
 
+	std::unordered_map <std::pair <int, int>, SamplesPlot*, pairHash>::iterator plot_it = baseline_map.begin();	
 	
-	//std::unordered_map <std::pair <int, int>, TH2F*, pairHash>::iterator plot_it = baseline_map.begin(); 
-	std::unordered_map <std::pair <int, int>, SamplesPlot*, pairHash>::iterator plot_it = baseline_map.begin(); 
-	canvas->Print("baseline_run_summary.pdf[");
-    TH1D* projection = NULL;
-	//TH2F* baseline_plot = NULL;
-	SamplesPlot* baseline_plot = NULL;
-	TGraphErrors* mean = NULL;
-	TGraphErrors* noise = NULL;
 	for (plot_it; plot_it != baseline_map.end(); ++plot_it) { 
-		
-		baseline_plot = plot_it->second;
-
-		for(int sample_n = 0; sample_n < 6; ++sample_n) { 
-
-			//baseline_plot->getPlot(sample_n)->Draw("colz"); 
-			//canvas->Print("baseline_run_summary.pdf(");
-			mean = new TGraphErrors(640);
-			noise = new TGraphErrors(640); 	
-			for (int channel = 0; channel < 640; ++channel) { 
-				projection = baseline_plot->getPlot(sample_n)->ProjectionY("", channel+1, channel+1);
-				mean->SetPoint(channel,channel, projection->GetMean()); 
-				mean->SetPointError(channel, 0, projection->GetMeanError()); 
-				noise->SetPoint(channel, channel, projection->GetRMS()); 
-			}
-			mean->Draw("A*e");
-			canvas->Print("baseline_run_summary.pdf(");
-			noise->Draw("A*"); 
-			canvas->Print("baseline_run_summary.pdf(");
-			delete mean;
-			delete noise; 	
-		}
-		//baseline_plot->Draw("colz"); 		
+		this->processBaselinePlot(plot_it->first.first, plot_it->first.second, plot_it->second); 
 	}	
-	canvas->Print("baseline_run_summary.pdf]");
 
 	baseline_map.clear();
 
@@ -128,20 +95,48 @@ void BaselineAnalysis::finalize()
     writer->closeDocument();
 }
 
-std::string BaselineAnalysis::toString()
-{
+void BaselineAnalysis::processBaselinePlot(int feb, int hybrid, SamplesPlot* baseline_plot) {
+
+	TMultiGraph* samples_mean_baseline = new TMultiGraph();
+	TMultiGraph* samples_noise = new TMultiGraph();
+
+    TH1D* projection = NULL;
+
+	std::string file_name = "feb" + std::to_string(feb) + 
+							"_hybrid0" + std::to_string(hybrid) +
+							"_baseline_run_summary.pdf";
+
+	canvas->Print((file_name + "[").c_str());
+	for (int sample_n = 0; sample_n < 6; ++sample_n) { 
+
+		//baseline_plot->getPlot(sample_n)->Draw("colz"); 
+		//canvas->Print((file_name + "(").c_str());
+		
+		TGraphErrors* mean_baseline = new TGraphErrors(640);
+		TGraph* noise = new TGraphErrors(640); 	
+
+		for (int channel = 0; channel < 640; ++channel) { 
+			projection = baseline_plot->getPlot(sample_n)->ProjectionY("", channel+1, channel+1);
+			mean_baseline->SetPoint(channel,channel, projection->GetMean()); 
+			mean_baseline->SetPointError(channel, 0, projection->GetMeanError()); 
+			noise->SetPoint(channel, channel, projection->GetRMS()); 
+		}
+
+		samples_mean_baseline->Add(mean_baseline); 
+		samples_noise->Add(noise); 
+	}
+
+	samples_mean_baseline->Draw("Ap");
+	canvas->Print((file_name + "(").c_str());
+	samples_noise->Draw("Ap");
+	canvas->Print((file_name + "(").c_str());
+	canvas->Print((file_name + "]").c_str());
+
+	delete samples_mean_baseline; 
+	delete samples_noise; 
+}
+
+std::string BaselineAnalysis::toString() {
 	std::string string_buffer = "Class Name: " + class_name; 
 	return string_buffer; 	
 }
-
-/*void BaselineAnalysis::findCalibrations(TH1* pedestal_plot, double &baseline, double &noise)
-{
-   gaussian->SetRange(pedestal_plot->GetMean() - 3*pedestal_plot->GetRMS(), 
-                      pedestal_plot->GetMean() + 3*pedestal_plot->GetRMS());
-    pedestal_plot->Fit("gaussian", "RQ"); 
-    baseline = gaussian->GetParameter(1); 
-    noise = gaussian->GetParameter(2); 
-}*/
-
-
-

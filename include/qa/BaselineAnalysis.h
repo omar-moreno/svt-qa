@@ -30,6 +30,7 @@
 #include <TH2F.h>
 #include <TH1D.h>
 #include <TGraphErrors.h>
+#include <TMultiGraph.h>
 
 class pairHash { 	
 
@@ -48,16 +49,38 @@ class BaselineAnalysis : public QAAnalysis {
 
 	public: 
 
+		/**
+		 */
 		BaselineAnalysis();	
+		
+		/**
+		 */
 		BaselineAnalysis(int, int);	
+	
+		/**
+		 */
 		~BaselineAnalysis(); 
 
+		/**
+		 */
         void initialize();
-		void processEvent(TriggerSample*); 
-        void finalize();
-		std::string toString(); 
 
-        //void findCalibrations(TH1*, double &, double &);
+		/**
+		 */
+		void processEvent(TriggerSample*);
+	
+		/**
+		 */
+		void processBaselinePlot(int, int, SamplesPlot*);	
+        
+
+		/**
+		 */
+		void finalize();
+		
+		/**
+		 */
+		std::string toString(); 
 
     private: 
 
@@ -65,7 +88,6 @@ class BaselineAnalysis : public QAAnalysis {
 
         CalibrationWriter* writer; 
 		
-		//std::unordered_map <std::pair <int, int>, TH2F*, pairHash> baseline_map; 
 		std::unordered_map <std::pair <int, int>, SamplesPlot*, pairHash> baseline_map; 
 
 		std::string class_name;
