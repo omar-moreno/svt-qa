@@ -28,13 +28,16 @@ BaselineAnalysis::~BaselineAnalysis() {
     delete writer;  
 }
 
-void BaselineAnalysis::initialize() {	
+void BaselineAnalysis::initialize() {
+
+	
 	PlottingUtils::setPalette(); 
 	PlottingUtils::setStyle(); 
 	
 	canvas = new TCanvas("canvas", "canvas", 300, 300);
 	
 	writer->openDocument("test.xml");
+
     // TODO: Add method to writer that checks whether a specific FEB and Hybrid 
     //       node have been created.
     //writer->addFeb(feb_id);
@@ -60,7 +63,7 @@ void BaselineAnalysis::processEvent(TriggerSample* samples) {
 		std::string plot_title = "FEB: " + std::to_string(samples->febAddress()) + 
 								 " Hybrid: " + std::to_string(samples->hybrid()) + 
 								 " Baseline"; 
-		baseline_map[daq_pair] = new SamplesPlot(plot_title);
+		baseline_map[daq_pair] = new SamplesPlot(6, plot_title);
 		baseline_map.at(daq_pair)->setXAxisTitles("Physical Channel");
 		baseline_map.at(daq_pair)->setYAxisTitles("Baseline [ADC Counts]");
 	
@@ -102,23 +105,29 @@ void BaselineAnalysis::processBaselinePlot(int feb, int hybrid, SamplesPlot* bas
 
     TH1D* projection = NULL;
 
-	std::string file_name = "feb" + std::to_string(feb) + 
-							"_hybrid0" + std::to_string(hybrid) +
-							"_baseline_run_summary.pdf";
+	std::string file_name = "feb";
+	if (feb < 10) file_name += "0";
+	file_name += std::to_string(feb) + "_hybrid0" + std::to_string(hybrid) +
+				 "_baseline_run_summary.pdf";
 
 	canvas->Print((file_name + "[").c_str());
-	for (int sample_n = 0; sample_n < 6; ++sample_n) { 
 
-		//baseline_plot->getPlot(sample_n)->Draw("colz"); 
-		//canvas->Print((file_name + "(").c_str());
+	baseline_plot->getSumOfPlots()->Draw("colz"); 
+	canvas->Print((file_name + "(").c_str());
+	
+	for (int sample_n = 0; sample_n < 6; ++sample_n) { 
 		
 		TGraphErrors* mean_baseline = new TGraphErrors(640);
+		mean_baseline->SetMarkerColor(2 + sample_n);
+		mean_baseline->SetLineColor(2 + sample_n);
 		TGraph* noise = new TGraphErrors(640); 	
+		noise->SetMarkerColor(2 + sample_n);
+		noise->SetLineColor(2 + sample_n);
 
 		for (int channel = 0; channel < 640; ++channel) { 
 			projection = baseline_plot->getPlot(sample_n)->ProjectionY("", channel+1, channel+1);
 			mean_baseline->SetPoint(channel,channel, projection->GetMean()); 
-			mean_baseline->SetPointError(channel, 0, projection->GetMeanError()); 
+			mean_baseline->SetPointError(channel, projection->GetMeanError(), 0); 
 			noise->SetPoint(channel, channel, projection->GetRMS()); 
 		}
 
