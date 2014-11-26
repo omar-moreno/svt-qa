@@ -133,7 +133,7 @@ class TestRunSvtEvent : public Data {
 		double tempTableNew_[adcCnt_];
 
 		// Frame Constants
-		static const unsigned int headSize_   = 8;
+		static const unsigned int headSize_   = 7;
 		static const unsigned int tailSize_   = 1;
 		static const unsigned int sampleSize_ = 4;
 
