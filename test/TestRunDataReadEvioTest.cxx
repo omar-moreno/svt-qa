@@ -51,8 +51,8 @@ int main(int argc, char **argv)
 	// If an EVIO input file was not specified, warn the user and 
 	// exit the program
 	if (evio_file_name.empty()) {
-		cerr << "\n[ SVT QA ]: Please specify a file to process." << endl;
-		cerr << "[ SVT QA ]: Use --help for usage.\n" << endl;
+		cerr << "\n[ TestRunDataReadEvioTest ]: Please specify a file to process." << endl;
+		cerr << "[ TestRunDataReadEvioTest ]: Use --help for usage.\n" << endl;
 		return EXIT_FAILURE; 
 	}
 
@@ -62,22 +62,22 @@ int main(int argc, char **argv)
 	TestRunSvtEvent* data = new TestRunSvtEvent();
 
 	while (data_reader->next(data)) {
-		cout << "[ DataReadEvioTest ]:\t\tFpga: " << data->fpgaAddress() << endl;
+		cout << "[ TestRunDataReadEvioTest ]:\t\tFpga: " << data->fpgaAddress() << endl;
 	    	
 		for(int temp_index = 0; temp_index < 12; ++temp_index){
-			cout << "[ DataReadEvioTest ]:\t\tTemperature " << temp_index << ": " 
+			cout << "[ TestRunDataReadEvioTest ]:\t\tTemperature " << temp_index << ": " 
 				 << data->temperature(temp_index) << endl; 
 		}
-		cout << "[ DataReadEvioTest ]:\t\tCount: " << data->count() << endl;
+		cout << "[ TestRunDataReadEvioTest ]:\t\tCount: " << data->count() << endl;
 		
         for(uint sample_set_n = 0; sample_set_n < data->count(); ++sample_set_n){ 
 			data->sample(sample_set_n, data_sample);
-			cout << "[ DataReadEvioTest ]:\t\tFPGA:    " << data_sample->fpgaAddress() 
+			cout << "[ TestRunDataReadEvioTest ]:\t\tFPGA:    " << data_sample->fpgaAddress() 
                  << "\tHybrid:  " << data_sample->hybrid() 
                  << "\tapv:	    " << data_sample->apv()
 			     << "\tchannel: " << data_sample->channel() << endl;
 			for(int sample_n = 0; sample_n < 6; ++sample_n){
-				cout << "[ DataReadEvioTest ]:\t\t\tsample " << sample_n 
+				cout << "[ TestRunDataReadEvioTest ]:\t\t\tsample " << sample_n 
 					 << ": " << data_sample->value(sample_n) << endl;
 			}
 		}
