@@ -1,7 +1,8 @@
 /**
  *
  * @file	DataReadEvio.cxx
- * @brief	EVIO to Data event converter.
+ * @brief	EVIO to Data event converter used for the engineering run
+ *          and beyond.
  * @author: Omar Moreno <omoreno1@ucsc.edu>
  *          Santa Cruz Institute for Particle Physics
  *          University of California, Santa Cruz
@@ -11,7 +12,7 @@
 
 #include <DataReadEvio.h>
 
-DataReadEvio::DataReadEvio() : AbstractDataReadEvio(1,2)
+DataReadEvio::DataReadEvio() : AbstractDataReadEvio(1,3)
 {}
 
 DataReadEvio::~DataReadEvio()
@@ -19,6 +20,7 @@ DataReadEvio::~DataReadEvio()
 
 void DataReadEvio::processDataBank(Data* data_obj, uint16_t tag, std::vector<uint32_t>* data)
 {
-	// Copy the data to the data object
+	 
+    // Copy the data to the data object
 	data_obj->copy(&(*data)[0], data->size());
 }

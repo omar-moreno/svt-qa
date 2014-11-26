@@ -1,6 +1,7 @@
 /**
  * @file	DataReadEvio.h
- * @brief	EVIO to Data event converter.
+ * @brief	EVIO to Data event converter used for the engineering run
+ *          and beyond.
  * @author	Omar Moreno <omoreno1@ucsc.edu>
  *          Santa Cruz Institute for Particle Physics
  *          University of California, Santa Cruz
