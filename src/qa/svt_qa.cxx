@@ -23,6 +23,7 @@
 
 //--- SVT QA ---//
 //--------------//
+#include <DataReadEvio.h>
 #include <BaselineAnalysis.h>
 
 using namespace std; 
@@ -35,6 +36,7 @@ int main(int argc, char **argv) {
     
     string input_file_name;
     bool run_baseline = false;
+    bool evio = false; 
     int feb_id = -1; 
     int hybrid_id = -1; 
     int total_events = -1; 
@@ -45,14 +47,15 @@ int main(int argc, char **argv) {
         { "input",          required_argument, 0, 'i' },
         { "feb",            required_argument, 0, 'f' },
         { "hybrid",         required_argument, 0, 'h' },
-        { "baseline",       no_argument,       0, 'b' },
         { "total_events",   required_argument, 0, 'n' },
+        { "baseline",       no_argument,       0, 'b' },
+        { "evio",           no_argument,       0, 'e' },
         { "help",           no_argument,       0, 'u' }, 
         { 0, 0, 0, 0 }
     };
     int option_index = 0;
     int option_char; 
-    while ((option_char = getopt_long(argc, argv, "i:f:h:bn:u", long_options, &option_index)) != -1) {
+    while ((option_char = getopt_long(argc, argv, "i:f:h:n:beu", long_options, &option_index)) != -1) {
         switch (option_char) {
             case 'i': 
                 input_file_name = optarg; 
@@ -63,12 +66,15 @@ int main(int argc, char **argv) {
             case 'h':
                 hybrid_id = atoi(optarg);
                 break;  
-            case 'b': 
-                run_baseline = true; 
-                break;
             case 'n':
                 total_events = atoi(optarg); 
                 break; 
+            case 'b': 
+                run_baseline = true; 
+                break;
+            case 'e':
+                evio = true; 
+                break;
             case 'u':
                 displayUsage();
                 return EXIT_SUCCESS;
@@ -89,8 +95,13 @@ int main(int argc, char **argv) {
     // 
     TriggerEvent trigger_event;
     TriggerSample* trigger_samples = new TriggerSample(); 
-    DataRead *data_reader = new DataRead(); 
-
+    DataRead *data_reader = NULL; 
+    if (evio) { 
+        data_reader = new DataReadEvio();  
+    } else { 
+        data_reader = new DataRead(); 
+    }
+    
     // Open the input file.  If the input file can't be opened, exit the 
     // application
     if (!data_reader->open(input_file_name)) {
