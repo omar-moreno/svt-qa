@@ -39,6 +39,10 @@ include_directories("${GENERIC_HDR_DIR}")
 set(UTILS_HDR_DIR "${SVT_QA_SOURCE_DIR}/include/utils")
 include_directories("${UTILS_HDR_DIR}")
 
+# Include EVIO headers
+set(EVIO_HDR_DIR "$ENV{CODA}/Linux-x86_64/include")
+include_directories("${EVIO_HDR_DIR}")
+
 # Include the QA headers 
 set(QA_HDR_DIR "${SVT_QA_SOURCE_DIR}/include/qa")
 include_directories("${QA_HDR_DIR}")
@@ -51,6 +55,10 @@ include_directories("${PLOTTING_HDR_DIR}")
 set(XML_HDR_DIR "${SVT_QA_SOURCE_DIR}/include/xml")
 include_directories("${XML_HDR_DIR}")
 
+# Include the daq headers
+set(DAQ_HDR_DIR "${SVT_QA_SOURCE_DIR}/include/daq")
+include_directories("${DAQ_HDR_DIR}")
+
 # Add the xml directory to the build 
 add_subdirectory("${SVT_QA_SOURCE_DIR}/src/xml")
 
@@ -62,6 +70,9 @@ add_subdirectory("${SVT_QA_SOURCE_DIR}/src/plotting")
 
 # Add the analysis subdirectory to the build
 add_subdirectory("${SVT_QA_SOURCE_DIR}/src/qa")
+
+# Add the daq directory to the build
+add_subdirectory("${SVT_QA_SOURCE_DIR}/src/daq")
 
 # Add the test directory to the build
 add_subdirectory("${SVT_QA_SOURCE_DIR}/test")
