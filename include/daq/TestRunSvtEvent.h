@@ -5,8 +5,33 @@
  *				Santa Cruz Institute for Particle Physics
  *				University of California, Santa Cruz
  *	@date		November 12, 2014
- *
- *	HPS Test run event container. Event Data consists of the following:
+ */
+
+
+#ifndef __TEST_RUN_SVT_EVENT_H__
+#define __TEST_RUN_SVT_EVENT_H__
+
+//------------------//
+//--- C++ StdLib ---//
+//------------------//
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <unistd.h>
+#include <cmath>
+#include <cstdlib>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <sys/types.h>
+
+//---------------//
+//--- SVT DAQ ---//
+//---------------//
+#include <Data.h>
+#include <TestRunSvtSample.h>
+
+/**
+ *  HPS Test run event container. Event Data consists of the following:
  *	  Z[xx:xx] = Zeros
  *    Frame Size = 1 x 32-bits (32-bit dwords)
  *    Header = 8 x 32-bits
@@ -37,105 +62,97 @@
  *       
  *       Tail[1] = Z[31:0]
  */
-
-#ifndef _TEST_RUN_SVT_EVENT_H_
-#define _TEST_RUN_SVT_EVENT_H_
-
-
-#include <iostream>
-#include <sstream>
-#include <string>
-#include <unistd.h>
-#include <math.h>
-#include <stdlib.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <sys/types.h>
-
-//-----------//
-//--- DAQ ---//
-//-----------//
-#include <Data.h>
-#include <TestRunSvtSample.h>
-
 class TestRunSvtEvent : public Data {
 
 	public:
 
-		//! Constructor
+        /**
+         *  Default Constructor
+         */
 		TestRunSvtEvent();
 
-		//! Deconstructor
+        /**
+         *  Deconstructor
+         */
 		~TestRunSvtEvent();
 
-		//! Is frame TI frame?
+        /**
+         *  Check whether the data corresponds to a TI frame
+         */
 		bool isTiFrame();
 
-		//! Get FpgaAddress value from header.
-		/*!
-		 * Returns fpgaAddress
-		 */
-		uint fpgaAddress();
+		/**
+         *  Get the FPGA address value from the header
+         *
+         *  @return The FPGA address
+         */
+        uint fpgaAddress();
 
-		//! Get sequence count from header.
-		/*!
-		 * Returns sequence count
-		 */
-		uint sequence();
-
-		//! Get trigger block from header.
-		/*!
-		 * Returns trigger block
-		 */
+		/**
+         *  Get the sequence count from the header.
+         *
+         *  @return The sequence count
+         */
+        uint sequence();
+        
+        /**
+         *  Get the trigger block from the header.
+         *
+         *  @return The trigger block
+         */
 		uint * tiData();
 
-		//! Get temperature values from header.
-		/*!
-		 * Returns temperature value.
-		 * \param index temperature index, 0-11.
-		 */
-		double temperature(uint);
+	    /**
+         *  Get the temperature at the given index from the header.
+         *
+         *  @param index - temperature index in the range 0-11
+         *  @return temperature in C
+         */
+        double temperature(uint index);
 
-		//! Get sample count
-		/*!
-		 * Returns sample count
-		 */
-		uint count();
+		/**
+         *  Get the total number of sample sets in the event
+         *
+         *  @return The sample set count
+         */
+        uint count();
 
-		//! Get the sample at index
-		/*!
-		 * Returns the sample at index
-		 */
-		void sample(uint, TestRunSvtSample*);
+		/**
+         *  Get the sample set at the given index.
+         *
+         *  @param index - sample set index less than this->count()
+         *  @param sample - The test run sample use to encapsulate the data
+         */
+        void sample(uint index, TestRunSvtSample* sample);
 
 	public:
 
 		// Temperature Constants
-		static const double coeffA_     = -1.4141963e1;
-		static const double coeffB_     =  4.4307830e3;
-		static const double coeffC_     = -3.4078983e4;
-		static const double coeffD_     = -8.8941929e6;
-		static const double beta_       = 3750;
-		static const double constA_     = 0.03448533;
-		static const double t25_        = 10000.0;
-		static const double k0_         = 273.15;
-		static const double vmax_       = 2.5;
-		static const double vref_       = 2.5;
-		static const double vrefNew_    = 2.048;
-		static const double rdiv_       = 10000;
-		static const double minTemp_    = -50;
-		static const double maxTemp_    = 150;
-		static const double incTemp_    = 0.01;
-		static const uint   adcCnt_     = 4096;
+		static const double coeffA_;
+		static const double coeffB_;
+		static const double coeffC_;
+		static const double coeffD_;
+		static const double beta_;
+		static const double constA_;
+		static const double t25_;
+		static const double k0_;
+		static const double vmax_;
+		static const double vref_;
+		static const double vrefNew_;
+		static const double rdiv_;
+		static const double minTemp_;
+		static const double maxTemp_;
+		static const double incTemp_;
+		static constexpr uint adcCnt_ = 4096;
 
 		// Temperature lookup table
 		double tempTable_[adcCnt_];
 		double tempTableNew_[adcCnt_];
 
 		// Frame Constants
-		static const unsigned int headSize_   = 7;
-		static const unsigned int tailSize_   = 1;
-		static const unsigned int sampleSize_ = 4;
+		static const unsigned int headSize_;
+		static const unsigned int tailSize_;
+		static const unsigned int sampleSize_;
 
 		// Update
 		void update();

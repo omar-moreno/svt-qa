@@ -1,3 +1,6 @@
+
+add_definitions("-std=c++11")
+
 # Find the EVIO libraries
 find_library(EVIO_LIB evio $ENV{CODA}/Linux-x86_64/lib)
 find_library(EVIOXX_LIB evioxx $ENV{CODA}/Linux-x86_64/lib)

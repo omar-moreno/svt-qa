@@ -10,12 +10,9 @@
 
 #include <TestRunSvtEvent.h>
 
-void TestRunSvtEvent::update()
-{ 
-}
+void TestRunSvtEvent::update() {}
 
-TestRunSvtEvent::TestRunSvtEvent() : Data() 
-{
+TestRunSvtEvent::TestRunSvtEvent() : Data() {
    double       temp;
    double       tk;
    double       res;
@@ -50,29 +47,24 @@ TestRunSvtEvent::TestRunSvtEvent() : Data()
 TestRunSvtEvent::~TestRunSvtEvent()
 {}
 
-bool TestRunSvtEvent::isTiFrame()
-{
+bool TestRunSvtEvent::isTiFrame() {
    return((data_[0] & 0x80000000) != 0);
 }
 
-uint TestRunSvtEvent::fpgaAddress()
-{
+uint TestRunSvtEvent::fpgaAddress() {
    return(data_[0] & 0xFFFF);
 }
 
-uint TestRunSvtEvent::sequence()
-{
+uint TestRunSvtEvent::sequence() {
    return(data_[1]);
 }
 
-uint * TestRunSvtEvent::tiData()
-{
+uint * TestRunSvtEvent::tiData() {
    return(&(data_[2]));
 }
 
 
-double TestRunSvtEvent::temperature(uint index)
-{
+double TestRunSvtEvent::temperature(uint index) {
    uint adcValue;
    uint convValue;
 
@@ -100,16 +92,34 @@ double TestRunSvtEvent::temperature(uint index)
    return (tempTableNew_[convValue]);
 }
 
-uint TestRunSvtEvent::count()
-{
+uint TestRunSvtEvent::count() {
    if ( isTiFrame () ) return(0);
    else return((size_-(headSize_ + tailSize_))/sampleSize_);
 }
 
-void TestRunSvtEvent::sample(uint index, TestRunSvtSample* sample)
-{
+void TestRunSvtEvent::sample(uint index, TestRunSvtSample* sample) {
 	if( index < count() ) { 
       sample->setData(&(data_[headSize_ + (index*sampleSize_)]));
 	}	
 }
+
+const double TestRunSvtEvent::coeffA_     = -1.4141963e1;
+const double TestRunSvtEvent::coeffB_     =  4.4307830e3;  
+const double TestRunSvtEvent::coeffC_     = -3.4078983e4;
+const double TestRunSvtEvent::coeffD_     = -8.8941929e6;
+const double TestRunSvtEvent::beta_       = 3750;
+const double TestRunSvtEvent::constA_     = 0.03448533;
+const double TestRunSvtEvent::t25_        = 10000.0;
+const double TestRunSvtEvent::k0_         = 273.15;
+const double TestRunSvtEvent::vmax_       = 2.5;
+const double TestRunSvtEvent::vref_       = 2.5;
+const double TestRunSvtEvent::vrefNew_    = 2.048;
+const double TestRunSvtEvent::rdiv_       = 10000;
+const double TestRunSvtEvent::minTemp_    = -50;
+const double TestRunSvtEvent::maxTemp_    = 150;
+const double TestRunSvtEvent::incTemp_    = 0.01;
+
+const unsigned int TestRunSvtEvent::headSize_   = 7;
+const unsigned int TestRunSvtEvent::tailSize_   = 1;
+const unsigned int TestRunSvtEvent::sampleSize_ = 4;
 
