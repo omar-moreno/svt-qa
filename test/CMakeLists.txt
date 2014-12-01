@@ -1,4 +1,6 @@
 
+add_definitions("-std=c++11")
+
 add_executable(CalibrationWriterTest CalibrationWriterTest.cxx)
 target_link_libraries(CalibrationWriterTest CalibrationWriter)
 

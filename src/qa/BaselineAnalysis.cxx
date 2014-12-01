@@ -36,13 +36,7 @@ void BaselineAnalysis::initialize() {
 	
 	canvas = new TCanvas("canvas", "canvas", 300, 300);
 	
-	writer->openDocument("test.xml");
-
-    // TODO: Add method to writer that checks whether a specific FEB and Hybrid 
-    //       node have been created.
-    //writer->addFeb(feb_id);
-    //writer->addHybrid(feb_id, hybrid_id); 
-    
+	writer->open("test.xml");
 }
 
 void BaselineAnalysis::processEvent(TriggerSample* samples) {
@@ -91,11 +85,8 @@ void BaselineAnalysis::finalize() {
 	}	
 
 	baseline_map.clear();
-
-    //writer->writeBaseline(feb_id, hybrid_id, 0, channel, 0, baseline);  
-    //writer->writeNoise(feb_id, hybrid_id, 0, channel, 0, noise);
-
-    writer->closeDocument();
+    
+    writer->close();
 }
 
 void BaselineAnalysis::processBaselinePlot(int feb, int hybrid, SamplesPlot* baseline_plot) {
@@ -129,6 +120,8 @@ void BaselineAnalysis::processBaselinePlot(int feb, int hybrid, SamplesPlot* bas
 			mean_baseline->SetPoint(channel,channel, projection->GetMean()); 
 			mean_baseline->SetPointError(channel, projection->GetMeanError(), 0); 
 			noise->SetPoint(channel, channel, projection->GetRMS()); 
+            writer->writeBaseline(feb, hybrid, channel, sample_n, projection->GetMean());
+            writer->writeNoise(feb, hybrid, channel, sample_n, projection->GetRMS());
 		}
 
 		samples_mean_baseline->Add(mean_baseline); 
