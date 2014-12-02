@@ -1,21 +1,25 @@
 /**
- *
- *	@author: Omar Moreno <omoreno1@ucsc.edu>
- *			 Santa Cruz Institute for Particle Physics
- *			 University of California, Santa Cruz
- *  @date:   May 5, 2014
+ *  @file   BaselineAnalysis.h
+ *  @brief  Analysis class used to extract baseline and noise values for all
+ *          SVT channels.
+ *	@author Omar Moreno <omoreno1@ucsc.edu>
+ *			Santa Cruz Institute for Particle Physics
+ *			University of California, Santa Cruz
+ *  @date   May 5, 2014
  *
  */
 
 #ifndef __BASELINE_ANALYSIS_H__
 #define __BASELINE_ANALYSIS_H__
 
-//--- StdLib ---//
-//--------------//
+//------------------//
+//--- C++ StdLib ---//
+//------------------//
 #include <string>
 #include <unordered_map>
 #include <vector>
 
+//--------------//
 //--- SVT QA ---//
 //--------------//
 #include <QAAnalysis.h>
@@ -24,6 +28,7 @@
 #include <PlottingUtils.h>
 #include <SamplesPlot.h>
 
+//------------//
 //--- ROOT ---//
 //------------//
 #include <TCanvas.h>
@@ -50,14 +55,20 @@ class BaselineAnalysis : public QAAnalysis {
 	public: 
 
 		/**
+         * Default Constructor
 		 */
 		BaselineAnalysis();	
-		
-		/**
-		 */
-		BaselineAnalysis(int, int);	
+	
+        /**
+         *  Constructor
+         *
+         *  @param feb_id - FEB ID
+         *  @param hybrid_id - Hybrid ID
+         */    
+		BaselineAnalysis(int feb_id, int hybrid_id);	
 	
 		/**
+         * Destructor
 		 */
 		~BaselineAnalysis(); 
 
