@@ -44,13 +44,19 @@ find_library(EVIO_LIB evio $ENV{CODA}/Linux-x86_64/lib)
 find_library(EVIOXX_LIB evioxx $ENV{CODA}/Linux-x86_64/lib)
 
 add_library(BaselineAnalysis BaselineAnalysis.cxx)
-target_link_libraries(BaselineAnalysis ${ROOT_RIO_LIB})
-target_link_libraries(BaselineAnalysis ${ROOT_TREE_LIB})
-target_link_libraries(BaselineAnalysis ${ROOT_CORE_LIB}) 
-target_link_libraries(BaselineAnalysis ${ROOT_HIST_LIB})
-target_link_libraries(BaselineAnalysis ${ROOT_GPAD_LIB})
-target_link_libraries(BaselineAnalysis QAUtils CalibrationWriter)
-target_link_libraries(BaselineAnalysis SamplesPlot)
+target_link_libraries(BaselineAnalysis 
+    ${ROOT_RIO_LIB}
+    ${ROOT_TREE_LIB}
+    ${ROOT_CORE_LIB}
+    ${ROOT_HIST_LIB}
+    ${ROOT_GPAD_LIB}
+    QAUtils
+    CalibrationWriter
+    SamplesPlot
+)
+
+add_library(CalibrationAnalysis CalibrationAnalysis.cxx)
+
 
 #add_executable(apv25_qa apv25_qa.cxx)
 #target_link_libraries(apv25_qa ${ROOT_TREE_LIB} ${ROOT_CORE_LIB} ${ROOT_RIO_LIB} ${ROOT_PHYSICS_LIB} PlotUtils Apv25Utils ${TRACKER_EVENT_LIB} ${TRACKER_SAMPLE_LIB} ${DATA_READ_LIB} ${DATA_LIB} ${ROOT_GPAD_LIB} ${ROOT_HIST_LIB} ${ROOT_GRAF_LIB} ${ROOT_MATHCORE_LIB} ${XMLVARIABLES_LIB} ${ROOT_MATRIX_LIB} ${ROOT_CINT_LIB} ${ROOT_THREAD_LIB} ${ROOT_SQLIO_LIB} ${XML_LIB} ${ROOT_NET_LIB} SvtCalibrations ${RT_LIB} ${BZ2_LIB}) 
@@ -62,16 +68,18 @@ target_link_libraries(BaselineAnalysis SamplesPlot)
 #target_link_libraries(source_analysis ${ROOT_TREE_LIB} ${ROOT_CORE_LIB} ${ROOT_RIO_LIB} ${ROOT_PHYSICS_LIB} PlotUtils ${TRACKER_EVENT_LIB} ${TRACKER_SAMPLE_LIB} ${DATA_READ_LIB} ${DATA_LIB} ${ROOT_GPAD_LIB} ${ROOT_HIST_LIB} ${ROOT_GRAF_LIB} ${ROOT_MATHCORE_LIB} ${XMLVARIABLES_LIB} ${ROOT_MATRIX_LIB} ${ROOT_CINT_LIB} ${ROOT_THREAD_LIB} ${ROOT_SQLIO_LIB} ${XML_LIB} ${ROOT_NET_LIB} SvtCalibrations ${ROO_FIT_LIB} ${ROO_FIT_CORE_LIB} Apv25Utils ${RT_LIB} ${BZ2_LIB}) 
 
 add_executable(svt_qa svt_qa.cxx)
-target_link_libraries(svt_qa DataReadEvio)
-target_link_libraries(svt_qa ${TRACKER_EVENT_LIB})
-target_link_libraries(svt_qa ${TRACKER_SAMPLE_LIB})
-target_link_libraries(svt_qa ${TRIGGER_EVENT_LIB})
-target_link_libraries(svt_qa ${TRIGGER_SAMPLE_LIB})
-target_link_libraries(svt_qa ${XMLVARIABLES_LIB})
-target_link_libraries(svt_qa ${BZ2_LIB})
-target_link_libraries(svt_qa ${XML_LIB})
-target_link_libraries(svt_qa ${RT_LIB})
-target_link_libraries(svt_qa ${EVIOXX_LIB})
-target_link_libraries(svt_qa ${EVIO_LIB})
-target_link_libraries(svt_qa ${EXPAT_LIB})
-target_link_libraries(svt_qa BaselineAnalysis)
+target_link_libraries(svt_qa 
+    DataReadEvio
+    ${TRACKER_EVENT_LIB}
+    ${TRACKER_SAMPLE_LIB}
+    ${TRIGGER_EVENT_LIB}
+    ${TRIGGER_SAMPLE_LIB}
+    ${XMLVARIABLES_LIB}
+    ${BZ2_LIB}
+    ${XML_LIB}
+    ${RT_LIB}
+    ${EVIOXX_LIB}
+    ${EVIO_LIB}
+    ${EXPAT_LIB}
+    BaselineAnalysis
+)
