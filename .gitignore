@@ -1,18 +1,34 @@
+#
+#   @file .gitignore
+#   @brief  Files, directories and compiled sources that should be ignored by
+#           by git.
+#   @author Omar Moreno <omoreno1@ucsc.edu>
+#           Santa Cruz Institute for Particle Physics
+#           University of California, Santa Cruz
+#   @date   December 04, 2014
+#   
 
-# Compile Sources
+# Compiled Sources 
 bin/
-.obj
+.obj/
 *.o
 *.so
 
-# Build Directory
+# Build Directory 
 build/
 
-# ROOT files
+# files  
 *.root
+*.pdf
 
-# Temp files
+# Temp files 
 *~
-*.swp
-*.swo
+[._]*.s[a-w][a-z]
+[._]s[a-w][a-z]
+
+# Eclipse project description file 
+.project
+
+# Pydev project file
+.pydevproject
 
