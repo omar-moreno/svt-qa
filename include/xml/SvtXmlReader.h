@@ -46,6 +46,13 @@ class SvtXmlReader {
 		 */
 		void open(std::string xml_file_name);
 
+        /**
+         *
+         */
+        double getChannelData(std::string name, 
+                int feb, int hybrid, int channel, int sample);
+
+
 	private:
 
 		// Pointer to the XML document

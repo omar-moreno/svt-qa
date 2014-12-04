@@ -76,6 +76,7 @@ void SvtXmlReader::open(std::string xml_file_name) {
 		throw std::runtime_error("[ ERROR ]: Cannot create XPath context."); 	
 	}
 
+    // Get all of the hybrid nodes in the document
 	xmlXPathObjectPtr result = xmlXPathEvalExpression((const xmlChar*) hybrid_node_name.c_str(), context);
 	xmlXPathFreeContext(context);
 	if (result == NULL) { 
@@ -91,3 +92,15 @@ void SvtXmlReader::open(std::string xml_file_name) {
 	}
 }
 
+
+double SvtXmlReader::getChannelData(std::string name, 
+                        int feb, int hybrid, int channel, int sample) { 
+
+    xmlChar* feb_id = NULL;
+    for (int hybrid_node = 0; hybrid_node < hybrid_nodes->nodeNr; ++hybrid_node) { 
+        feb_id = xmlGetProp(hybrid_nodes->nodeTab[hybrid_node]->parent, (const xmlChar*) "id");
+        if (!xmlStrcmp(feb_id, (const xmlChar*) std::to_string(feb).c_str())) { 
+            std::cout << "[ SvtXmlReader ]: FEB with id " << feb << " found." << std::endl;
+        }
+    }
+}
