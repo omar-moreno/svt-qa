@@ -79,9 +79,9 @@ class HybridNode {
 
 
         /**
-         * Get the Hybrid ID
+         *  Get the Hybrid ID
          *
-         * @return The Hybrid ID
+         *  @return The Hybrid ID
          */
         int getHybridID() const { return hybrid_id; };  
 
