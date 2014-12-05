@@ -10,11 +10,16 @@
 
 #include <SvtXmlReader.h>
 
+SvtXmlReader::SvtXmlReader()
+	: document(NULL), system_node(NULL), config_node(NULL),
+	  system_node_name("system"), config_node_name("config"),
+	  feb_node_name("//Feb")
+{}
+
 SvtXmlReader::SvtXmlReader(std::string xml_file_name)
 	: document(NULL), system_node(NULL), config_node(NULL),
-	  hybrid_nodes(NULL), 
 	  system_node_name("system"), config_node_name("config"), 
-	  hybrid_node_name("//Hybrid") 
+	  feb_node_name("//Feb")
 {
 	// Open the file and parse it into a tree
 	this->open(xml_file_name); 
@@ -22,12 +27,12 @@ SvtXmlReader::SvtXmlReader(std::string xml_file_name)
 
 SvtXmlReader::~SvtXmlReader() {
 
-	// Free the document
-	xmlFreeDoc(document);	
+	feb_nodes.clear();
 }
 
 void SvtXmlReader::open(std::string xml_file_name) {
 
+    // If a document is already opened, throw an exception
 	if (document != NULL) { 
 		throw std::runtime_error("[ ERROR ]: A document is already opened.");
 	}
@@ -59,11 +64,10 @@ void SvtXmlReader::open(std::string xml_file_name) {
 		xmlFreeDoc(document);
 		throw std::runtime_error("[ ERROR ]: Root node is of the wrong type."); 
 	}
-
 	std::cout << "[ SvtXmlReader ]: Root element name: " << system_node->name << std::endl;
 
-	// The root node "system" has only child node "config".  Get the child node and verify
-	// that it's name is "config"
+	// The root node "system" should only have a single child node named "config".
+	// Get the child node and verify that it's name is "config"
 	config_node = system_node->xmlChildrenNode;
 	std::cout << "[ SvtXmlReader ]: Child element name: " << config_node->name << std::endl;
 	if (xmlStrcmp(config_node->name, (const xmlChar *) config_node_name.c_str())) {
@@ -71,36 +75,50 @@ void SvtXmlReader::open(std::string xml_file_name) {
 		throw std::runtime_error("[ ERROR ]: Root node is of the wrong type."); 
 	}
 
+	// Instantiate the xpath context to be used when retrieving all FEB nodes
 	xmlXPathContextPtr context = xmlXPathNewContext(document);
 	if (context == NULL) { 
 		throw std::runtime_error("[ ERROR ]: Cannot create XPath context."); 	
 	}
 
-    // Get all of the hybrid nodes in the document
-	xmlXPathObjectPtr result = xmlXPathEvalExpression((const xmlChar*) hybrid_node_name.c_str(), context);
+    // Get all of the FEB nodes in the document and free the context.  If no
+	// FEB were found, throw an exception
+	xmlXPathObjectPtr result = xmlXPathEvalExpression((const xmlChar*) feb_node_name.c_str(), context);
 	xmlXPathFreeContext(context);
 	if (result == NULL) { 
 		throw std::runtime_error("[ ERROR ]: xmlXPathEvalExpression returned NULL"); 	
 	}
-	
-	std::cout << "[ SvtXmlReader ]: Total Hybrid nodes found: " << result->nodesetval->nodeNr << std::endl;
+	std::cout << "[ SvtXmlReader ]: Total FEB nodes found: " << result->nodesetval->nodeNr << std::endl;
 
-	hybrid_nodes = result->nodesetval; 
-	if (xmlXPathNodeSetIsEmpty(hybrid_nodes)) {
-		xmlXPathFreeObject(result);
-		throw std::runtime_error("[ ERROR ]: Couldn't find any nodes with name " + hybrid_node_name);
+	// Loop through the FEB nodes that were found and create FebNode objects
+	for (int feb_node_n = 0; feb_node_n < result->nodesetval->nodeNr; ++feb_node_n) {
+
+	    FebNode* feb_node = new FebNode(result->nodesetval->nodeTab[feb_node_n]);
+	    feb_nodes[feb_node->getFebID()] = feb_node;
 	}
 }
 
+void SvtXmlReader::close() {
 
-double SvtXmlReader::getChannelData(std::string name, 
-                        int feb, int hybrid, int channel, int sample) { 
+    // If a document hasn't been created, throw a runtime exception
+	if(document == NULL){
+		throw std::runtime_error("[ ERROR ]: A document hasn't been created.");
+	}
 
-    xmlChar* feb_id = NULL;
-    for (int hybrid_node = 0; hybrid_node < hybrid_nodes->nodeNr; ++hybrid_node) { 
-        feb_id = xmlGetProp(hybrid_nodes->nodeTab[hybrid_node]->parent, (const xmlChar*) "id");
-        if (!xmlStrcmp(feb_id, (const xmlChar*) std::to_string(feb).c_str())) { 
-            std::cout << "[ SvtXmlReader ]: FEB with id " << feb << " found." << std::endl;
-        }
-    }
+	// Free the document
+	xmlFreeDoc(document);
+
+	// Cleanup the parser
+	xmlCleanupParser();
 }
+
+FebNode* SvtXmlReader::getFebNode(int feb_id) {
+
+    // If a document hasn't been created, throw a runtime exception
+    if (document == NULL) {
+        throw std::runtime_error("[ ERROR ]: The document has not been opened.");
+    }
+
+    return feb_nodes[feb_id];
+}
+

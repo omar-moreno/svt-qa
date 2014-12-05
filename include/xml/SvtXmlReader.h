@@ -17,6 +17,7 @@
 #include <string>
 #include <stdexcept>
 #include <iostream>
+#include <unordered_map>
 
 //--------------//
 //--- LibXML ---//
@@ -25,9 +26,19 @@
 #include <libxml/parser.h>
 #include <libxml/xpath.h>
 
+//--------------//
+//--- SVT QA ---//
+//--------------//
+#include <FebNode.h>
+
 class SvtXmlReader { 
 
 	public: 
+
+        /**
+         *  Default Constructor
+         */
+        SvtXmlReader();
 
 		/**
 		 *	Constructor
@@ -47,11 +58,17 @@ class SvtXmlReader {
 		void open(std::string xml_file_name);
 
         /**
-         *
+         *  Close the SVT XML reader
          */
-        double getChannelData(std::string name, 
-                int feb, int hybrid, int channel, int sample);
+        void close();
 
+        /**
+         *  Get the FebNode corresponding to the given FEB ID
+         *
+         *  @param feb_id - The FEB ID of the FebNode of interest
+         *  @return The FebNode corresponding to the given ID
+         */
+		FebNode* getFebNode(int feb_id);
 
 	private:
 
@@ -64,12 +81,12 @@ class SvtXmlReader {
 		// Pointer to the config element
 		xmlNodePtr config_node;
 
-		// Pointer to the set of hybrid pointers
-		xmlNodeSetPtr hybrid_nodes; 	
+        // A mapping between a FEB ID and the corresponding FEB node
+        std::unordered_map <int, FebNode*> feb_nodes;
 
 		std::string system_node_name;
 		std::string config_node_name; 	
-		std::string hybrid_node_name;
+		std::string feb_node_name;
 
 }; // SvtXmlReader
 
