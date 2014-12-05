@@ -16,6 +16,8 @@
 //------------------//
 #include <string>
 #include <vector>
+#include <stdexcept>
+#include <iostream>
 
 //--------------//
 //--- LibXML ---//
@@ -32,12 +34,19 @@ class FebNode {
 	public: 
 
         /**
-         *  Default Constructor
+         *  Constructor
          *
          *  @param parent_node - The parent node of this node
          *  @param feb_id - The FEB ID associated with this node
          */
-		FebNode(xmlNodePtr parent_node, int feb_id); 
+		FebNode(xmlNodePtr parent_node, int feb_id);
+
+		/**
+		 *  Constructor
+		 *
+		 *  @param feb_node - The FEB node
+		 */
+		FebNode(xmlNodePtr feb_node);
 		
         /**
          *  Destructor

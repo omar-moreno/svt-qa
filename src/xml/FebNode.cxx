@@ -28,6 +28,34 @@ FebNode::FebNode(xmlNodePtr parent_node, int feb_id)
     }
 }
 
+FebNode::FebNode(xmlNodePtr feb_node) {
+
+    // Check that the node corresponds to a FEB node.  If it isn't, throw an
+    // exception
+    if (xmlStrcmp(feb_node->name, (const xmlChar*) "Feb")) {
+        throw std::runtime_error("[ ERROR ]: Expecting FEB node.");
+    }
+
+    // Set the pointer to the parent node
+    parent_node = feb_node->parent;
+
+    // Set the pointer to the FEB node
+    this->feb_node = feb_node;
+
+    // Set the FEB ID
+    feb_id = atoi((char*) xmlGetProp(feb_node, (const xmlChar*) "id"));
+    std::cout << "[ FebNode ]: FEB ID: " << feb_id << std::endl;
+
+    // Iterate through all of the child nodes and create HybridNode objects.
+    xmlNodePtr hybrid_node = feb_node->xmlChildrenNode;
+    while (hybrid_node != NULL) {
+
+        std::cout << "[ FebNode ]: Hybrid node name: " << hybrid_node->name << std::endl;
+        hybrid_nodes.push_back(new HybridNode(hybrid_node));
+        hybrid_node = hybrid_node->next;
+    }
+}
+
 FebNode::~FebNode() {
     // Destroy all of the HybridNodes associated with this FebNode
     hybrid_nodes.clear();
