@@ -95,6 +95,7 @@ void SvtXmlReader::open(std::string xml_file_name) {
 
 	    FebNode* feb_node = new FebNode(result->nodesetval->nodeTab[feb_node_n]);
 	    feb_nodes[feb_node->getFebID()] = feb_node;
+	    feb_node_collection.push_back(feb_node);
 	}
 }
 
@@ -122,3 +123,6 @@ FebNode* SvtXmlReader::getFebNode(int feb_id) {
     return feb_nodes[feb_id];
 }
 
+std::vector<FebNode*> SvtXmlReader::getFebNodes() {
+    return feb_node_collection;
+}

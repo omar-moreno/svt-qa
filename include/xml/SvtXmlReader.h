@@ -70,6 +70,13 @@ class SvtXmlReader {
          */
 		FebNode* getFebNode(int feb_id);
 
+		/**
+		 *  Get all FebNode's as a vector
+		 *
+		 *  @return A vector containing all FebNodes
+		 */
+		std::vector<FebNode*> getFebNodes();
+
 	private:
 
 		// Pointer to the XML document
@@ -83,6 +90,9 @@ class SvtXmlReader {
 
         // A mapping between a FEB ID and the corresponding FEB node
         std::unordered_map <int, FebNode*> feb_nodes;
+
+        // A vector containing all FebNodes
+        std::vector<FebNode*> feb_node_collection;
 
 		std::string system_node_name;
 		std::string config_node_name; 	
