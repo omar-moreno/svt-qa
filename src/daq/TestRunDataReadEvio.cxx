@@ -30,3 +30,10 @@ void TestRunDataReadEvio::processDataBank(Data* data_obj, uint16_t tag, std::vec
     data_obj->copy(&(*data)[0], data->size());    
 }
 
+int TestRunDataReadEvio::getMaxRocBankTag() { 
+	return 3;
+}
+
+int TestRunDataReadEvio::getMinRocBankTag() { 
+	return 3; 
+}

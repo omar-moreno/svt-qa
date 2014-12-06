@@ -32,6 +32,11 @@ class DataReadEvio : public AbstractDataReadEvio {
 		 */
 		void processDataBank(Data*, uint16_t, std::vector<uint32_t>*);
 
+		int getMaxRocBankTag();  
+
+		int getMinRocBankTag();
+
+
 }; // DataReadEvio
 
 #endif // __DATA_READ_EVIO_H__

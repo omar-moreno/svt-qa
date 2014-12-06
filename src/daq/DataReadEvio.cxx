@@ -12,15 +12,20 @@
 
 #include <DataReadEvio.h>
 
-DataReadEvio::DataReadEvio() : AbstractDataReadEvio(1,3)
-{}
+DataReadEvio::DataReadEvio() : AbstractDataReadEvio(1,3) {}
 
-DataReadEvio::~DataReadEvio()
-{}
+DataReadEvio::~DataReadEvio() {}
 
-void DataReadEvio::processDataBank(Data* data_obj, uint16_t tag, std::vector<uint32_t>* data)
-{
+void DataReadEvio::processDataBank(Data* data_obj, uint16_t tag, std::vector<uint32_t>* data) {
 	 
     // Copy the data to the data object
 	data_obj->copy(&(*data)[0], data->size());
+}
+
+int DataReadEvio::getMaxRocBankTag() { 
+	return 17;
+}
+
+int DataReadEvio::getMinRocBankTag() { 
+	return 12; 
 }
