@@ -14,7 +14,8 @@
 
 AbstractDataReadEvio::AbstractDataReadEvio(int physics_event_tag, int svt_bank_tag)
     :   file_channel(NULL), event(NULL), data_banks(new evioDOMNodeList), event_n(0),
-        physics_event_tag(physics_event_tag), svt_bank_tag(svt_bank_tag)
+        physics_event_tag(physics_event_tag), svt_bank_tag(svt_bank_tag),
+		roc_banks(new evioDOMNodeList)
 {
 }
 
@@ -78,15 +79,29 @@ bool AbstractDataReadEvio::next(Data* data) {
 
         // Get the SVT bank encapsulated by the physics event.  
         // There should only be a single SVT bank.
-        evioDOMNodeListP svt_banks = physics_bank->getChildren(tagEquals(this->svt_bank_tag));
-        std::cout << "[ DataReadEvio ]: \tTotal number of SVT banks " << svt_banks->size() << std::endl;
+		roc_banks->clear();
+		for (int roc_bank_tag = this->getMinRocBankTag(); 
+				roc_bank_tag <= this->getMaxRocBankTag(); ++roc_bank_tag) {
+			std::cout << "[ DataReadEvio ]: Retrieving ROC bank: " << roc_bank_tag << std::endl;
+			evioDOMNodeListP result = physics_bank->getChildren(tagEquals(roc_bank_tag));
+			std::cout << "[ DataReadEvio ]: Total banks found: " << result->size() << std::endl;
+			roc_banks->insert(roc_banks->end(), result->begin(), result->end());
+		}
+        
+		//evioDOMNodeListP svt_banks = physics_bank->getChildren(tagEquals(this->svt_bank_tag));
+        std::cout << "[ DataReadEvio ]: \tTotal number of ROC banks " << roc_banks->size() << std::endl;
 
-        // Get the data banks (either FPGA or FEB) encapsulated by the SVT bank.
-        data_banks = svt_banks->front()->getChildren();
+		
+        // Get the data banks (either FPGA or RCE) encapsulated by the ROC banks
+		for (evioDOMNodeList::iterator roc_it = roc_banks->begin(); roc_it != roc_banks->end(); ++roc_it) { 
+			evioDOMNodeListP result = (*roc_it)->getChildren();
+			data_banks->insert(data_banks->end(), result->begin(), result->end());
+		}
         std::cout << "[ DataReadEvio ]: \tTotal number of data banks " << data_banks->size() << std::endl;
 
         // Get an iterator to the list of data banks
         data_iterator = data_banks->begin();
+		
 
     } catch(evioException e) { 
         std::cerr << e.toString() << std::endl;

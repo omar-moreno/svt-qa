@@ -59,15 +59,28 @@ class AbstractDataReadEvio : public DataRead {
 		 */
 		evioDOMTree* getPhysicsEvent();
 
+
 	private:
 
 		/**
 		 */
 		virtual void processDataBank(Data*, uint16_t, std::vector<uint32_t>*) = 0;
 
+
+		/**
+		 *
+		 */
+		virtual int getMaxRocBankTag() = 0; 
+
+		/**
+		 *
+		 */
+		virtual int getMinRocBankTag() = 0; 
+
 		evioDOMTree* event;
 		evioFileChannel* file_channel;
 		evioDOMNodeListP data_banks;
+		evioDOMNodeListP roc_banks;
 		evioDOMNodeList::iterator data_iterator;
 
 		int event_n;	
