@@ -1,7 +1,5 @@
-#
-#	@author: Omar Moreno <omoreno1@ucsc.edu>
-#	@date: January 09, 2014
-#
+
+add_definitions("-std=c++11")
 
 # Find the required ROOT libraries
 find_library(ROOT_TREE_LIB Tree $ENV{ROOTSYS}/lib)
