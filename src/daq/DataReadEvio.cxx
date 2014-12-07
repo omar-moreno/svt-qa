@@ -19,6 +19,10 @@ DataReadEvio::~DataReadEvio() {}
 void DataReadEvio::processDataBank(Data* data_obj, uint16_t tag, std::vector<uint32_t>* data) {
 	 
     // Copy the data to the data object
+	//for(int i = 0; i < 10; i++) { 
+	//	std::cout << "Data index " << i << ": " << hex << (*data)[i] << std::endl;
+	//}
+	//data_obj->copy(&(*data)[2], data->size());
 	data_obj->copy(&(*data)[0], data->size());
 }
 
@@ -27,5 +31,5 @@ int DataReadEvio::getMaxRocBankTag() {
 }
 
 int DataReadEvio::getMinRocBankTag() { 
-	return 12; 
+	return 11; 
 }

@@ -154,10 +154,11 @@ int main(int argc, char **argv) {
    
         // Open the input file.  If the input file can't be opened, exit the 
         // application
-        if (!data_reader->open(*files_it)) {
-            cerr << "\n[ SVT QA ]: Error! File " << *files_it << " cannot be opened." << endl;
-            return EXIT_FAILURE; 
-        }
+        //if (!data_reader->open(*files_it, false)) {
+        //    cerr << "\n[ SVT QA ]: Error! File " << *files_it << " cannot be opened." << endl;
+        //    return EXIT_FAILURE; 
+        //}
+        data_reader->open(*files_it, false);
         cout << "[ SVT QA ]: Processing file: " << *files_it << endl;
         event_number = 0;  
         while (data_reader->next(&trigger_event)) {

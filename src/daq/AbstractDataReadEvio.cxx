@@ -56,7 +56,7 @@ void AbstractDataReadEvio::close() {
 bool AbstractDataReadEvio::next(Data* data) {
 
     if(!data_banks->empty()) { 
-        std::cout << "[ DataReadEvio ]:\tProcessing data bank " << (*data_iterator)->tag << std::endl;
+        //std::cout << "[ DataReadEvio ]:\tProcessing data bank " << (*data_iterator)->tag << std::endl;
         // Use the data enclosed by the data bank to create a Data object 
         this->processDataBank(data, (*data_iterator)->tag, (*data_iterator)->getVector<uint32_t>());
         // Remove the data bank from the list of data banks
@@ -68,36 +68,37 @@ bool AbstractDataReadEvio::next(Data* data) {
 
         // Get a physics event.  If the physics event is NULL, the end of the EVIO file was reached.
         if((event = this->getPhysicsEvent()) == NULL) return false;
-        std::cout << "[ DataReadEvio ]: --------------------------------------" << std::endl;
-        std::cout << "[ DataReadEvio ]: --------------------------------------" << std::endl;
-        std::cout << "[ DataReadEvio ]:\tProcessing event " << ++event_n << std::endl;
+        //std::cout << "[ DataReadEvio ]: --------------------------------------" << std::endl;
+        //std::cout << "[ DataReadEvio ]: --------------------------------------" << std::endl;
+        //std::cout << "[ DataReadEvio ]:\tProcessing event " << ++event_n << std::endl;
 
         // Get the physics bank (tag == 1) from the physics event.  There
         // should only be a single physics bank.
         evioDOMNodeP physics_bank = event->getFirstNode(tagEquals(this->physics_event_tag));
-        std::cout << "[ DataReadEvio ]:\tFound physics event " << std::endl;
+        //std::cout << "[ DataReadEvio ]:\tFound physics event " << std::endl;
 
         // Get the SVT bank encapsulated by the physics event.  
         // There should only be a single SVT bank.
 		roc_banks->clear();
 		for (int roc_bank_tag = this->getMinRocBankTag(); 
 				roc_bank_tag <= this->getMaxRocBankTag(); ++roc_bank_tag) {
-			std::cout << "[ DataReadEvio ]: Retrieving ROC bank: " << roc_bank_tag << std::endl;
-			evioDOMNodeListP result = physics_bank->getChildren(tagEquals(roc_bank_tag));
-			std::cout << "[ DataReadEvio ]: Total banks found: " << result->size() << std::endl;
+			//std::cout << "[ DataReadEvio ]: Retrieving ROC bank: " << roc_bank_tag << std::endl;
+			evioDOMNodeListP result = physics_bank->getChildren(tagEquals(roc_bank_tag))->front()->getChildren(tagEquals(roc_bank_tag));
+			//std::cout << "[ DataReadEvio ]: Total banks found: " << result->size() << std::endl;
 			roc_banks->insert(roc_banks->end(), result->begin(), result->end());
 		}
         
 		//evioDOMNodeListP svt_banks = physics_bank->getChildren(tagEquals(this->svt_bank_tag));
-        std::cout << "[ DataReadEvio ]: \tTotal number of ROC banks " << roc_banks->size() << std::endl;
+        //std::cout << "[ DataReadEvio ]: \tTotal number of ROC banks " << roc_banks->size() << std::endl;
 
 		
         // Get the data banks (either FPGA or RCE) encapsulated by the ROC banks
 		for (evioDOMNodeList::iterator roc_it = roc_banks->begin(); roc_it != roc_banks->end(); ++roc_it) { 
 			evioDOMNodeListP result = (*roc_it)->getChildren();
-			data_banks->insert(data_banks->end(), result->begin(), result->end());
+			//data_banks->insert(data_banks->end(), result->begin(), result->end());
+			data_banks->push_back(result->front());
 		}
-        std::cout << "[ DataReadEvio ]: \tTotal number of data banks " << data_banks->size() << std::endl;
+        //std::cout << "[ DataReadEvio ]: \tTotal number of data banks " << data_banks->size() << std::endl;
 
         // Get an iterator to the list of data banks
         data_iterator = data_banks->begin();
