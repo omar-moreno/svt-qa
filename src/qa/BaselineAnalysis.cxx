@@ -13,14 +13,14 @@ BaselineAnalysis::BaselineAnalysis()
     : canvas(NULL), 
       writer(new CalibrationWriter()),
       class_name("BaselineAnalysis"), 
-      feb_id(-1), hybrid_id(-1)
+      feb_id(-1), hybrid_id(-1), readout_order(false)
 {}
 
 BaselineAnalysis::BaselineAnalysis(int feb_id, int hybrid_id)
     : canvas(NULL),
       writer(new CalibrationWriter()),
       class_name("BaselineAnalysis"), 
-      feb_id(feb_id), hybrid_id(feb_id) 
+      feb_id(feb_id), hybrid_id(feb_id), readout_order(false) 
 {}
 
 BaselineAnalysis::~BaselineAnalysis() {
@@ -37,6 +37,13 @@ void BaselineAnalysis::initialize() {
     canvas = new TCanvas("canvas", "canvas", 300, 300);
     
     writer->open("test.xml");
+
+	for(int n = 0; n < 128; n++){
+		int channel = (32*(n%4)) + (8*(n/4)) - (31*(n/16));
+		channel_map[channel] = n; 
+		//channel_map.push_back(n); 
+    }
+
 }
 
 void BaselineAnalysis::processEvent(TriggerSample* samples) {
@@ -66,15 +73,30 @@ void BaselineAnalysis::processEvent(TriggerSample* samples) {
                   << std::endl;
     }
     SamplesPlot* baseline_plot = baseline_map.at(daq_pair); 
+	
+	// If the readout order flag has been set, get the readout order number
+	// corresponding to the APV25 channel number.  Else, get the physical 
+	// channel number.
+	int channel = 0; 
+	if (readout_order) {
+		channel = channel_map[samples->channel()] + samples->apv()*128; 
+	} else { 
+		channel = QAUtils::getPhysicalChannel(samples->apv(), samples->channel()); 
+	}
 
     // Get the physical channel number corresponding to the APV25 channel
     // number.
-    int physical_channel =  QAUtils::getPhysicalChannel(samples->apv(), samples->channel());
+    //int physical_channel =  QAUtils::getPhysicalChannel(samples->apv(), samples->channel());
     
     for (int sample_n = 0; sample_n < 6; ++sample_n) {
-        baseline_plot->fill(sample_n, physical_channel, samples->value(sample_n));
+        baseline_plot->fill(sample_n, channel, samples->value(sample_n));
     } 
 }
+
+void BaselineAnalysis::readoutOrder(bool readout_order) {
+	this->readout_order = readout_order; 
+}
+
 
 void BaselineAnalysis::finalize() {
 
@@ -98,8 +120,9 @@ void BaselineAnalysis::processBaselinePlot(int feb, int hybrid, SamplesPlot* bas
 
     std::string file_name = "feb";
     if (feb < 10) file_name += "0";
-    file_name += std::to_string(feb) + "_hybrid0" + std::to_string(hybrid) +
-                 "_baseline_run_summary.pdf";
+    file_name += std::to_string(feb) + "_hybrid0" + std::to_string(hybrid);
+	if (readout_order) file_name += "_readout_order"; 
+    file_name += "_baseline_run_summary.pdf";
 
     canvas->Print((file_name + "[").c_str());
 

@@ -42,6 +42,7 @@ int main(int argc, char **argv) {
     string input_file_list_name;
     bool run_baseline = false;
     bool evio = false; 
+	bool readout_order = false;
     int feb_id = -1; 
     int hybrid_id = -1; 
     int total_events = -1; 
@@ -53,6 +54,7 @@ int main(int argc, char **argv) {
         { "input_list",     required_argument, 0, 'l' },
         { "feb",            required_argument, 0, 'f' },
         { "hybrid",         required_argument, 0, 'h' },
+		{ "readout_order",  no_argument,	   0, 'r' },	
         { "total_events",   required_argument, 0, 'n' },
         { "baseline",       no_argument,       0, 'b' },
         { "evio",           no_argument,       0, 'e' },
@@ -61,7 +63,7 @@ int main(int argc, char **argv) {
     };
     int option_index = 0;
     int option_char; 
-    while ((option_char = getopt_long(argc, argv, "i:l:f:h:n:beu", long_options, &option_index)) != -1) {
+    while ((option_char = getopt_long(argc, argv, "i:l:f:h:rn:beu", long_options, &option_index)) != -1) {
         switch (option_char) {
             case 'i': 
                 input_file_name = optarg; 
@@ -75,6 +77,9 @@ int main(int argc, char **argv) {
             case 'h':
                 hybrid_id = atoi(optarg);
                 break;  
+			case 'r':
+				readout_order = true;
+				break;
             case 'n':
                 total_events = atoi(optarg); 
                 break; 
@@ -135,12 +140,17 @@ int main(int argc, char **argv) {
     // Container to hold all analyses 
     list<QAAnalysis*> analyses; 
     
-    // TODO: All analyses should be loaded dynamically
+    // TODO: All analyses should be loaded dynamicallykerSample(kSampleSize, data) {}
+	BaselineAnalysis* baseline_analysis = NULL;
     if (run_baseline) {
+
         if (feb_id != -1 && hybrid_id != -1) 
-            analyses.push_back(new BaselineAnalysis(feb_id, hybrid_id));
-        else analyses.push_back(new BaselineAnalysis());    
-    }
+            baseline_analysis = new BaselineAnalysis(feb_id, hybrid_id);
+        else baseline_analysis = new BaselineAnalysis();    
+		
+		baseline_analysis->readoutOrder(readout_order); 
+		analyses.push_back(baseline_analysis); 	
+	}
 
     // Initialize all QA analyses 
     for (list<QAAnalysis*>::iterator analysis = analyses.begin(); analysis != analyses.end(); ++analysis) {

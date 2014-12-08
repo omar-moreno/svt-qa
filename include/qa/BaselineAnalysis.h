@@ -82,7 +82,12 @@ class BaselineAnalysis : public QAAnalysis {
 	
 		/**
 		 */
-		void processBaselinePlot(int, int, SamplesPlot*);	
+		void processBaselinePlot(int, int, SamplesPlot*);
+
+		/**
+		 *
+		 */
+		void readoutOrder(bool readout_order);	
         
 
 		/**
@@ -103,8 +108,12 @@ class BaselineAnalysis : public QAAnalysis {
 
 		std::string class_name;
 
+		//std::vector <int> channel_map;
+		int channel_map[128];
 		int feb_id; 
 		int hybrid_id;
+
+		bool readout_order;
 };
 
 #endif // __BASELINE_ANALYIS_H__
