@@ -157,8 +157,12 @@ void BaselineAnalysis::processBaselinePlot(int feb, int hybrid, SamplesPlot* bas
     }
 
     samples_mean_baseline->Draw("Ap");
+    samples_mean_baseline->GetXaxis()->SetTitle("Channel #");
+    samples_mean_baseline->GetYaxis()->SetTitle("Mean Baseline [ADC Counts]");
     canvas->Print((file_name + "(").c_str());
     samples_noise->Draw("Ap");
+    samples_noise->GetXaxis()->SetTitle("Channel #");
+    samples_noise->GetYaxis()->SetTitle("Noise [ADC Counts]");
     canvas->Print((file_name + "(").c_str());
     canvas->Print((file_name + "]").c_str());
    
