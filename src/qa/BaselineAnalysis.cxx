@@ -100,7 +100,7 @@ void BaselineAnalysis::readoutOrder(bool readout_order) {
 
 void BaselineAnalysis::finalize() {
 
-    std::unordered_map <std::pair <int, int>, SamplesPlot*, pairHash>::iterator plot_it = baseline_map.begin(); 
+    std::unordered_map <std::pair <int, int>, SamplesPlot*, PairHash>::iterator plot_it = baseline_map.begin();
     
     for (plot_it; plot_it != baseline_map.end(); ++plot_it) { 
         this->processBaselinePlot(plot_it->first.first, plot_it->first.second, plot_it->second); 

@@ -36,19 +36,7 @@
 #include <TH1D.h>
 #include <TGraphErrors.h>
 #include <TMultiGraph.h>
-
-class pairHash { 	
-
-	public: 
-		//template <typename T, typename U> 
-		//std::size_t operator() (const std::pair <T, U> &p) const {
-		std::size_t operator() (const std::pair <int, int> &p) const {
-				// This is just a copy of what boost::hash does.  
-				size_t seed = std::hash<int>()(p.first);
-				return std::hash<int>()(p.second) + 0x9e3779b9 + (seed<<6) + (seed>>2);	
-			}
-};
-
+#include <PairHash.h>
 
 class BaselineAnalysis : public QAAnalysis { 
 
@@ -104,11 +92,10 @@ class BaselineAnalysis : public QAAnalysis {
 
         CalibrationWriter* writer; 
 		
-		std::unordered_map <std::pair <int, int>, SamplesPlot*, pairHash> baseline_map; 
+		std::unordered_map <std::pair <int, int>, SamplesPlot*, PairHash> baseline_map;
 
 		std::string class_name;
 
-		//std::vector <int> channel_map;
 		int channel_map[128];
 		int feb_id; 
 		int hybrid_id;
