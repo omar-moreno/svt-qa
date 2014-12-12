@@ -10,38 +10,34 @@
 #include <BaselineAnalysis.h>
 
 BaselineAnalysis::BaselineAnalysis()
-    : canvas(NULL), 
-      writer(new CalibrationWriter()),
-      class_name("BaselineAnalysis"), 
-      feb_id(-1), hybrid_id(-1), readout_order(false)
+   : output_file(new TFile("calibration_results.root", "RECREATE")),  
+     writer(new CalibrationWriter()),
+     class_name("BaselineAnalysis"), 
+     feb_id(-1), hybrid_id(-1), readout_order(false)
 {}
 
 BaselineAnalysis::BaselineAnalysis(int feb_id, int hybrid_id)
-    : canvas(NULL),
+    : output_file(new TFile("calibration_results.root", "new")),  
       writer(new CalibrationWriter()),
       class_name("BaselineAnalysis"), 
       feb_id(feb_id), hybrid_id(feb_id), readout_order(false) 
 {}
 
 BaselineAnalysis::~BaselineAnalysis() {
-    delete canvas; 
+    delete output_file;  
     delete writer;  
 }
 
 void BaselineAnalysis::initialize() {
-
     
     PlottingUtils::setPalette(); 
     PlottingUtils::setStyle(); 
-    
-    canvas = new TCanvas("canvas", "canvas", 300, 300);
     
     writer->open("test.xml");
 
 	for(int n = 0; n < 128; n++){
 		int channel = (32*(n%4)) + (8*(n/4)) - (31*(n/16));
 		channel_map[channel] = n; 
-		//channel_map.push_back(n); 
     }
 
 }
@@ -84,10 +80,6 @@ void BaselineAnalysis::processEvent(TriggerSample* samples) {
 		channel = QAUtils::getPhysicalChannel(samples->apv(), samples->channel()); 
 	}
 
-    // Get the physical channel number corresponding to the APV25 channel
-    // number.
-    //int physical_channel =  QAUtils::getPhysicalChannel(samples->apv(), samples->channel());
-    
     for (int sample_n = 0; sample_n < 6; ++sample_n) {
         baseline_plot->fill(sample_n, channel, samples->value(sample_n));
     } 
@@ -109,6 +101,7 @@ void BaselineAnalysis::finalize() {
     baseline_map.clear();
     
     writer->close();
+    output_file->Close();
 }
 
 void BaselineAnalysis::processBaselinePlot(int feb, int hybrid, SamplesPlot* baseline_plot) {
@@ -122,12 +115,10 @@ void BaselineAnalysis::processBaselinePlot(int feb, int hybrid, SamplesPlot* bas
     if (feb < 10) file_name += "0";
     file_name += std::to_string(feb) + "_hybrid0" + std::to_string(hybrid);
 	if (readout_order) file_name += "_readout_order"; 
-    file_name += "_baseline_run_summary.pdf";
+    output_file->mkdir(file_name.c_str());
+    output_file->cd(file_name.c_str());
 
-    canvas->Print((file_name + "[").c_str());
-
-    baseline_plot->getSumOfPlots()->Draw("colz"); 
-    canvas->Print((file_name + "(").c_str());
+    baseline_plot->getSumOfPlots()->Write(); 
     
     for (int sample_n = 0; sample_n < 6; ++sample_n) { 
 
@@ -156,16 +147,10 @@ void BaselineAnalysis::processBaselinePlot(int feb, int hybrid, SamplesPlot* bas
         samples_noise->Add(g_noise); 
     }
 
-    samples_mean_baseline->Draw("Ap");
-    samples_mean_baseline->GetXaxis()->SetTitle("Channel #");
-    samples_mean_baseline->GetYaxis()->SetTitle("Mean Baseline [ADC Counts]");
-    canvas->Print((file_name + "(").c_str());
-    samples_noise->Draw("Ap");
-    samples_noise->GetXaxis()->SetTitle("Channel #");
-    samples_noise->GetYaxis()->SetTitle("Noise [ADC Counts]");
-    canvas->Print((file_name + "(").c_str());
-    canvas->Print((file_name + "]").c_str());
-   
+    samples_mean_baseline->Write();
+    samples_noise->Write();
+
+    output_file->cd();
 
     delete samples_mean_baseline; 
     delete samples_noise;

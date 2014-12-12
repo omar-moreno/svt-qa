@@ -37,6 +37,7 @@
 #include <TGraphErrors.h>
 #include <TMultiGraph.h>
 #include <PairHash.h>
+#include <TFile.h>
 
 class BaselineAnalysis : public QAAnalysis { 
 
@@ -88,7 +89,7 @@ class BaselineAnalysis : public QAAnalysis {
 
     private: 
 
-        TCanvas* canvas;
+        TFile* output_file; 
 
         CalibrationWriter* writer; 
 		
