@@ -10,7 +10,8 @@
 #include <BaselineAnalysis.h>
 
 BaselineAnalysis::BaselineAnalysis()
-   : output_file(new TFile("calibration_results.root", "RECREATE")),  
+   : output_file(new TFile("calibration_results.root", "RECREATE")), 
+     gaussian(new TF1("gaussian", "gaus")), 
      writer(new CalibrationWriter()),
      class_name("BaselineAnalysis"), 
      feb_id(-1), hybrid_id(-1), readout_order(false)
@@ -18,6 +19,7 @@ BaselineAnalysis::BaselineAnalysis()
 
 BaselineAnalysis::BaselineAnalysis(int feb_id, int hybrid_id)
     : output_file(new TFile("calibration_results.root", "new")),  
+      gaussian(new TF1("gaussian", "gaus")), 
       writer(new CalibrationWriter()),
       class_name("BaselineAnalysis"), 
       feb_id(feb_id), hybrid_id(feb_id), readout_order(false) 
@@ -119,7 +121,10 @@ void BaselineAnalysis::processBaselinePlot(int feb, int hybrid, SamplesPlot* bas
     output_file->cd(file_name.c_str());
 
     baseline_plot->getSumOfPlots()->Write(); 
-    
+   
+    double mean_baseline =0;
+    double mean_baseline_error = 0; 
+    double noise = 0;  
     for (int sample_n = 0; sample_n < 6; ++sample_n) { 
 
         TGraphErrors* g_mean_baseline = new TGraphErrors(640);
@@ -132,10 +137,12 @@ void BaselineAnalysis::processBaselinePlot(int feb, int hybrid, SamplesPlot* bas
         TH2F* baseline_sample_plot = baseline_plot->getPlot(sample_n);
         PlottingUtils::adjust2DPlotRange(baseline_sample_plot, 2);
         for (int channel = 0; channel < 640; ++channel) {
-            projection = baseline_sample_plot->ProjectionY("", channel+1, channel+1);
-            double mean_baseline = projection->GetMean();
-            double mean_baseline_error = projection->GetMeanError();
-            double noise = projection->GetRMS();
+            //this->getSimpleCalibrations(
+            //        baseline_sample_plot->ProjectionY("", channel+1, channel+1),
+            //        mean_baseline, mean_baseline_error, noise);
+            this->getCalibrations(
+                    baseline_sample_plot->ProjectionY("", channel+1, channel+1),
+                    mean_baseline, mean_baseline_error, noise);
             g_mean_baseline->SetPoint(channel,channel, mean_baseline); 
             g_mean_baseline->SetPointError(channel, 0, mean_baseline_error); 
             g_noise->SetPoint(channel, channel, noise); 
@@ -154,6 +161,29 @@ void BaselineAnalysis::processBaselinePlot(int feb, int hybrid, SamplesPlot* bas
 
     delete samples_mean_baseline; 
     delete samples_noise;
+}
+
+void BaselineAnalysis::getCalibrations(TH1D* baseline_histogram, 
+                                       double &mean_baseline, 
+                                       double &mean_baseline_error,
+                                       double &noise) {
+
+    this->getSimpleCalibrations(baseline_histogram, 
+                                mean_baseline, mean_baseline_error, noise);
+    gaussian->SetRange(mean_baseline - 3*noise, mean_baseline + 3*noise); 
+    baseline_histogram->Fit("gaussian", "RQ");
+    mean_baseline = gaussian->GetParameter(1); 
+    noise = gaussian->GetParameter(2);
+}
+
+void BaselineAnalysis::getSimpleCalibrations(TH1D* baseline_histogram, 
+                                             double &mean_baseline, 
+                                             double &mean_baseline_error,
+                                             double &noise) { 
+    
+    mean_baseline = baseline_histogram->GetMean();
+    mean_baseline_error = baseline_histogram->GetMeanError();
+    noise = baseline_histogram->GetRMS();
 }
 
 std::string BaselineAnalysis::toString() {

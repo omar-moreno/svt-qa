@@ -38,6 +38,7 @@
 #include <TMultiGraph.h>
 #include <PairHash.h>
 #include <TFile.h>
+#include <TF1.h>
 
 class BaselineAnalysis : public QAAnalysis { 
 
@@ -85,12 +86,34 @@ class BaselineAnalysis : public QAAnalysis {
 		
 		/**
 		 */
-		std::string toString(); 
+		std::string toString();
+
 
     private: 
 
+        /**
+         * 
+         */
+        void getCalibrations(TH1D* baseline_histogram, 
+                             double &mean, 
+                             double &mean_error, 
+                             double &noise);
+
+        /**
+         *
+         */
+        void getSimpleCalibrations(TH1D* baseline_histogram, 
+                                   double &mean, 
+                                   double &mean_error,
+                                   double &noise);   
+
+
+        // ROOT output_file
         TFile* output_file; 
 
+        TF1* gaussian; 
+
+        // XML writer for SVT conditions
         CalibrationWriter* writer; 
 		
 		std::unordered_map <std::pair <int, int>, SamplesPlot*, PairHash> baseline_map;
