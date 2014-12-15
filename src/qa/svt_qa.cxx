@@ -29,6 +29,7 @@
 //--------------//
 #include <DataReadEvio.h>
 #include <BaselineAnalysis.h>
+#include <CalibrationAnalysis.h>
 
 using namespace std; 
 
@@ -41,6 +42,7 @@ int main(int argc, char **argv) {
     string input_file_name;
     string input_file_list_name;
     bool run_baseline = false;
+    bool run_calibration = false; 
     bool evio = false; 
 	bool readout_order = false;
     int feb_id = -1; 
@@ -57,13 +59,14 @@ int main(int argc, char **argv) {
 		{ "readout_order",  no_argument,	   0, 'r' },	
         { "total_events",   required_argument, 0, 'n' },
         { "baseline",       no_argument,       0, 'b' },
+        { "calibration",    no_argument,       0, 'c' },
         { "evio",           no_argument,       0, 'e' },
         { "help",           no_argument,       0, 'u' }, 
         { 0, 0, 0, 0 }
     };
     int option_index = 0;
     int option_char; 
-    while ((option_char = getopt_long(argc, argv, "i:l:f:h:rn:beu", long_options, &option_index)) != -1) {
+    while ((option_char = getopt_long(argc, argv, "i:l:f:h:rn:bceu", long_options, &option_index)) != -1) {
         switch (option_char) {
             case 'i': 
                 input_file_name = optarg; 
@@ -85,6 +88,9 @@ int main(int argc, char **argv) {
                 break; 
             case 'b': 
                 run_baseline = true; 
+                break;
+            case 'c': 
+                run_calibration = true; 
                 break;
             case 'e':
                 evio = true; 
@@ -142,6 +148,7 @@ int main(int argc, char **argv) {
     
     // TODO: All analyses should be loaded dynamicallykerSample(kSampleSize, data) {}
 	BaselineAnalysis* baseline_analysis = NULL;
+    CalibrationAnalysis* calibration_analysis = NULL; 
     if (run_baseline) {
 
         if (feb_id != -1 && hybrid_id != -1) 
@@ -150,7 +157,13 @@ int main(int argc, char **argv) {
 		
 		baseline_analysis->readoutOrder(readout_order); 
 		analyses.push_back(baseline_analysis); 	
-	}
+	} else if (run_calibration) { 
+        
+        if (feb_id != -1 && hybrid_id != -1) 
+            calibration_analysis = new CalibrationAnalysis(feb_id, hybrid_id);
+        else calibration_analysis = new CalibrationAnalysis();    
+		analyses.push_back(calibration_analysis); 	
+    }
 
     // Initialize all QA analyses 
     for (list<QAAnalysis*>::iterator analysis = analyses.begin(); analysis != analyses.end(); ++analysis) {
@@ -181,7 +194,10 @@ int main(int argc, char **argv) {
             for (uint sample_set_n = 0; sample_set_n < trigger_event.count(); ++sample_set_n) {
             
                 trigger_event.sample(sample_set_n, trigger_samples);
-                        
+                if (run_calibration) { 
+                    calibration_analysis->setCalibrationGroup(
+                            data_reader->getConfigInt("FrontEndTestFpga:FebCore:Hybrid:apv25:CalGroup"));
+                } 
                 for (list<QAAnalysis*>::iterator analysis = analyses.begin(); analysis != analyses.end(); ++analysis) {
                     (*analysis)->processEvent(trigger_samples); 
                 }   
