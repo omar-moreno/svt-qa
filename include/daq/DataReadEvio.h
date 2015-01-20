@@ -36,6 +36,7 @@ class DataReadEvio : public AbstractDataReadEvio {
 
 		int getMinRocBankTag();
 
+        int getPhysicsBankTag(); 
 
 }; // DataReadEvio
 
