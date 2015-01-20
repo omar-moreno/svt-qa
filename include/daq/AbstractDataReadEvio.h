@@ -12,6 +12,9 @@
 #ifndef __ABSTRACT_DATA_READ_EVIO_H__
 #define __ABSTRACT_DATA_READ_EVIO_H__
 
+//------------------//
+//--- C++ StdLib ---//
+//------------------//
 #include <stdint.h>
 #include <vector>
 
@@ -35,30 +38,47 @@ class AbstractDataReadEvio : public DataRead {
 	public: 
 
 		/**
-		 */
-		AbstractDataReadEvio(int, int);
+		 *  Default Constructor
+         */
+		AbstractDataReadEvio();
 		
 		/**
-		 */
+		 *  Destructor
+         */
 		virtual ~AbstractDataReadEvio();
 
 		// TODO: Make these classes virtual in DataRead
 		/**
+         *  Read the next Data object in the event.
+         *
+         *  @param data : 
+         *  @return
 		 */
-		bool next(Data*);
+		bool next(Data* data);
 		
 		/**
+         *  Open an EVIO file for reading.
+         *
+         *  @param evio_file_name : The EVIO file name to open
+         *  @param compressed : True if the file is compressed, false otherwise
+         *  @return True if the file was successfully opened, false otherwise
 		 */
-		bool open(string, bool);
+		bool open(std::string evio_file_name, bool compressed);
 		
 		/**
+         *  Close the EVIO file channel.
 		 */
 		void close();
 
 		/**
+         *  
 		 */
 		evioDOMTree* getPhysicsEvent();
 
+        /**
+         *
+         */
+        evioDOMNodeListP getDataBanks(evioDOMNode* roc_banks); 
 
 	private:
 
@@ -75,7 +95,12 @@ class AbstractDataReadEvio : public DataRead {
 		/**
 		 *
 		 */
-		virtual int getMinRocBankTag() = 0; 
+		virtual int getMinRocBankTag() = 0;
+
+		/**
+		 *
+		 */
+		virtual int getPhysicsBankTag() = 0;
 
 		evioDOMTree* event;
 		evioFileChannel* file_channel;
@@ -85,18 +110,6 @@ class AbstractDataReadEvio : public DataRead {
 
 		int event_n;	
 		
-		//-----------------------//
-		//--- Event constants ---//
-		//-----------------------//
-
-		/**
-		 */
-		int physics_event_tag;
-
-		/**
-		 */
-		int svt_bank_tag;		
-
 }; // AbstractDataReadEvio
 
 #endif // __ABSTRACT_DATA_READ_EVIO_H__
