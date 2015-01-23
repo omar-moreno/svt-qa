@@ -63,7 +63,7 @@ void BaselineAnalysis::processEvent(TriggerSample* samples) {
                                  " Hybrid: " + std::to_string(samples->hybrid()) + 
                                  " Baseline"; 
         baseline_map[daq_pair] = new SamplesPlot(6, plot_title);
-        baseline_map.at(daq_pair)->setXAxisTitles("Physical Channel");
+        baseline_map.at(daq_pair)->setXAxisTitles("Channel");
         baseline_map.at(daq_pair)->setYAxisTitles("Baseline [ADC Counts]");
     
         std::cout << "[ BaselineAnalysis ]: Created baseline histogram for FEB: "   
@@ -154,7 +154,13 @@ void BaselineAnalysis::processBaselinePlot(int feb, int hybrid, SamplesPlot* bas
         samples_noise->Add(g_noise); 
     }
 
+    samples_mean_baseline->Draw("a"); 
+    samples_mean_baseline->GetXaxis()->SetTitle("Channel");
+    samples_mean_baseline->GetYaxis()->SetTitle("Mean Baseline [ADC Counts]");
     samples_mean_baseline->Write();
+    samples_noise->Draw("a");
+    samples_noise->GetXaxis()->SetTitle("Channel");
+    samples_noise->GetYaxis()->SetTitle("Noise [ADC Counts]");
     samples_noise->Write();
 
     output_file->cd();
