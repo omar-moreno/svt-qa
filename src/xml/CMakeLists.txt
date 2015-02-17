@@ -27,3 +27,6 @@ target_link_libraries(SvtXmlReader
 
 add_library(CalibrationWriter CalibrationWriter.cxx)
 target_link_libraries(CalibrationWriter SvtXmlWriter)
+
+add_library(ThresholdWriter ThresholdWriter.cxx)
+target_link_libraries(ThresholdWriter SvtXmlWriter)
