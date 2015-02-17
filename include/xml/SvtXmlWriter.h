@@ -51,7 +51,7 @@ class SvtXmlWriter {
          *
          *  @param file_name - The name of the XML document
          */
-		void open(std::string file_name);
+		virtual void open(std::string file_name);
 		
         /**
          *  Close the SVT XML document
@@ -59,12 +59,24 @@ class SvtXmlWriter {
         void close();
 
         /**
+         *  Get a pointer to the current node in the XML document tree.
+         *
+         *  @return pointer to the current node in the XML document tree 
+         */
+        xmlNodePtr getCurrentNode(); 
+
+        /**
          *  Get the FebNode corresponding to the given FEB ID
          *
          *  @param feb_id - The FEB ID of the FebNode of interest
          *  @return The FebNode corresponding to the given ID 
          */
-        FebNode* getFebNode(int feb_id);
+        //FebNode* getFebNode(int feb_id);
+
+    protected:
+
+        // Pointer to the current node in the XML document tree
+        xmlNodePtr current_node; 
 
 	private:
 
@@ -72,10 +84,7 @@ class SvtXmlWriter {
 		xmlDocPtr document; 
 		
 		// Pointer to the root element "system"
-		xmlNodePtr system_node; 
-
-		// Pointer to the config element
-		xmlNodePtr config_node; 
+		xmlNodePtr system_node;
 
         // A mapping between a FEB ID and the corresponding FEB node
         std::unordered_map <int, FebNode*> feb_nodes;

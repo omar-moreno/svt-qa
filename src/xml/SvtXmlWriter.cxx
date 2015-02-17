@@ -11,7 +11,7 @@
 #include <SvtXmlWriter.h>
 
 SvtXmlWriter::SvtXmlWriter()
-	: document(NULL), system_node(NULL), config_node(NULL), 
+	: document(NULL), system_node(NULL), current_node(NULL), 
 	  file_name(""), 
 	  bytes_written(-1)	  
 {}
@@ -34,16 +34,13 @@ void SvtXmlWriter::open(std::string file_name) {
 	//------------------------------//
 	
 	// Create and set the root node "system"
-    // TODO: Check whether this will still be the name assigned to the root
-    //       node 
 	system_node = xmlNewNode(NULL, BAD_CAST "system");
 	xmlDocSetRootElement(document, system_node);
 
-	// Create a child node "config" that is attached to the node "system"
-	config_node = xmlNewChild(system_node, NULL, BAD_CAST "config", NULL);
+    // Set the current node to point to the system node
+    current_node = system_node; 
 	
 }
-
 
 void SvtXmlWriter::close() {
 
@@ -64,6 +61,12 @@ void SvtXmlWriter::close() {
 	xmlFreeDoc(document); 
 }
 
+xmlNodePtr SvtXmlWriter::getCurrentNode() { 
+    return current_node; 
+}
+
+/*
+
 FebNode* SvtXmlWriter::getFebNode(int feb_id) { 
   
     // If a document hasn't been created, throw a runtime exception
@@ -80,4 +83,4 @@ FebNode* SvtXmlWriter::getFebNode(int feb_id) {
     }
 
     return feb_nodes[feb_id];
-}
+} */
