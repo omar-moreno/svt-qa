@@ -36,10 +36,10 @@ bool AbstractDataReadEvio::open(std::string evio_file_name, bool compressed = fa
         std::cerr << "[ AbstractDataReadEvio ]: Couldn't open file " 
                   << evio_file_name << "." << std::endl;
         std::cerr << e.toString() << std::endl;
-        return EXIT_FAILURE;
+        return false;
     }
 
-    return EXIT_SUCCESS; 
+    return true; 
 }
 
 void AbstractDataReadEvio::close() {
