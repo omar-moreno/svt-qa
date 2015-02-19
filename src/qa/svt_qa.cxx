@@ -1,5 +1,6 @@
 /**
  *  @file   svt_qa.cxx
+ *  @brief  App used to process SVT EVIO events and Data events
  *  @author Omar Moreno <omoreno1@ucsc.edu>
  *          Santa Cruz Institute for Particle Physics
  *          University of California, Santa Cruz
@@ -45,6 +46,7 @@ int main(int argc, char **argv) {
     bool run_calibration = false; 
     bool evio = false; 
 	bool readout_order = false;
+    bool fix_apv_order = false; 
     int feb_id = -1; 
     int hybrid_id = -1; 
     int total_events = -1; 
@@ -56,7 +58,8 @@ int main(int argc, char **argv) {
         { "input_list",     required_argument, 0, 'l' },
         { "feb",            required_argument, 0, 'f' },
         { "hybrid",         required_argument, 0, 'h' },
-		{ "readout_order",  no_argument,	   0, 'r' },	
+		{ "readout_order",  no_argument,	   0, 'r' },
+        { "fix_apv_order",  no_argument,       0, 'o' },     
         { "total_events",   required_argument, 0, 'n' },
         { "baseline",       no_argument,       0, 'b' },
         { "calibration",    no_argument,       0, 'c' },
@@ -64,9 +67,10 @@ int main(int argc, char **argv) {
         { "help",           no_argument,       0, 'u' }, 
         { 0, 0, 0, 0 }
     };
+
     int option_index = 0;
     int option_char; 
-    while ((option_char = getopt_long(argc, argv, "i:l:f:h:rn:bceu", long_options, &option_index)) != -1) {
+    while ((option_char = getopt_long(argc, argv, "i:l:f:h:ron:bceu", long_options, &option_index)) != -1) {
         switch (option_char) {
             case 'i': 
                 input_file_name = optarg; 
@@ -83,6 +87,9 @@ int main(int argc, char **argv) {
 			case 'r':
 				readout_order = true;
 				break;
+            case 'o':
+                fix_apv_order = true; 
+                break;
             case 'n':
                 total_events = atoi(optarg); 
                 break; 
@@ -146,13 +153,16 @@ int main(int argc, char **argv) {
     // Container to hold all analyses 
     list<QAAnalysis*> analyses; 
     
-    // TODO: All analyses should be loaded dynamicallykerSample(kSampleSize, data) {}
+    // TODO: All analyses should be loaded dynamically
 	BaselineAnalysis* baseline_analysis = NULL;
     CalibrationAnalysis* calibration_analysis = NULL; 
     if (run_baseline) {
 
-        if (feb_id != -1 && hybrid_id != -1) 
-            baseline_analysis = new BaselineAnalysis(feb_id, hybrid_id);
+        //if (feb_id != -1 && hybrid_id != -1) 
+        if (feb_id != -1 && hybrid_id != -1)
+            baseline_analysis = new BaselineAnalysis(feb_id, hybrid_id); 
+        else if (feb_id != -1) 
+            baseline_analysis = new BaselineAnalysis(feb_id);
         else baseline_analysis = new BaselineAnalysis();    
 		
 		baseline_analysis->readoutOrder(readout_order); 
@@ -177,11 +187,12 @@ int main(int argc, char **argv) {
    
         // Open the input file.  If the input file can't be opened, exit the 
         // application
-        //if (!data_reader->open(*files_it, false)) {
-        //    cerr << "\n[ SVT QA ]: Error! File " << *files_it << " cannot be opened." << endl;
-        //    return EXIT_FAILURE; 
-        //}
-        data_reader->open(*files_it, false);
+        cout << "Data reader state " << data_reader->open(*files_it, false) << endl;
+        if (!data_reader->open(*files_it, false)) {
+            cerr << "\n[ SVT QA ]: Error! File " << *files_it << " cannot be opened." << endl;
+            return EXIT_FAILURE; 
+        }
+        //data_reader->open(*files_it, false);
         cout << "[ SVT QA ]: Processing file: " << *files_it << endl;
         event_number = 0;  
         while (data_reader->next(&trigger_event)) {
@@ -224,6 +235,8 @@ void displayUsage()
     cout << "Either a binary or EVIO INPUT_FILE must be specified.\n" << endl;
     cout << "OPTIONS:\n"
          << "\t -i Input binary or EVIO file name \n"
+         << "\t -l List of binary or EVIO files to process \n"
+         << "\t -f Front end board ID to process data from \n"
          << "\t -b Run the baseline analysis \n"
          << "\t --help Display this help and exit \n"
          << endl;
