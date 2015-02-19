@@ -12,17 +12,28 @@
 BaselineAnalysis::BaselineAnalysis()
    : output_file(new TFile("calibration_results.root", "RECREATE")), 
      gaussian(new TF1("gaussian", "gaus")), 
-     writer(new CalibrationWriter()),
+     //writer(new CalibrationWriter()),
+     writer(new ThresholdWriter()),
      class_name("BaselineAnalysis"), 
      feb_id(-1), hybrid_id(-1), readout_order(false)
 {}
 
-BaselineAnalysis::BaselineAnalysis(int feb_id, int hybrid_id)
-    : output_file(new TFile("calibration_results.root", "new")),  
+BaselineAnalysis::BaselineAnalysis(int feb_id)
+    : output_file(new TFile("calibration_results.root", "RECREATE")),  
       gaussian(new TF1("gaussian", "gaus")), 
-      writer(new CalibrationWriter()),
+      //writer(new CalibrationWriter()),
+      writer(new ThresholdWriter()),
       class_name("BaselineAnalysis"), 
-      feb_id(feb_id), hybrid_id(feb_id), readout_order(false) 
+      feb_id(feb_id), hybrid_id(-1), readout_order(false) 
+{}
+
+BaselineAnalysis::BaselineAnalysis(int feb_id, int hybrid_id)
+    : output_file(new TFile("calibration_results.root", "RECREATE")),  
+      gaussian(new TF1("gaussian", "gaus")), 
+      //writer(new CalibrationWriter()),
+      writer(new ThresholdWriter()),
+      class_name("BaselineAnalysis"), 
+      feb_id(feb_id), hybrid_id(hybrid_id), readout_order(false) 
 {}
 
 BaselineAnalysis::~BaselineAnalysis() {
@@ -46,9 +57,19 @@ void BaselineAnalysis::initialize() {
 
 void BaselineAnalysis::processEvent(TriggerSample* samples) {
 
-    //if(samples->febAddress() != feb_id) return; 
-    //if(samples->hybrid()  != hybrid_id) return; 
+    // If a FEB ID has been specified and it doesn't match the FEB ID 
+    // associated with the sample, skip the event
+    if ((feb_id != -1) && (samples->febAddress() != feb_id)) return;
 
+    //std::cout << "Feb ID: " << feb_id << std::endl;
+
+    // If a hybrid ID has been specified and it doesn't match the hybrid ID
+    // associated with the sample, skip the event 
+    if ((hybrid_id != -1) && (samples->hybrid() != hybrid_id)) return;
+    
+    //std::cout << "Hybrid ID: " << hybrid_id << std::endl;
+
+    // If the sample is a header or a tail event, skip the event
     if(samples->head() || samples->tail()) return;
 
     // Create a DAQ pair
@@ -146,8 +167,9 @@ void BaselineAnalysis::processBaselinePlot(int feb, int hybrid, SamplesPlot* bas
             g_mean_baseline->SetPoint(channel,channel, mean_baseline); 
             g_mean_baseline->SetPointError(channel, 0, mean_baseline_error); 
             g_noise->SetPoint(channel, channel, noise); 
-            writer->writeBaseline(feb, hybrid, channel, sample_n, mean_baseline);
-            writer->writeNoise(feb, hybrid, channel, sample_n, noise);
+            writer->writeThreshold(feb, hybrid, channel, mean_baseline, noise);
+            //writer->writeBaseline(feb, hybrid, channel, sample_n, mean_baseline);
+            //writer->writeNoise(feb, hybrid, channel, sample_n, noise);
         }
 
         samples_mean_baseline->Add(g_mean_baseline); 

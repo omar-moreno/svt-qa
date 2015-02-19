@@ -25,6 +25,7 @@
 #include <QAAnalysis.h>
 #include <QAUtils.h>
 #include <CalibrationWriter.h>
+#include <ThresholdWriter.h>
 #include <PlottingUtils.h>
 #include <SamplesPlot.h>
 
@@ -48,16 +49,25 @@ class BaselineAnalysis : public QAAnalysis {
          * Default Constructor
 		 */
 		BaselineAnalysis();	
-	
+		
+		/**
+         *  Constructor used when data from only a single FEB is going to be 
+         *  processed.
+         *
+         *  @param feb_id : FEB ID
+         */
+        BaselineAnalysis(int feb_id);
+
         /**
-         *  Constructor
+         *  Constructor used when data from only a single hybrid connected to
+         *  the specified FEB is going to be processed.
          *
          *  @param feb_id - FEB ID
          *  @param hybrid_id - Hybrid ID
          */    
 		BaselineAnalysis(int feb_id, int hybrid_id);	
-	
-		/**
+        
+        /**
          * Destructor
 		 */
 		~BaselineAnalysis(); 
@@ -114,8 +124,9 @@ class BaselineAnalysis : public QAAnalysis {
         TF1* gaussian; 
 
         // XML writer for SVT conditions
-        CalibrationWriter* writer; 
-		
+        //CalibrationWriter* writer; 
+	    ThresholdWriter* writer; 
+
 		std::unordered_map <std::pair <int, int>, SamplesPlot*, PairHash> baseline_map;
 
 		std::string class_name;
