@@ -57,6 +57,19 @@ target_link_libraries(BaselineAnalysis
     PairHash
 )
 
+add_library(SimpleBaselineAnalysis SimpleBaselineAnalysis.cxx)
+target_link_libraries(SimpleBaselineAnalysis 
+    ${ROOT_RIO_LIB}
+    ${ROOT_TREE_LIB}
+    ${ROOT_CORE_LIB}
+    ${ROOT_HIST_LIB}
+    ${ROOT_GPAD_LIB}
+    QAUtils
+    ThresholdWriter
+    PairHash
+)
+
+
 add_library(CalibrationAnalysis CalibrationAnalysis.cxx)
 target_link_libraries(CalibrationAnalysis
     ${ROOT_CORE_LIB}
@@ -93,5 +106,6 @@ target_link_libraries(svt_qa
     ${EVIO_LIB}
     ${EXPAT_LIB}
     BaselineAnalysis
+    SimpleBaselineAnalysis
     CalibrationAnalysis
 )
