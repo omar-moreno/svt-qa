@@ -30,6 +30,7 @@
 //--------------//
 #include <DataReadEvio.h>
 #include <BaselineAnalysis.h>
+#include <SimpleBaselineAnalysis.h>
 #include <CalibrationAnalysis.h>
 
 using namespace std; 
@@ -43,6 +44,7 @@ int main(int argc, char **argv) {
     string input_file_name;
     string input_file_list_name;
     bool run_baseline = false;
+    bool run_simple_baseline = false; 
     bool run_calibration = false; 
     bool evio = false; 
 	bool readout_order = false;
@@ -54,23 +56,24 @@ int main(int argc, char **argv) {
     // Parse all the command line arguments. If there are no valid command line
     // arguments passed, print the usage and exit.
     static struct option long_options[] = {
-        { "input",          required_argument, 0, 'i' },
-        { "input_list",     required_argument, 0, 'l' },
-        { "feb",            required_argument, 0, 'f' },
-        { "hybrid",         required_argument, 0, 'h' },
-		{ "readout_order",  no_argument,	   0, 'r' },
-        { "fix_apv_order",  no_argument,       0, 'o' },     
-        { "total_events",   required_argument, 0, 'n' },
-        { "baseline",       no_argument,       0, 'b' },
-        { "calibration",    no_argument,       0, 'c' },
-        { "evio",           no_argument,       0, 'e' },
-        { "help",           no_argument,       0, 'u' }, 
+        { "input",           required_argument, 0, 'i' },
+        { "input_list",      required_argument, 0, 'l' },
+        { "feb",             required_argument, 0, 'f' },
+        { "hybrid",          required_argument, 0, 'h' },
+		{ "readout_order",   no_argument,	    0, 'r' },
+        { "fix_apv_order",   no_argument,       0, 'o' },     
+        { "total_events",    required_argument, 0, 'n' },
+        { "baseline",        no_argument,       0, 'b' },
+        { "simple_baseline", no_argument,       0, 's' }, 
+        { "calibration",     no_argument,       0, 'c' },
+        { "evio",            no_argument,       0, 'e' },
+        { "help",            no_argument,       0, 'u' }, 
         { 0, 0, 0, 0 }
     };
 
     int option_index = 0;
     int option_char; 
-    while ((option_char = getopt_long(argc, argv, "i:l:f:h:ron:bceu", long_options, &option_index)) != -1) {
+    while ((option_char = getopt_long(argc, argv, "i:l:f:h:ron:bsceu", long_options, &option_index)) != -1) {
         switch (option_char) {
             case 'i': 
                 input_file_name = optarg; 
@@ -95,6 +98,9 @@ int main(int argc, char **argv) {
                 break; 
             case 'b': 
                 run_baseline = true; 
+                break;
+            case 's': 
+                run_simple_baseline = true; 
                 break;
             case 'c': 
                 run_calibration = true; 
@@ -155,10 +161,10 @@ int main(int argc, char **argv) {
     
     // TODO: All analyses should be loaded dynamically
 	BaselineAnalysis* baseline_analysis = NULL;
+    SimpleBaselineAnalysis* simple_baseline_analysis = NULL; 
     CalibrationAnalysis* calibration_analysis = NULL; 
     if (run_baseline) {
 
-        //if (feb_id != -1 && hybrid_id != -1) 
         if (feb_id != -1 && hybrid_id != -1)
             baseline_analysis = new BaselineAnalysis(feb_id, hybrid_id); 
         else if (feb_id != -1) 
@@ -166,7 +172,19 @@ int main(int argc, char **argv) {
         else baseline_analysis = new BaselineAnalysis();    
 		
 		baseline_analysis->readoutOrder(readout_order); 
-		analyses.push_back(baseline_analysis); 	
+		analyses.push_back(baseline_analysis);
+
+    } else if (run_simple_baseline) { 
+       
+        if (feb_id != -1 && hybrid_id != -1)
+            simple_baseline_analysis = new SimpleBaselineAnalysis(feb_id, hybrid_id); 
+        else if (feb_id != -1) 
+            simple_baseline_analysis = new SimpleBaselineAnalysis(feb_id);
+        else simple_baseline_analysis = new SimpleBaselineAnalysis();    
+		
+		simple_baseline_analysis->readoutOrder(readout_order); 
+		analyses.push_back(simple_baseline_analysis); 
+         
 	} else if (run_calibration) { 
         
         if (feb_id != -1 && hybrid_id != -1) 
