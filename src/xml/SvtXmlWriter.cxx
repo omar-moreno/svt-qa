@@ -16,9 +16,7 @@ SvtXmlWriter::SvtXmlWriter()
 	  bytes_written(-1)	  
 {}
 
-SvtXmlWriter::~SvtXmlWriter() {
-    feb_nodes.clear();
-}
+SvtXmlWriter::~SvtXmlWriter() {}
 
 void SvtXmlWriter::open(std::string file_name) {
 
@@ -40,6 +38,13 @@ void SvtXmlWriter::open(std::string file_name) {
     // Set the current node to point to the system node
     current_node = system_node; 
 	
+}
+
+bool SvtXmlWriter::isOpen() { 
+    
+    if (document == NULL) return false;
+   
+    return true;
 }
 
 void SvtXmlWriter::close() {

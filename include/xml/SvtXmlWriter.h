@@ -27,11 +27,6 @@
 //--------------//
 #include <libxml/tree.h>
 
-//--------------//
-//--- SVT QA ---//
-//--------------//
-#include <FebNode.h>
-
 class SvtXmlWriter { 
 
 	public: 
@@ -52,7 +47,14 @@ class SvtXmlWriter {
          *  @param file_name - The name of the XML document
          */
 		virtual void open(std::string file_name);
-		
+
+        /**
+         *  Method to check if XML document has been opened
+         *
+         *  @return true if it has been opened, false otherwise
+         */
+        bool isOpen();
+
         /**
          *  Close the SVT XML document
          */
@@ -65,16 +67,9 @@ class SvtXmlWriter {
          */
         xmlNodePtr getCurrentNode(); 
 
-        /**
-         *  Get the FebNode corresponding to the given FEB ID
-         *
-         *  @param feb_id - The FEB ID of the FebNode of interest
-         *  @return The FebNode corresponding to the given ID 
-         */
-        //FebNode* getFebNode(int feb_id);
-
     protected:
 
+        
         // Pointer to the current node in the XML document tree
         xmlNodePtr current_node; 
 
@@ -82,12 +77,9 @@ class SvtXmlWriter {
 
 		// Pointer to the XML document
 		xmlDocPtr document; 
-		
+
 		// Pointer to the root element "system"
 		xmlNodePtr system_node;
-
-        // A mapping between a FEB ID and the corresponding FEB node
-        std::unordered_map <int, FebNode*> feb_nodes;
 
 		// Name of the file the document will be saved to
 		std::string file_name;
