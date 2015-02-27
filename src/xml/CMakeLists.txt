@@ -16,7 +16,6 @@ target_link_libraries(FebNode
 add_library(SvtXmlWriter SvtXmlWriter.cxx)
 target_link_libraries(SvtXmlWriter 
     ${XML_LIB}
-    FebNode
 )
 
 add_library(SvtXmlReader SvtXmlReader.cxx)
@@ -26,7 +25,10 @@ target_link_libraries(SvtXmlReader
 )
 
 add_library(CalibrationWriter CalibrationWriter.cxx)
-target_link_libraries(CalibrationWriter SvtXmlWriter)
+target_link_libraries(CalibrationWriter 
+    SvtXmlWriter
+    FebNode
+)
 
 add_library(ThresholdWriter ThresholdWriter.cxx)
 target_link_libraries(ThresholdWriter SvtXmlWriter)
