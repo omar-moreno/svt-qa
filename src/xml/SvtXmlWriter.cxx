@@ -70,22 +70,3 @@ xmlNodePtr SvtXmlWriter::getCurrentNode() {
     return current_node; 
 }
 
-/*
-
-FebNode* SvtXmlWriter::getFebNode(int feb_id) { 
-  
-    // If a document hasn't been created, throw a runtime exception
-    if (document == NULL) { 
-        throw std::runtime_error("[ ERROR ]: Cannot created a FEB node. The document has not been opened."); 
-    }
-
-    // Check if the FebNode already exists.  If it doesn't, create it.
-    if (feb_nodes.find(feb_id) == feb_nodes.end()) { 
-        feb_nodes[feb_id] = new FebNode(config_node, feb_id);
-        std::cout << "[ SvtXmlWriter ]: FebNode with ID " << feb_id 
-                  << " was created." << std::endl;
-   
-    }
-
-    return feb_nodes[feb_id];
-} */
