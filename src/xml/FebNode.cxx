@@ -57,7 +57,12 @@ FebNode::FebNode(xmlNodePtr feb_node) {
 }
 
 FebNode::~FebNode() {
-    // Destroy all of the HybridNodes associated with this FebNode
+
+    // Destroy all of the HybridNodes stored in the map 
+    std::vector <HybridNode*>::iterator hybrid_it = hybrid_nodes.begin();
+    for (hybrid_it; hybrid_it != hybrid_nodes.end(); ++hybrid_it) { 
+        delete *hybrid_it;
+    }
     hybrid_nodes.clear();
 }
 

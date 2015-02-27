@@ -20,8 +20,6 @@ HybridNode::HybridNode(xmlNodePtr parent_node, int hybrid_id)
     xmlNewProp(hybrid_node, BAD_CAST "id", 
                 BAD_CAST std::to_string(hybrid_id).c_str()); 
 
-
-
     for (int channel = 0; channel < 640; ++channel) { 
 
         channel_nodes.push_back(xmlNewChild(hybrid_node, NULL,
