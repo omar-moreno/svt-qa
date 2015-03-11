@@ -21,6 +21,7 @@
 //--- SVT QA ---//
 //--------------//
 #include <SvtXmlWriter.h>
+#include <FebNode.h>
 
 class CalibrationWriter : public SvtXmlWriter { 
 
@@ -35,6 +36,13 @@ class CalibrationWriter : public SvtXmlWriter {
          *  Destructor
          */
 		~CalibrationWriter();
+
+        /**
+         *  Open an XML calibration document
+         *
+         *  @param file_name - The name of the XML document
+         */
+        void open(std::string file_name);
 
         /**
          *  Write a baseline value to the XML document
@@ -59,6 +67,26 @@ class CalibrationWriter : public SvtXmlWriter {
          */
         void writeNoise(int feb_id, int hybrid_id, int channel, 
                         int sample, double noise);
+
+    private:
+    
+        /**
+         *  Create a FebNode for the specified FEB ID
+         *
+         *  @param feb_id : FEB ID 
+         */
+        void createFebNode(int feb_id);
+
+        /**
+         *  Get the FebNode corresponding to the given FEB ID
+         *
+         *  @param feb_id - The FEB ID of the FebNode of interest
+         *  @return The FebNode corresponding to the given ID 
+         */
+        FebNode* getFebNode(int feb_id);
+
+        // A mapping between a FEB ID and the corresponding FEB node
+        std::unordered_map <int, FebNode*> feb_nodes;
 
 }; // CalibrationWriter
 
