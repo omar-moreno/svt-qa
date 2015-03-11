@@ -30,5 +30,5 @@ target_link_libraries(AbstractDataReadEvio
 add_library(DataReadEvio DataReadEvio.cxx)
 target_link_libraries(DataReadEvio AbstractDataReadEvio)
 
-add_library(TestRunDataReadEvio TestRunDataReadEvio.cxx)
-target_link_libraries(TestRunDataReadEvio AbstractDataReadEvio)
+#add_library(TestRunDataReadEvio TestRunDataReadEvio.cxx)
+#target_link_libraries(TestRunDataReadEvio AbstractDataReadEvio)
