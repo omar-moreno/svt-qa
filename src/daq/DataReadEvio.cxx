@@ -23,13 +23,13 @@ void DataReadEvio::processDataBank(Data* data_obj, uint16_t tag, std::vector<uin
 }
 
 int DataReadEvio::getMaxRocBankTag() { 
-	return 27;
+    return 66;
 }
 
 int DataReadEvio::getMinRocBankTag() { 
-	return 11; 
+	return 51; 
 }
 
 int DataReadEvio::getPhysicsBankTag() {
-    return 1;
+    return 193;
 }
