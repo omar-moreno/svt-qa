@@ -31,7 +31,7 @@
 #include <DataReadEvio.h>
 #include <BaselineAnalysis.h>
 #include <SimpleBaselineAnalysis.h>
-#include <CalibrationAnalysis.h>
+//#include <CalibrationAnalysis.h>
 
 using namespace std; 
 
@@ -162,7 +162,7 @@ int main(int argc, char **argv) {
     // TODO: All analyses should be loaded dynamically
 	BaselineAnalysis* baseline_analysis = NULL;
     SimpleBaselineAnalysis* simple_baseline_analysis = NULL; 
-    CalibrationAnalysis* calibration_analysis = NULL; 
+    //CalibrationAnalysis* calibration_analysis = NULL; 
     if (run_baseline) {
 
         if (feb_id != -1 && hybrid_id != -1)
@@ -185,13 +185,14 @@ int main(int argc, char **argv) {
 		simple_baseline_analysis->readoutOrder(readout_order); 
 		analyses.push_back(simple_baseline_analysis); 
          
-	} else if (run_calibration) { 
+	} 
+    /*else if (run_calibration) { 
         
         if (feb_id != -1 && hybrid_id != -1) 
             calibration_analysis = new CalibrationAnalysis(feb_id, hybrid_id);
         else calibration_analysis = new CalibrationAnalysis();    
 		analyses.push_back(calibration_analysis); 	
-    }
+    }*/
 
     // Initialize all QA analyses 
     for (list<QAAnalysis*>::iterator analysis = analyses.begin(); analysis != analyses.end(); ++analysis) {
@@ -223,10 +224,10 @@ int main(int argc, char **argv) {
             for (uint sample_set_n = 0; sample_set_n < trigger_event.count(); ++sample_set_n) {
             
                 trigger_event.sample(sample_set_n, trigger_samples);
-                if (run_calibration) { 
+                /*if (run_calibration) { 
                     calibration_analysis->setCalibrationGroup(
                             data_reader->getConfigInt("FrontEndTestFpga:FebCore:Hybrid:apv25:CalGroup"));
-                } 
+                } */
                 for (list<QAAnalysis*>::iterator analysis = analyses.begin(); analysis != analyses.end(); ++analysis) {
                     (*analysis)->processEvent(trigger_samples); 
                 }   

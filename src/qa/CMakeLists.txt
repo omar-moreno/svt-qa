@@ -51,8 +51,7 @@ target_link_libraries(BaselineAnalysis
     ${ROOT_HIST_LIB}
     ${ROOT_GPAD_LIB}
     QAUtils
-    #    CalibrationWriter
-    ThresholdWriter
+    CalibrationWriter
     SamplesPlot
     PairHash
 )
@@ -70,17 +69,17 @@ target_link_libraries(SimpleBaselineAnalysis
 )
 
 
-add_library(CalibrationAnalysis CalibrationAnalysis.cxx)
-target_link_libraries(CalibrationAnalysis
-    ${ROOT_CORE_LIB}
-    ${ROOT_GPAD_LIB}
-    ${ROOT_HIST_LIB}
-    QAUtils
-    CalGroupsPlot
-    PlottingUtils
-    Apv25Utils
-    PairHash
-)
+#add_library(CalibrationAnalysis CalibrationAnalysis.cxx)
+#target_link_libraries(CalibrationAnalysis
+#    ${ROOT_CORE_LIB}
+#    ${ROOT_GPAD_LIB}
+#    ${ROOT_HIST_LIB}
+#    QAUtils
+#    CalGroupsPlot
+#    PlottingUtils
+#    Apv25Utils
+#    PairHash
+#)
 
 #add_executable(apv25_qa apv25_qa.cxx)
 #target_link_libraries(apv25_qa ${ROOT_TREE_LIB} ${ROOT_CORE_LIB} ${ROOT_RIO_LIB} ${ROOT_PHYSICS_LIB} PlotUtils Apv25Utils ${TRACKER_EVENT_LIB} ${TRACKER_SAMPLE_LIB} ${DATA_READ_LIB} ${DATA_LIB} ${ROOT_GPAD_LIB} ${ROOT_HIST_LIB} ${ROOT_GRAF_LIB} ${ROOT_MATHCORE_LIB} ${XMLVARIABLES_LIB} ${ROOT_MATRIX_LIB} ${ROOT_CINT_LIB} ${ROOT_THREAD_LIB} ${ROOT_SQLIO_LIB} ${XML_LIB} ${ROOT_NET_LIB} SvtCalibrations ${RT_LIB} ${BZ2_LIB}) 
@@ -107,5 +106,5 @@ target_link_libraries(svt_qa
     ${EXPAT_LIB}
     BaselineAnalysis
     SimpleBaselineAnalysis
-    CalibrationAnalysis
+    #    CalibrationAnalysis
 )
