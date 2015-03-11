@@ -7,6 +7,8 @@ find_library(ROOT_CORE_LIB Core $ENV{ROOTSYS}/lib)
 find_library(ROOT_RIO_LIB RIO $ENV{ROOTSYS}/lib)
 find_library(ROOT_PHYSICS_LIB Physics $ENV{ROOTSYS}/lib)
 
+add_library(PairHash PairHash.cxx)
+
 # Create the PlotUtils library
 add_library(PlottingUtils PlottingUtils.cxx)
 target_link_libraries(PlottingUtils ${ROOT_TREE_LIB})
