@@ -2,9 +2,9 @@
  *  @file   SimpleBaselineAnalysis.cxx
  *  @brief  Analysis class used to extract baseline and noise values for all
  *          SVT channels.
- *	@author Omar Moreno <omoreno1@ucsc.edu>
- *			Santa Cruz Institute for Particle Physics
- *			University of California, Santa Cruz
+ *  @author Omar Moreno <omoreno1@ucsc.edu>
+ *          Santa Cruz Institute for Particle Physics
+ *          University of California, Santa Cruz
  *  @date   February 19, 2015
  *
  */
@@ -61,9 +61,9 @@ void SimpleBaselineAnalysis::initialize() {
     
     writer->open("test.xml");
 
-	for(int n = 0; n < 128; n++){
-		int channel = (32*(n%4)) + (8*(n/4)) - (31*(n/16));
-		channel_map[channel] = n; 
+    for(int n = 0; n < 128; n++){
+        int channel = (32*(n%4)) + (8*(n/4)) - (31*(n/16));
+        channel_map[channel] = n; 
     }
 }
 
@@ -85,15 +85,15 @@ void SimpleBaselineAnalysis::processEvent(TriggerSample* samples) {
     // If the sample is a header or a tail event, skip the event
     if(samples->head() || samples->tail()) return;
 
-	// If the readout order flag has been set, get the readout order number
-	// corresponding to the APV25 channel number.  Else, get the physical 
-	// channel number.
-	int channel = 0; 
-	if (readout_order) {
-		channel = channel_map[samples->channel()] + samples->apv()*128; 
-	} else { 
-		channel = QAUtils::getPhysicalChannel(samples->apv(), samples->channel()); 
-	}
+    // If the readout order flag has been set, get the readout order number
+    // corresponding to the APV25 channel number.  Else, get the physical 
+    // channel number.
+    int channel = 0; 
+    if (readout_order) {
+        channel = channel_map[samples->channel()] + samples->apv()*128; 
+    } else { 
+        channel = QAUtils::getPhysicalChannel(samples->apv(), samples->channel()); 
+    }
 
     for (int sample_n = 0; sample_n < 6; ++sample_n) {
         baseline_map[samples->febAddress()][samples->hybrid()]->Fill(channel, samples->value(sample_n));
@@ -101,7 +101,7 @@ void SimpleBaselineAnalysis::processEvent(TriggerSample* samples) {
 }
 
 void SimpleBaselineAnalysis::readoutOrder(bool readout_order) {
-	this->readout_order = readout_order; 
+    this->readout_order = readout_order; 
 }
 
 void SimpleBaselineAnalysis::finalize() {
@@ -120,6 +120,11 @@ void SimpleBaselineAnalysis::finalize() {
     
     writer->close();
     output_file->Close();
+}
+
+
+void SimpleBaselineAnalysis::setThreshold(const double threshold) { 
+    writer->setThreshold(threshold); 
 }
 
 std::string SimpleBaselineAnalysis::toString() {
@@ -154,7 +159,7 @@ void SimpleBaselineAnalysis::processBaselinePlot(int feb, int hybrid, TH2S* base
     std::string file_name = "feb";
     if (feb < 10) file_name += "0";
     file_name += std::to_string(feb) + "_hybrid0" + std::to_string(hybrid);
-	if (readout_order) file_name += "_readout_order"; 
+    if (readout_order) file_name += "_readout_order"; 
     output_file->mkdir(file_name.c_str());
     output_file->cd(file_name.c_str());
 

@@ -2,9 +2,9 @@
  *  @file   SimpleBaselineAnalysis.h
  *  @brief  Analysis class used to extract baseline and noise values for all
  *          SVT channels.
- *	@author Omar Moreno <omoreno1@ucsc.edu>
- *			Santa Cruz Institute for Particle Physics
- *			University of California, Santa Cruz
+ *  @author Omar Moreno <omoreno1@ucsc.edu>
+ *          Santa Cruz Institute for Particle Physics
+ *          University of California, Santa Cruz
  *  @date   February 19, 2015
  *
  */
@@ -48,7 +48,7 @@ class SimpleBaselineAnalysis : public QAAnalysis {
          */
         SimpleBaselineAnalysis();
 
-		/**
+        /**
          *  Constructor used when data from only a single FEB is going to be 
          *  processed.
          *
@@ -63,41 +63,52 @@ class SimpleBaselineAnalysis : public QAAnalysis {
          *  @param feb_id - FEB ID
          *  @param hybrid_id - Hybrid ID
          */    
-		SimpleBaselineAnalysis(int feb_id, int hybrid_id);	
+        SimpleBaselineAnalysis(int feb_id, int hybrid_id);  
 
         /**
          *  Destructor
          */
         ~SimpleBaselineAnalysis(); 
 
-		/**
-		 */
+        /**
+         */
         void initialize();
 
-		/**
-		 *
-		 */
-		void readoutOrder(bool readout_order);	
+        /**
+         *
+         */
+        void readoutOrder(bool readout_order);  
 
-		/**
-		 */
-		void processEvent(TriggerSample*);
+        /**
+         */
+        void processEvent(TriggerSample*);
 
-		/**
-		 */
-		void finalize();
-		
-		/**
-		 */
-		std::string toString();
+        /**
+         */
+        void finalize();
+        
+        /**
+         *  Set the number of RMS noise above baseline that the threshold 
+         *  should be set to i.e. the multiplicative factor N in
+         *  the equation threshold = baseline + N*noise. This method is 
+         *  just a wrapper to the setThreshold method of the Threshold
+         *  writer.
+         *
+         *  @param threshold : Number of RMS noise above baseline
+         */
+        void setThreshold(const double threshold);
+
+        /**
+         */
+        std::string toString();
 
     private: 
         
         void addBaselineHistogram(int feb_id, int hybrid_id); 
 
-		/**
-		 */
-		void processBaselinePlot(int, int, TH2S*);
+        /**
+         */
+        void processBaselinePlot(int, int, TH2S*);
 
 
         /**
@@ -115,7 +126,7 @@ class SimpleBaselineAnalysis : public QAAnalysis {
                                    double &mean, 
                                    double &mean_error,
                                    double &noise);   
-
+        
 
         // ROOT output_file
         TFile* output_file; 
@@ -124,19 +135,19 @@ class SimpleBaselineAnalysis : public QAAnalysis {
         TF1* gaussian; 
 
         // XML threshold writer for SVT conditions
-	    ThresholdWriter* writer;
+        ThresholdWriter* writer;
 
         // Map of FEB ID to a vector containing plots for each of the hybrids
         std::unordered_map <int, std::vector <TH2S*>> baseline_map; 
 
         // The name of the class
-		std::string class_name;
-		
+        std::string class_name;
+        
         int channel_map[128];
-		int feb_id; 
-		int hybrid_id;
+        int feb_id; 
+        int hybrid_id;
 
-		bool readout_order;
+        bool readout_order;
 };
 
 #endif // __SIMPLE_BASELINE_ANALYSIS_H__
