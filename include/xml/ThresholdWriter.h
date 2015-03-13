@@ -14,6 +14,7 @@
 //--- C++ StdLib ---//
 //------------------//
 #include <string>
+#include <cmath>
 
 //--------------//
 //--- LibXML ---//

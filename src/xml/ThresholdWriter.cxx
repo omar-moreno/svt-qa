@@ -10,7 +10,9 @@
 
 #include <ThresholdWriter.h>
 
-ThresholdWriter::ThresholdWriter() {}
+ThresholdWriter::ThresholdWriter()
+    : threshold(2) 
+{}
 
 ThresholdWriter::~ThresholdWriter() {}
 
@@ -50,7 +52,7 @@ void ThresholdWriter::writeThreshold(int feb_id, int hybrid_id, int channel,
                                       "Channel" + std::to_string(apv_channel);
 
     // Calculate the threshold
-    int threshold_value = ceil(baseline + 2*noise); 
+    int threshold_value = ceil(baseline + threshold*noise); 
 
     // Add a threshold node with the calculated threshold
     xmlNewChild(this->getCurrentNode(), NULL, BAD_CAST threshold_node_name.c_str(), 
