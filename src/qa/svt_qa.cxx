@@ -44,14 +44,14 @@ int main(int argc, char **argv) {
     string input_file_name;
     string input_file_list_name;
     bool run_baseline = false;
-    bool run_simple_baseline = false; 
     bool run_calibration = false; 
     bool evio = false; 
-	bool readout_order = false;
+    bool readout_order = false;
     bool fix_apv_order = false; 
     int feb_id = -1; 
     int hybrid_id = -1; 
     int total_events = -1; 
+    double threshold = -1;
 
     // Parse all the command line arguments. If there are no valid command line
     // arguments passed, print the usage and exit.
@@ -60,12 +60,12 @@ int main(int argc, char **argv) {
         { "input_list",      required_argument, 0, 'l' },
         { "feb",             required_argument, 0, 'f' },
         { "hybrid",          required_argument, 0, 'h' },
-		{ "readout_order",   no_argument,	    0, 'r' },
+        { "readout_order",   no_argument,       0, 'r' },
         { "fix_apv_order",   no_argument,       0, 'o' },     
         { "total_events",    required_argument, 0, 'n' },
         { "baseline",        no_argument,       0, 'b' },
-        { "simple_baseline", no_argument,       0, 's' }, 
         { "calibration",     no_argument,       0, 'c' },
+        { "threshold",       required_argument, 0, 't' },
         { "evio",            no_argument,       0, 'e' },
         { "help",            no_argument,       0, 'u' }, 
         { 0, 0, 0, 0 }
@@ -73,7 +73,7 @@ int main(int argc, char **argv) {
 
     int option_index = 0;
     int option_char; 
-    while ((option_char = getopt_long(argc, argv, "i:l:f:h:ron:bsceu", long_options, &option_index)) != -1) {
+    while ((option_char = getopt_long(argc, argv, "i:l:f:h:ron:bct:eu", long_options, &option_index)) != -1) {
         switch (option_char) {
             case 'i': 
                 input_file_name = optarg; 
@@ -87,9 +87,9 @@ int main(int argc, char **argv) {
             case 'h':
                 hybrid_id = atoi(optarg);
                 break;  
-			case 'r':
-				readout_order = true;
-				break;
+            case 'r':
+                readout_order = true;
+                break;
             case 'o':
                 fix_apv_order = true; 
                 break;
@@ -99,11 +99,11 @@ int main(int argc, char **argv) {
             case 'b': 
                 run_baseline = true; 
                 break;
-            case 's': 
-                run_simple_baseline = true; 
-                break;
             case 'c': 
                 run_calibration = true; 
+                break;
+            case 't':
+                threshold = atof(optarg);
                 break;
             case 'e':
                 evio = true; 
@@ -160,7 +160,7 @@ int main(int argc, char **argv) {
     list<QAAnalysis*> analyses; 
     
     // TODO: All analyses should be loaded dynamically
-	BaselineAnalysis* baseline_analysis = NULL;
+    BaselineAnalysis* baseline_analysis = NULL;
     SimpleBaselineAnalysis* simple_baseline_analysis = NULL; 
     //CalibrationAnalysis* calibration_analysis = NULL; 
     if (run_baseline) {
@@ -170,28 +170,28 @@ int main(int argc, char **argv) {
         else if (feb_id != -1) 
             baseline_analysis = new BaselineAnalysis(feb_id);
         else baseline_analysis = new BaselineAnalysis();    
-		
-		baseline_analysis->readoutOrder(readout_order); 
-		analyses.push_back(baseline_analysis);
+        
+        baseline_analysis->readoutOrder(readout_order); 
+        analyses.push_back(baseline_analysis);
 
-    } else if (run_simple_baseline) { 
-       
+    } else if (threshold != -1) { 
+    
         if (feb_id != -1 && hybrid_id != -1)
             simple_baseline_analysis = new SimpleBaselineAnalysis(feb_id, hybrid_id); 
         else if (feb_id != -1) 
             simple_baseline_analysis = new SimpleBaselineAnalysis(feb_id);
         else simple_baseline_analysis = new SimpleBaselineAnalysis();    
-		
-		simple_baseline_analysis->readoutOrder(readout_order); 
-		analyses.push_back(simple_baseline_analysis); 
-         
-	} 
+        
+        simple_baseline_analysis->readoutOrder(readout_order);
+        simple_baseline_analysis->setThreshold(threshold);  
+        analyses.push_back(simple_baseline_analysis); 
+    } 
     /*else if (run_calibration) { 
         
         if (feb_id != -1 && hybrid_id != -1) 
             calibration_analysis = new CalibrationAnalysis(feb_id, hybrid_id);
         else calibration_analysis = new CalibrationAnalysis();    
-		analyses.push_back(calibration_analysis); 	
+        analyses.push_back(calibration_analysis);   
     }*/
 
     // Initialize all QA analyses 
