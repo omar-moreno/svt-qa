@@ -16,21 +16,26 @@ SamplesPlot::SamplesPlot(int n_plots, std::string name)
 
 	for (int sample_n = 0; sample_n < this->getNumberOfPlots(); ++sample_n) { 
 	
-		std::string histo_name = this->getName() + " - Sample " + PlottingUtils::toString(sample_n);
-		plots.push_back(new TH2F(histo_name.c_str(), histo_name.c_str(), 640, 0, 640, 16384, 0, 16384));	
+		std::string histo_name = 
+            this->getName() + " - Sample " + std::to_string(sample_n);
+		plots.push_back(new TH2S(histo_name.c_str(),
+                                 histo_name.c_str(), 640, 0, 640, 16384, 0, 16384));	
 	}
 }
 
 SamplesPlot::~SamplesPlot() {
 
+    // Destroy all plots stored in the map
+    std::vector <TH2S*>::iterator plot_it = plots.begin(); 
+    for (plot_it; plot_it != plots.end(); ++plot_it) { 
+        delete *plot_it; 
+    }
 	plots.clear();
 
 	if (sum_plot != NULL) delete sum_plot; 
-
 }
 
 void SamplesPlot::fill(int sample_n, int channel, double pedestal) { 
-
 	plots[sample_n]->Fill(channel, pedestal);
 }
 
@@ -48,17 +53,17 @@ void SamplesPlot::setYAxisTitles(std::string title) {
 	this->y_axis_title = title;
 }
 
-TH2F* SamplesPlot::getPlot(int sample_n) { 
-
+TH2S* SamplesPlot::getPlot(int sample_n) { 
 	return plots[sample_n]; 
 }
 
-TH2F* SamplesPlot::getSumOfPlots() { 
+TH2S* SamplesPlot::getSumOfPlots() { 
 
 	if(sum_plot != NULL) return sum_plot; 
 
 	std::string histo_name = this->getName(); 
-	TH2F* sum_plot = new TH2F(histo_name.c_str(), histo_name.c_str(), 640, 0, 640, 16384, 0, 16384); 
+	TH2S* sum_plot = new TH2S(histo_name.c_str(), 
+                              histo_name.c_str(), 640, 0, 640, 16384, 0, 16384); 
 	for (int sample_n = 0; sample_n < plots.size(); ++sample_n) { 
 		sum_plot->Add(plots[sample_n]);	
 	}

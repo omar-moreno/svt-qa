@@ -148,7 +148,7 @@ void BaselineAnalysis::processBaselinePlot(int feb, int hybrid, SamplesPlot* bas
         g_noise->SetMarkerColor(2 + sample_n);
         g_noise->SetLineColor(2 + sample_n);
 
-        TH2F* baseline_sample_plot = baseline_plot->getPlot(sample_n);
+        TH2S* baseline_sample_plot = baseline_plot->getPlot(sample_n);
         PlottingUtils::adjust2DPlotRange(baseline_sample_plot, 2);
         for (int channel = 0; channel < 640; ++channel) {
             //this->getSimpleCalibrations(

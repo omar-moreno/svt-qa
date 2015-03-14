@@ -15,23 +15,29 @@
 
 #include <PlottingUtils.h>
 
-#include <TH2F.h>
+#include <TH2S.h>
 
 class SamplesPlot { 
 	
 	public: 
 
 		/**
+         *  Constructor
+         *
+         *  @param n_plots : The number of samples that the plots will contain
+         *  @param name : The name of the plots
 		 */
-		SamplesPlot(int, std::string);	
+		SamplesPlot(int n_samples, std::string name);	
 		
 		/**
+         *  Destructor
 		 */
 		~SamplesPlot(); 
 
 		/**
+         * 
 		 */
-		void fill(int, int, double);
+		void fill(int sample_n, int, double);
 		
 		/**
 		 */	
@@ -50,12 +56,12 @@ class SamplesPlot {
 		/**
 		 *
 		 */
-		TH2F* getPlot(int);
+		TH2S* getPlot(int);
 
 		/**
 		 *
 		 */	
-		TH2F* getSumOfPlots();
+		TH2S* getSumOfPlots();
 
 		/**
 		 */
@@ -69,8 +75,8 @@ class SamplesPlot {
 	private:
 
 
-		TH2F* sum_plot; 	
-		std::vector <TH2F*> plots;
+		TH2S* sum_plot; 	
+		std::vector <TH2S*> plots;
 		
 		std::string name;
 		std::string x_axis_title;
