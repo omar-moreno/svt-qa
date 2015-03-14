@@ -107,16 +107,12 @@ void SimpleBaselineAnalysis::readoutOrder(bool readout_order) {
 void SimpleBaselineAnalysis::finalize() {
 
     std::unordered_map <int, std::vector <TH2S*>>::iterator feb_it = baseline_map.begin();
-    std::vector <TH2S*>::iterator hybrid_it; 
 
     for (feb_it; feb_it != baseline_map.end(); ++feb_it) {
-        hybrid_it = feb_it->second.begin();
         for (int hybrid = 0; hybrid < feb_it->second.size(); ++hybrid) { 
             this->processBaselinePlot(feb_it->first, hybrid, feb_it->second[hybrid]); 
         }
     }   
-
-    //baseline_map.clear();
     
     writer->close();
     output_file->Close();
@@ -148,7 +144,6 @@ void SimpleBaselineAnalysis::addBaselineHistogram(int feb_id, int hybrid_id) {
     std::cout << "[ BaselineAnalysis ]: Created baseline histogram for FEB: "   
               << feb_id << " Hybrid: " << hybrid_id << std::endl;
 } 
-
 
 void SimpleBaselineAnalysis::processBaselinePlot(int feb, int hybrid, TH2S* baseline_plot) {
 
