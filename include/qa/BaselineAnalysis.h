@@ -17,7 +17,6 @@
 //------------------//
 #include <string>
 #include <unordered_map>
-#include <vector>
 
 //--------------//
 //--- SVT QA ---//
@@ -25,15 +24,13 @@
 #include <QAAnalysis.h>
 #include <QAUtils.h>
 #include <CalibrationWriter.h>
-#include <ThresholdWriter.h>
 #include <PlottingUtils.h>
 #include <SamplesPlot.h>
 
 //------------//
 //--- ROOT ---//
 //------------//
-#include <TCanvas.h>
-#include <TH2F.h>
+#include <TH2S.h>
 #include <TH1D.h>
 #include <TGraphErrors.h>
 #include <TMultiGraph.h>
@@ -51,32 +48,34 @@ class BaselineAnalysis : public QAAnalysis {
 		BaselineAnalysis();	
 		
 		/**
-         *  Constructor used when data from only a single FEB is going to be 
-         *  processed.
+         *  Parameterized constructor used when data from hybrids associated 
+         *  with a single FEB is going to be processed.
          *
          *  @param feb_id : FEB ID
          */
         BaselineAnalysis(int feb_id);
 
         /**
-         *  Constructor used when data from only a single hybrid connected to
-         *  the specified FEB is going to be processed.
+         *  Parameterized constructor used when data from only a single hybrid
+         *  is going to be processed.
          *
-         *  @param feb_id - FEB ID
-         *  @param hybrid_id - Hybrid ID
+         *  @param feb_id : FEB ID
+         *  @param hybrid_id : Hybrid ID
          */    
 		BaselineAnalysis(int feb_id, int hybrid_id);	
         
         /**
-         * Destructor
+         *  Destructor
 		 */
 		~BaselineAnalysis(); 
 
 		/**
-		 */
+		 *  Method called at the beginning of an analysis class.
+         */
         void initialize();
 
 		/**
+         *  Method used to process events.
 		 */
 		void processEvent(TriggerSample*);
 	
@@ -85,12 +84,17 @@ class BaselineAnalysis : public QAAnalysis {
 		void processBaselinePlot(int, int, SamplesPlot*);
 
 		/**
-		 *
+		 *  Setter used to specify that all plots should be made with the channel
+         *  numbers in readout order instead of physical order.
+         *
+         *  @param readout_order : True if readout_order is desired, false 
+         *                         otherwise.
 		 */
 		void readoutOrder(bool readout_order);	
         
 
 		/**
+         *  Method after all events have been processed.  
 		 */
 		void finalize();
 		
@@ -117,18 +121,19 @@ class BaselineAnalysis : public QAAnalysis {
                                    double &mean_error,
                                    double &noise);   
 
-
         // ROOT output_file
         TFile* output_file; 
 
+        // Gaussian distribution
         TF1* gaussian; 
 
         // XML writer for SVT conditions
-        //CalibrationWriter* writer; 
-	    ThresholdWriter* writer; 
+        CalibrationWriter* writer; 
 
+        // Map between a FEB and hybrid pair and the corresponding SamplesPlot
 		std::unordered_map <std::pair <int, int>, SamplesPlot*, PairHash> baseline_map;
 
+        // Name of the class
 		std::string class_name;
 
 		int channel_map[128];
