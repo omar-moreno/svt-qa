@@ -15,7 +15,14 @@ BaselineAnalysis::BaselineAnalysis()
      writer(new CalibrationWriter()),
      class_name("BaselineAnalysis"), 
      feb_id(-1), hybrid_id(-1), readout_order(false)
-{}
+{
+
+    for (int feb = 0; feb < 10; ++feb) {
+        for (int hybrid = 0; hybrid < 4; ++hybrid) {
+            this->addBaselineHistogram(feb, hybrid); 
+        }
+    }
+}
 
 BaselineAnalysis::BaselineAnalysis(int feb_id)
     : output_file(new TFile("calibration_results.root", "RECREATE")),  
@@ -23,7 +30,11 @@ BaselineAnalysis::BaselineAnalysis(int feb_id)
       writer(new CalibrationWriter()),
       class_name("BaselineAnalysis"), 
       feb_id(feb_id), hybrid_id(-1), readout_order(false) 
-{}
+{
+    for (int hybrid = 0; hybrid < 4; ++hybrid) { 
+        this->addBaselineHistogram(feb_id, hybrid); 
+    }
+}
 
 BaselineAnalysis::BaselineAnalysis(int feb_id, int hybrid_id)
     : output_file(new TFile("calibration_results.root", "RECREATE")),  
@@ -31,11 +42,27 @@ BaselineAnalysis::BaselineAnalysis(int feb_id, int hybrid_id)
       writer(new CalibrationWriter()),
       class_name("BaselineAnalysis"), 
       feb_id(feb_id), hybrid_id(hybrid_id), readout_order(false) 
-{}
+{
+    this->addBaselineHistogram(feb_id, hybrid_id);
+}
 
 BaselineAnalysis::~BaselineAnalysis() {
     delete output_file;  
     delete writer;  
+}
+
+void BaselineAnalysis::addBaselineHistogram(int feb_id, int hybrid_id) { 
+        
+    std::string plot_title = "FEB: " + std::to_string(feb_id) + 
+                             " Hybrid: " + std::to_string(hybrid_id) + 
+                             " Baseline";
+
+    baseline_map[feb_id].push_back(new SamplesPlot(6, plot_title));
+    baseline_map[feb_id][hybrid_id]->setXAxisTitles("Channel");
+    baseline_map[feb_id][hybrid_id]->setYAxisTitles("Baseline [ADC Counts]");
+    
+    std::cout << "[ BaselineAnalysis ]: Created baseline histogram for FEB: "   
+              << feb_id << " Hybrid: " << hybrid_id << std::endl;
 }
 
 void BaselineAnalysis::initialize() {
@@ -65,27 +92,6 @@ void BaselineAnalysis::processEvent(TriggerSample* samples) {
     // If the sample is a header or a tail event, skip the event
     if(samples->head() || samples->tail()) return;
 
-    // Create a DAQ pair
-    std::pair <int, int> daq_pair = std::make_pair(samples->febAddress(), samples->hybrid()); 
-    
-    // Check if the baseline map already contains the DAQ pair key. If it 
-    // doesn't, create a histogram to contain the baseline for that
-    // FEB and hybrid.
-    if (baseline_map.find(daq_pair) == baseline_map.end()) {
-        
-        std::string plot_title = "FEB: " + std::to_string(samples->febAddress()) + 
-                                 " Hybrid: " + std::to_string(samples->hybrid()) + 
-                                 " Baseline"; 
-        baseline_map[daq_pair] = new SamplesPlot(6, plot_title);
-        baseline_map.at(daq_pair)->setXAxisTitles("Channel");
-        baseline_map.at(daq_pair)->setYAxisTitles("Baseline [ADC Counts]");
-    
-        std::cout << "[ BaselineAnalysis ]: Created baseline histogram for FEB: "   
-                  << samples->febAddress() << " Hybrid: " << samples->hybrid()
-                  << std::endl;
-    }
-    SamplesPlot* baseline_plot = baseline_map.at(daq_pair); 
-	
 	// If the readout order flag has been set, get the readout order number
 	// corresponding to the APV25 channel number.  Else, get the physical 
 	// channel number.
@@ -97,7 +103,7 @@ void BaselineAnalysis::processEvent(TriggerSample* samples) {
 	}
 
     for (int sample_n = 0; sample_n < 6; ++sample_n) {
-        baseline_plot->fill(sample_n, channel, samples->value(sample_n));
+        baseline_map[samples->febAddress()][samples->hybrid()]->fill(sample_n, channel, samples->value(sample_n));
     } 
 }
 
@@ -108,13 +114,13 @@ void BaselineAnalysis::readoutOrder(bool readout_order) {
 
 void BaselineAnalysis::finalize() {
 
-    std::unordered_map <std::pair <int, int>, SamplesPlot*, PairHash>::iterator plot_it = baseline_map.begin();
-    
-    for (plot_it; plot_it != baseline_map.end(); ++plot_it) { 
-        this->processBaselinePlot(plot_it->first.first, plot_it->first.second, plot_it->second); 
-    }   
+    std::unordered_map <int, std::vector <SamplesPlot*>>::iterator feb_it = baseline_map.begin();
 
-    baseline_map.clear();
+    for (feb_it; feb_it != baseline_map.end(); ++feb_it) {
+        for (int hybrid = 0; hybrid < feb_it->second.size(); ++hybrid) { 
+            this->processBaselinePlot(feb_it->first, hybrid, feb_it->second[hybrid]); 
+        }
+    }
     
     writer->close();
     output_file->Close();

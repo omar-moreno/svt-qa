@@ -105,6 +105,8 @@ class BaselineAnalysis : public QAAnalysis {
 
     private: 
 
+        void addBaselineHistogram(int feb_id, int hybrid_id); 
+
         /**
          * 
          */
@@ -130,8 +132,7 @@ class BaselineAnalysis : public QAAnalysis {
         // XML writer for SVT conditions
         CalibrationWriter* writer; 
 
-        // Map between a FEB and hybrid pair and the corresponding SamplesPlot
-		std::unordered_map <std::pair <int, int>, SamplesPlot*, PairHash> baseline_map;
+		std::unordered_map <int, std::vector <SamplesPlot*>> baseline_map;
 
         // Name of the class
 		std::string class_name;
