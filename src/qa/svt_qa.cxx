@@ -211,7 +211,7 @@ int main(int argc, char **argv) {
             cerr << "\n[ SVT QA ]: Error! File " << *files_it << " cannot be opened." << endl;
             return EXIT_FAILURE; 
         }
-        //data_reader->open(*files_it, false);
+        
         cout << "[ SVT QA ]: Processing file: " << *files_it << endl;
         event_number = 0;  
         while (data_reader->next(&trigger_event)) {
@@ -221,20 +221,11 @@ int main(int argc, char **argv) {
             if(event_number%500 == 0) 
                 cout << "[ SVT QA ]: Processing event " << event_number << endl;
 
-            for (uint sample_set_n = 0; sample_set_n < trigger_event.count(); ++sample_set_n) {
-            
-                trigger_event.sample(sample_set_n, trigger_samples);
-                /*if (run_calibration) { 
-                    calibration_analysis->setCalibrationGroup(
-                            data_reader->getConfigInt("FrontEndTestFpga:FebCore:Hybrid:apv25:CalGroup"));
-                } */
-                for (list<QAAnalysis*>::iterator analysis = analyses.begin(); analysis != analyses.end(); ++analysis) {
-                    (*analysis)->processEvent(trigger_samples); 
-                }   
-            }
+            for (list<QAAnalysis*>::iterator analysis = analyses.begin(); analysis != analyses.end(); ++analysis) {
+                (*analysis)->processEvent(&trigger_event); 
+            }   
         }
     }
-
   
     for (list<QAAnalysis*>::iterator analysis = analyses.begin(); analysis != analyses.end(); ++analysis) {
         (*analysis)->finalize(); 
@@ -248,8 +239,7 @@ int main(int argc, char **argv) {
     return EXIT_SUCCESS;
 }
 
-void displayUsage()
-{
+void displayUsage() {
     cout << "\nUsage: svt_qa [OPTIONS] -i [INPUT_FILE]" << endl;
     cout << "Either a binary or EVIO INPUT_FILE must be specified.\n" << endl;
     cout << "OPTIONS:\n"
