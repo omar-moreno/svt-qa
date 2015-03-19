@@ -77,7 +77,12 @@ class BaselineAnalysis : public QAAnalysis {
 		/**
          *  Method used to process events.
 		 */
-		void processEvent(TriggerSample*);
+		void processEvent(TriggerEvent* event);
+
+        /**
+         *
+         */
+        void processSamples(TriggerSample* samples);
 	
 		/**
 		 */
@@ -91,7 +96,6 @@ class BaselineAnalysis : public QAAnalysis {
          *                         otherwise.
 		 */
 		void readoutOrder(bool readout_order);	
-        
 
 		/**
          *  Method after all events have been processed.  
@@ -122,6 +126,9 @@ class BaselineAnalysis : public QAAnalysis {
                                    double &mean, 
                                    double &mean_error,
                                    double &noise);   
+        
+        TriggerSample* trigger_samples;
+
 
         // ROOT output_file
         TFile* output_file; 

@@ -10,7 +10,8 @@
 #include <BaselineAnalysis.h>
 
 BaselineAnalysis::BaselineAnalysis()
-   : output_file(new TFile("calibration_results.root", "RECREATE")), 
+   : trigger_samples(new TriggerSample()),
+     output_file(new TFile("calibration_results.root", "RECREATE")), 
      gaussian(new TF1("gaussian", "gaus")), 
      writer(new CalibrationWriter()),
      class_name("BaselineAnalysis"), 
@@ -25,7 +26,8 @@ BaselineAnalysis::BaselineAnalysis()
 }
 
 BaselineAnalysis::BaselineAnalysis(int feb_id)
-    : output_file(new TFile("calibration_results.root", "RECREATE")),  
+    : trigger_samples(new TriggerSample()),
+      output_file(new TFile("calibration_results.root", "RECREATE")),  
       gaussian(new TF1("gaussian", "gaus")), 
       writer(new CalibrationWriter()),
       class_name("BaselineAnalysis"), 
@@ -37,7 +39,8 @@ BaselineAnalysis::BaselineAnalysis(int feb_id)
 }
 
 BaselineAnalysis::BaselineAnalysis(int feb_id, int hybrid_id)
-    : output_file(new TFile("calibration_results.root", "RECREATE")),  
+    : trigger_samples(new TriggerSample()),
+      output_file(new TFile("calibration_results.root", "RECREATE")),  
       gaussian(new TF1("gaussian", "gaus")), 
       writer(new CalibrationWriter()),
       class_name("BaselineAnalysis"), 
@@ -79,7 +82,15 @@ void BaselineAnalysis::initialize() {
 
 }
 
-void BaselineAnalysis::processEvent(TriggerSample* samples) {
+void BaselineAnalysis::processEvent(TriggerEvent* event) {
+
+    for (uint sample_set_n = 0; sample_set_n < event->count(); ++sample_set_n) {
+        event->sample(sample_set_n, trigger_samples); 
+        this->processSamples(trigger_samples);        
+    }        
+}
+
+void BaselineAnalysis::processSamples(TriggerSample* samples) {
 
     // If a FEB ID has been specified and it doesn't match the FEB ID 
     // associated with the sample, skip the event

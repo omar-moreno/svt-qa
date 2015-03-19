@@ -12,7 +12,8 @@
 #include <SimpleBaselineAnalysis.h>
 
 SimpleBaselineAnalysis::SimpleBaselineAnalysis()
-   : output_file(new TFile("calibration_results.root", "RECREATE")), 
+   : trigger_samples(new TriggerSample()),
+     output_file(new TFile("calibration_results.root", "RECREATE")), 
      gaussian(new TF1("gaussian", "gaus")), 
      writer(new ThresholdWriter()),
      class_name("SimpleBaselineAnalysis"), 
@@ -27,7 +28,8 @@ SimpleBaselineAnalysis::SimpleBaselineAnalysis()
 }
 
 SimpleBaselineAnalysis::SimpleBaselineAnalysis(int feb_id)
-    : output_file(new TFile("calibration_results.root", "RECREATE")),  
+    : trigger_samples(new TriggerSample()),
+      output_file(new TFile("calibration_results.root", "RECREATE")),  
       gaussian(new TF1("gaussian", "gaus")), 
       writer(new ThresholdWriter()),
       class_name("SimpleBaselineAnalysis"), 
@@ -39,7 +41,8 @@ SimpleBaselineAnalysis::SimpleBaselineAnalysis(int feb_id)
 }
 
 SimpleBaselineAnalysis::SimpleBaselineAnalysis(int feb_id, int hybrid_id)
-    : output_file(new TFile("calibration_results.root", "RECREATE")),  
+    : trigger_samples(new TriggerSample()),
+      output_file(new TFile("calibration_results.root", "RECREATE")),  
       gaussian(new TF1("gaussian", "gaus")), 
       writer(new ThresholdWriter()),
       class_name("SimpleBaselineAnalysis"), 
@@ -68,7 +71,14 @@ void SimpleBaselineAnalysis::initialize() {
 }
 
 
-void SimpleBaselineAnalysis::processEvent(TriggerSample* samples) {
+void SimpleBaselineAnalysis::processEvent(TriggerEvent* event) {
+    for (uint sample_set_n = 0; sample_set_n < event->count(); ++sample_set_n) {
+        event->sample(sample_set_n, trigger_samples); 
+        this->processSamples(trigger_samples);        
+    }        
+}
+
+void SimpleBaselineAnalysis::processSamples(TriggerSample* samples) {
 
     // If a FEB ID has been specified and it doesn't match the FEB ID 
     // associated with the sample, skip the event

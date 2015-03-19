@@ -80,8 +80,13 @@ class SimpleBaselineAnalysis : public QAAnalysis {
         void readoutOrder(bool readout_order);  
 
         /**
+         *
          */
-        void processEvent(TriggerSample*);
+        void processEvent(TriggerEvent* event);
+
+        /**
+         */
+        void processSamples(TriggerSample* samples);
 
         /**
          */
@@ -127,6 +132,7 @@ class SimpleBaselineAnalysis : public QAAnalysis {
                                    double &mean_error,
                                    double &noise);   
         
+        TriggerSample* trigger_samples;
 
         // ROOT output_file
         TFile* output_file; 
