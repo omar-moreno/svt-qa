@@ -31,6 +31,7 @@
 #include <DataReadEvio.h>
 #include <BaselineAnalysis.h>
 #include <SimpleBaselineAnalysis.h>
+#include <OccupancyAnalysis.h>
 //#include <CalibrationAnalysis.h>
 
 using namespace std; 
@@ -44,7 +45,8 @@ int main(int argc, char **argv) {
     string input_file_name;
     string input_file_list_name;
     bool run_baseline = false;
-    bool run_calibration = false; 
+    bool run_calibration = false;
+    bool run_occupancy = false; 
     bool evio = false; 
     bool readout_order = false;
     bool fix_apv_order = false; 
@@ -66,6 +68,7 @@ int main(int argc, char **argv) {
         { "baseline",        no_argument,       0, 'b' },
         { "calibration",     no_argument,       0, 'c' },
         { "threshold",       required_argument, 0, 't' },
+        { "occupancy",       no_argument,       0, 'p' },
         { "evio",            no_argument,       0, 'e' },
         { "help",            no_argument,       0, 'u' }, 
         { 0, 0, 0, 0 }
@@ -73,7 +76,7 @@ int main(int argc, char **argv) {
 
     int option_index = 0;
     int option_char; 
-    while ((option_char = getopt_long(argc, argv, "i:l:f:h:ron:bct:eu", long_options, &option_index)) != -1) {
+    while ((option_char = getopt_long(argc, argv, "i:l:f:h:ron:bct:peu", long_options, &option_index)) != -1) {
         switch (option_char) {
             case 'i': 
                 input_file_name = optarg; 
@@ -104,6 +107,9 @@ int main(int argc, char **argv) {
                 break;
             case 't':
                 threshold = atof(optarg);
+                break;
+            case 'p':
+                run_occupancy = true;
                 break;
             case 'e':
                 evio = true; 
@@ -161,7 +167,8 @@ int main(int argc, char **argv) {
     
     // TODO: All analyses should be loaded dynamically
     BaselineAnalysis* baseline_analysis = NULL;
-    SimpleBaselineAnalysis* simple_baseline_analysis = NULL; 
+    SimpleBaselineAnalysis* simple_baseline_analysis = NULL;
+    OccupancyAnalysis* occupancy_analysis = NULL; 
     //CalibrationAnalysis* calibration_analysis = NULL; 
     if (run_baseline) {
 
@@ -185,11 +192,18 @@ int main(int argc, char **argv) {
         simple_baseline_analysis->readoutOrder(readout_order);
         simple_baseline_analysis->setThreshold(threshold);  
         analyses.push_back(simple_baseline_analysis); 
+    } else if (run_occupancy) { 
+        if (feb_id != -1 && hybrid_id != -1)
+            occupancy_analysis = new OccupancyAnalysis(feb_id, hybrid_id); 
+        else if (feb_id != -1) 
+            occupancy_analysis = new OccupancyAnalysis(feb_id);
+        else occupancy_analysis = new OccupancyAnalysis();    
+        analyses.push_back(occupancy_analysis); 
     } 
     /*else if (run_calibration) { 
         
         if (feb_id != -1 && hybrid_id != -1) 
-            calibration_analysis = new CalibrationAnalysis(feb_id, hybrid_id);
+            calibration_analysis = new CalibraionAnalysis(feb_id, hybrid_id);
         else calibration_analysis = new CalibrationAnalysis();    
         analyses.push_back(calibration_analysis);   
     }*/
@@ -217,9 +231,6 @@ int main(int argc, char **argv) {
         while (data_reader->next(&trigger_event)) {
             if (event_number == total_events) break; 
             ++event_number;
-
-            if(event_number%500 == 0) 
-                cout << "[ SVT QA ]: Processing event " << event_number << endl;
 
             for (list<QAAnalysis*>::iterator analysis = analyses.begin(); analysis != analyses.end(); ++analysis) {
                 (*analysis)->processEvent(&trigger_event); 
