@@ -5,8 +5,8 @@ add_executable(CalibrationWriterTest CalibrationWriterTest.cxx)
 target_link_libraries(CalibrationWriterTest CalibrationWriter)
 
 # Find the EVIO libraries
-find_library(EVIO_LIB evio $ENV{CODA}/Linux-x86_64/lib)
-find_library(EVIOXX_LIB evioxx $ENV{CODA}/Linux-x86_64/lib)
+find_library(EVIO_LIB evio $ENV{EVIO_LIB_PATH})
+find_library(EVIOXX_LIB evioxx $ENV{EVIO_LIB_PATH})
 
 # Find the SVT DAQ libraries
 list(APPEND CMAKE_FIND_LIBRARY_SUFFIXES ".o")
@@ -19,7 +19,7 @@ find_library(TRACKER_SAMPLE_LIB TrackerSample.o $ENV{DAQ_HOME}/.obj)
 find_library(XMLVARIABLES_LIB XmlVariables.o $ENV{DAQ_HOME}/.obj)
 
 # Find bz2 libraries
-find_library(BZ2_LIB bz2 $ENV{BZ2_PATH})
+find_library(BZ2_LIB bz2 $ENV{BZ2_LIB_PATH})
 
 # Find xml libraries
 find_library(XML_LIB xml2 /usr/lib)
