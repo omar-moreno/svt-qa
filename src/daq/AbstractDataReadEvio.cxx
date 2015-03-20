@@ -80,7 +80,11 @@ bool AbstractDataReadEvio::next(Data* data) {
         // Get a physics event.  If the physics event is NULL, the end of the
         // EVIO file was reached.
         if ((event = this->getPhysicsEvent()) == NULL) return false;
-        
+       
+        //std::cout << "[ AbstractDataReadEvio ]: ROC number: " 
+        //          << (int) roc_banks->front()->num << std::endl;
+        data->setEventNumber(++event_n);
+
         /*
         std::cout << "[ AbstractDataReadEvio ]: --------------------------------------" << std::endl;
         std::cout << "[ AbstractDataReadEvio ]: --------------------------------------" << std::endl;
@@ -115,8 +119,8 @@ bool AbstractDataReadEvio::next(Data* data) {
                       << result->size() << std::endl;
             */
 			roc_banks->insert(roc_banks->end(), result->begin(), result->end());
-		}
-       
+        }
+      
         /*
         std::cout << "[ AbstractDataReadEvio ]: Total ROC banks found: " 
                   << roc_banks->size() << std::endl;
