@@ -9,10 +9,10 @@ target_link_libraries(SamplesPlot
     PlottingUtils
 )
 
-add_library(CalGroupsPlot CalGroupsPlot.cxx)
-target_link_libraries(CalGroupsPlot 
-    ${ROOT_CORE_LIB}
-    ${ROOT_HIST_LIB}
-    ${ROOT_GPAD_LIB}
-    ${ROOT_GRAF_LIB}
-)
+#add_library(CalGroupsPlot CalGroupsPlot.cxx)
+#target_link_libraries(CalGroupsPlot 
+#    ${ROOT_CORE_LIB}
+#    ${ROOT_HIST_LIB}
+#    ${ROOT_GPAD_LIB}
+#    ${ROOT_GRAF_LIB}
+#)
