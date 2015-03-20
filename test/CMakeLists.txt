@@ -28,7 +28,7 @@ find_library(XML_LIB xml2 $ENV{LIBXML_LIB_PATH})
 find_library(RT_LIB rt /usr/lib)
 
 # Find the expat libraries
-find_library(EXPAT_LIB expat /usr/lib64)
+find_library(EXPAT_LIB expat $ENV{EXPAT_LIB_PATH})
 
 #add_executable(TestRunDataReadEvioTest TestRunDataReadEvioTest.cxx)
 #target_link_libraries(TestRunDataReadEvioTest TestRunDataReadEvio)

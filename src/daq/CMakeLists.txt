@@ -11,7 +11,7 @@ find_library(DATAREAD_LIB DataRead.o $ENV{DAQ_HOME}/.obj)
 find_library(DATA_LIB Data.o $ENV{DAQ_HOME}/.obj)
 
 # Find the expat libraries
-find_library(EXPAT_LIB expat /usr/lib64)
+find_library(EXPAT_LIB expat $ENV{EXPAT_LIB_PATH})
 
 add_library(TestRunSvtSample TestRunSvtSample.cxx)
 
