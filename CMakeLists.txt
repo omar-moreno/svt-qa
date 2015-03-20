@@ -25,7 +25,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${SVT_QA_BINARY_DIR}/lib")
 include_directories("$ENV{ROOTSYS}/include")
 
 # Include the libXML headers
-include_directories("/usr/include/libxml2")
+include_directories("$ENV{LIBXML_INCLUDE_PATH}")
 
 # Include tracker headers
 set(TRACKER_HDR_DIR "$ENV{DAQ_HOME}/tracker")
@@ -40,8 +40,7 @@ set(UTILS_HDR_DIR "${SVT_QA_SOURCE_DIR}/include/utils")
 include_directories("${UTILS_HDR_DIR}")
 
 # Include EVIO headers
-set(EVIO_HDR_DIR "$ENV{CODA}/Linux-x86_64/include")
-include_directories("${EVIO_HDR_DIR}")
+include_directories("$ENV{EVIO_INCLUDE_PATH}")
 
 # Include the QA headers 
 set(QA_HDR_DIR "${SVT_QA_SOURCE_DIR}/include/qa")
