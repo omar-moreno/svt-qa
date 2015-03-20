@@ -22,7 +22,7 @@ find_library(XMLVARIABLES_LIB XmlVariables.o $ENV{DAQ_HOME}/.obj)
 find_library(BZ2_LIB bz2 $ENV{BZ2_LIB_PATH})
 
 # Find xml libraries
-find_library(XML_LIB xml2 /usr/lib)
+find_library(XML_LIB xml2 $ENV{LIBXML_LIB_PATH})
 
 # Find rt libraries
 find_library(RT_LIB rt /usr/lib)

@@ -2,7 +2,7 @@
 add_definitions("-std=c++11")
 
 # Find xml libraries
-find_library(XML_LIB xml2 /usr/lib)
+find_library(XML_LIB xml2 $ENV{LIBXML_LIB_PATH})
 
 add_library(HybridNode HybridNode.cxx)
 target_link_libraries(HybridNode ${XML_LIB})
