@@ -94,8 +94,10 @@ void HybridNode::writeChannelData(std::string type, int channel, int sample,
                 BAD_CAST std::to_string(sample).c_str());
 }
 
+/*
 double HybridNode::getChannelData(std::string name, int channel, int sample) {
 
+    
     // Get the channel node that contains the data
     xmlNodePtr channel_node = channel_nodes[channel];
 
@@ -112,4 +114,4 @@ double HybridNode::getChannelData(std::string name, int channel, int sample) {
     xmlFree(char_value);
 
     return value;
-}
+}*/

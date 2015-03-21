@@ -74,8 +74,8 @@ class HybridNode {
          *  @param sample - Sample ID of the child node
          *  @return Text node being held by the child node as a double
          */
-        double getChannelData(std::string name,
-                                int channel, int sample);
+        //double getChannelData(std::string name,
+        //                        int channel, int sample);
 
 
         /**

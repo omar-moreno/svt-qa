@@ -61,14 +61,14 @@ bool SvtCalibrations::loadCalibrations(std::string xml_file_path) {
 
 	        // Loop through all of the channels and samples and retrieve the
 	        // calibrations
-	        for (int channel = 0; channel < 640; ++channel) {
+	        /*for (int channel = 0; channel < 640; ++channel) {
 	            for (int sample = 0; sample < 6; ++sample) {
 	                baseline_map[daq_pair][channel]
 	                            = (*feb_node)->getHybridNode(hybrid_id)->getChannelData("baseline", channel, sample);
 	                noise_map[daq_pair][channel]
 	                            =(*feb_node)->getHybridNode(hybrid_id)->getChannelData("noise", channel, sample);
 	            }
-	        }
+	        }*/
 	    }
 	}
 
