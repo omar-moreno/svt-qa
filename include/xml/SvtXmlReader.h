@@ -17,45 +17,45 @@
 #include <string>
 #include <stdexcept>
 #include <iostream>
-#include <unordered_map>
 
 //--------------//
 //--- LibXML ---//
 //--------------//
 #include <libxml/tree.h>
 #include <libxml/parser.h>
-#include <libxml/xpath.h>
-
-//--------------//
-//--- SVT QA ---//
-//--------------//
-#include <FebNode.h>
 
 class SvtXmlReader { 
 
-	public: 
+    public: 
 
         /**
          *  Default Constructor
          */
         SvtXmlReader();
 
-		/**
-		 *	Constructor
-		 */
-		SvtXmlReader(std::string xml_file_name);
+        /**
+         *  Constructor
+         */
+        SvtXmlReader(std::string xml_file_name);
 
-		/**
-		 *	Destructor
-		 */
-		virtual ~SvtXmlReader();
+        /**
+         *  Destructor
+         */
+        virtual ~SvtXmlReader();
 
-		/**
-		 *	Open the SVT XML document and parse it to a tree. 
-		 *
-		 *	@param xml_file_name - The name of the SVT XML document.
-		 */
-		void open(std::string xml_file_name);
+        /**
+         *  Open the SVT XML document and parse it to a tree. 
+         *
+         *  @param xml_file_name : The name of the SVT XML document.
+         */
+        void open(std::string xml_file_name);
+
+        /**
+         *  Method to check if an XML document has been opened
+         *
+         *  @return true if it has been opened, false otherwise
+         */
+        bool isOpen(); 
 
         /**
          *  Close the SVT XML reader
@@ -63,40 +63,27 @@ class SvtXmlReader {
         void close();
 
         /**
-         *  Get the FebNode corresponding to the given FEB ID
+         *  Get a pointer to the current node in the XML document tree.
          *
-         *  @param feb_id - The FEB ID of the FebNode of interest
-         *  @return The FebNode corresponding to the given ID
+         *  @return pointer to the current node in the XML document tree 
          */
-		FebNode* getFebNode(int feb_id);
+        xmlNodePtr getCurrentNode(); 
 
-		/**
-		 *  Get all FebNode's as a vector
-		 *
-		 *  @return A vector containing all FebNodes
-		 */
-		std::vector<FebNode*> getFebNodes();
+    protected: 
+        // Pointer to the XML document
+        xmlDocPtr document; 
+        
+        // Pointer to the current node in the XML document tree
+        xmlNodePtr current_node; 
 
-	private:
+    private:
 
-		// Pointer to the XML document
-		xmlDocPtr document; 
-		
-		// Pointer to the root element "system"
-		xmlNodePtr system_node; 
+        
+        // Pointer to the root element "system"
+        xmlNodePtr system_node; 
 
-		// Pointer to the config element
-		xmlNodePtr config_node;
-
-        // A mapping between a FEB ID and the corresponding FEB node
-        std::unordered_map <int, FebNode*> feb_nodes;
-
-        // A vector containing all FebNodes
-        std::vector<FebNode*> feb_node_collection;
-
-		std::string system_node_name;
-		std::string config_node_name; 	
-		std::string feb_node_name;
+        // The root element name
+        std::string system_node_name;
 
 }; // SvtXmlReader
 
