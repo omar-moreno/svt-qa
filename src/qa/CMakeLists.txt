@@ -73,6 +73,7 @@ target_link_libraries(OccupancyAnalysis
     ${ROOT_RIO_LIB}
     ${ROOT_HIST_LIB}
     PlottingUtils
+    QAUtils
 )
 
 #add_library(CalibrationAnalysis CalibrationAnalysis.cxx)

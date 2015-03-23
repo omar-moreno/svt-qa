@@ -16,17 +16,20 @@
 #include <string>
 #include <iostream>
 #include <unordered_map>
+#include <vector>
 
 //--------------//
 //--- SVT QA ---//
 //--------------//
 #include <QAAnalysis.h>
 #include <PlottingUtils.h>
+#include <QAUtils.h>
 
 //------------//
 //--- ROOT ---//
 //------------//
 #include <TH1S.h>
+#include <TH2S.h>
 #include <TFile.h>
 
 class OccupancyAnalysis : public QAAnalysis { 
@@ -100,8 +103,9 @@ class OccupancyAnalysis : public QAAnalysis {
         
         // Map of FEB ID to a vector containing plots for each of the hybrids
         std::unordered_map <int, std::vector <TH1S*>> hit_counts_map;
-        std::unordered_map <int, std::vector<int>> hit_counts;  
-        
+	std::unordered_map <int, std::vector<TH2S*>> hit_counts_v_channel_map;        
+        std::unordered_map <int, std::vector<int>> hit_counts; 
+
         std::string class_name; 
 
         int feb_id; 
