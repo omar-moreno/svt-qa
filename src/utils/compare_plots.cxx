@@ -92,8 +92,16 @@ int main(int argc, char **argv) {
     map <string, vector<TH1*>>::iterator histogram_it = histogram_map.begin();
     canvas->Print("test.pdf[");
     for (histogram_it; histogram_it != histogram_map.end(); histogram_it++) { 
-        histogram_it->second[0]->Draw();
+        int color_index = 1;
+        histogram_it->second[0]->SetLineColor(color_index);
+	histogram_it->second[0]->GetYaxis()->SetRangeUser(0, 500);
+        ++color_index;
+	histogram_it->second[0]->Draw();
+
         for (int hist_n = 1; hist_n < histogram_it->second.size(); hist_n++) { 
+           histogram_it->second[hist_n]->SetLineColor(color_index);
+	   ++color_index;
+	   histogram_it->second[hist_n]->GetYaxis()->SetRangeUser(0, 500);
            histogram_it->second[hist_n]->Draw("same");  
             cout << "Draw : " << hist_n << endl;
        } 
