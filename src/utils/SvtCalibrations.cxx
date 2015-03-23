@@ -42,10 +42,10 @@ bool SvtCalibrations::loadCalibrations(std::string xml_file_path) {
 	this->xml_file_name = xml_file_name;
 
     // Open the file using the SVT XML reader
-    reader->open(xml_file_name);
+    //reader->open(xml_file_name);
 
     // Get the list of FebNodes from the reader and iterate over them
-    std::vector<FebNode*> feb_nodes = reader->getFebNodes();
+    /*std::vector<FebNode*> feb_nodes = reader->getFebNodes();
 	std::vector<FebNode*>::iterator feb_node = feb_nodes.begin();
 	for (feb_node; feb_node != feb_nodes.end(); ++feb_node) {
 	    for (int hybrid_id = 0; hybrid_id < 4; ++hybrid_id) {
@@ -61,16 +61,16 @@ bool SvtCalibrations::loadCalibrations(std::string xml_file_path) {
 
 	        // Loop through all of the channels and samples and retrieve the
 	        // calibrations
-	        /*for (int channel = 0; channel < 640; ++channel) {
+	        for (int channel = 0; channel < 640; ++channel) {
 	            for (int sample = 0; sample < 6; ++sample) {
 	                baseline_map[daq_pair][channel]
 	                            = (*feb_node)->getHybridNode(hybrid_id)->getChannelData("baseline", channel, sample);
 	                noise_map[daq_pair][channel]
 	                            =(*feb_node)->getHybridNode(hybrid_id)->getChannelData("noise", channel, sample);
 	            }
-	        }*/
+	        }
 	    }
-	}
+	}*/
 
     std::cout << "[ SvtCalibrations ]: Calibrations have been loaded." << std::endl;
     calibrations_loaded = true;
