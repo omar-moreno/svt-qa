@@ -152,6 +152,7 @@ class SimpleBaselineAnalysis : public QAAnalysis {
         int channel_map[128];
         int feb_id; 
         int hybrid_id;
+        int current_event; 
 
         bool readout_order;
 };

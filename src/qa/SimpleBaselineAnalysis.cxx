@@ -17,7 +17,7 @@ SimpleBaselineAnalysis::SimpleBaselineAnalysis()
      gaussian(new TF1("gaussian", "gaus")), 
      writer(new ThresholdWriter()),
      class_name("SimpleBaselineAnalysis"), 
-     feb_id(-1), hybrid_id(-1), readout_order(false)
+     feb_id(-1), hybrid_id(-1), readout_order(false), current_event(0)
 {
 
     for (int feb = 0; feb < 10; ++feb) {
@@ -33,7 +33,7 @@ SimpleBaselineAnalysis::SimpleBaselineAnalysis(int feb_id)
       gaussian(new TF1("gaussian", "gaus")), 
       writer(new ThresholdWriter()),
       class_name("SimpleBaselineAnalysis"), 
-      feb_id(feb_id), hybrid_id(-1), readout_order(false) 
+      feb_id(feb_id), hybrid_id(-1), readout_order(false), current_event(0) 
 {
     for (int hybrid = 0; hybrid < 4; ++hybrid) { 
         this->addBaselineHistogram(feb_id, hybrid); 
@@ -46,7 +46,7 @@ SimpleBaselineAnalysis::SimpleBaselineAnalysis(int feb_id, int hybrid_id)
       gaussian(new TF1("gaussian", "gaus")), 
       writer(new ThresholdWriter()),
       class_name("SimpleBaselineAnalysis"), 
-      feb_id(feb_id), hybrid_id(hybrid_id), readout_order(false) 
+      feb_id(feb_id), hybrid_id(hybrid_id), readout_order(false), current_event(0)
 {
     this->addBaselineHistogram(feb_id, hybrid_id);
 }
@@ -72,6 +72,16 @@ void SimpleBaselineAnalysis::initialize() {
 
 
 void SimpleBaselineAnalysis::processEvent(TriggerEvent* event) {
+    
+    if (current_event != event->getEventNumber()) { 
+        current_event = event->getEventNumber();
+        if (current_event != 1) { 
+        
+            if(current_event%500 == 0) 
+            cout << "[ SimpleBaselineAnalysis ]: Processing event " << current_event << endl;
+        }
+    }
+    
     for (uint sample_set_n = 0; sample_set_n < event->count(); ++sample_set_n) {
         event->sample(sample_set_n, trigger_samples); 
         this->processSamples(trigger_samples);        
@@ -171,16 +181,28 @@ void SimpleBaselineAnalysis::processBaselinePlot(int feb, int hybrid, TH2S* base
     double mean_baseline =0;
     double mean_baseline_error = 0; 
     double noise = 0;  
-    
+
+    std::string plot_title = "FEB: " + std::to_string(feb) + 
+                             " Hybrid: " + std::to_string(hybrid) + 
+                             " - Mean Baseline";
+
     TGraphErrors* g_mean_baseline = new TGraphErrors(640);
     g_mean_baseline->SetMarkerColor(2);
     g_mean_baseline->SetLineColor(2);
-    
+    g_mean_baseline->SetName(plot_title.c_str());
+    g_mean_baseline->SetTitle(plot_title.c_str());
+
+    plot_title = "FEB: " + std::to_string(feb) + 
+                             " Hybrid: " + std::to_string(hybrid) + 
+                             " - Noise";
+
     TGraph* g_noise = new TGraphErrors(640);    
     g_noise->SetMarkerColor(2);
     g_noise->SetLineColor(2);
+    g_noise->SetName(plot_title.c_str());
+    g_noise->SetTitle(plot_title.c_str());
    
-    PlottingUtils::adjust2DPlotRange(baseline_plot, 2);
+    PlottingUtils::adjust2DPlotRange(baseline_plot, 1);
     
     for (int channel = 0; channel < 640; ++channel) {
     
@@ -200,10 +222,12 @@ void SimpleBaselineAnalysis::processBaselinePlot(int feb, int hybrid, TH2S* base
         writer->writeThreshold(feb, hybrid, channel, mean_baseline, noise);
     }
 
+
     g_mean_baseline->Draw("a"); 
     g_mean_baseline->GetXaxis()->SetTitle("Channel");
     g_mean_baseline->GetYaxis()->SetTitle("Mean Baseline [ADC Counts]");
     g_mean_baseline->Write();
+
     g_noise->Draw("a");
     g_noise->GetXaxis()->SetTitle("Channel");
     g_noise->GetYaxis()->SetTitle("Noise [ADC Counts]");
