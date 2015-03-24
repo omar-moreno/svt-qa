@@ -7,7 +7,7 @@ int QAUtils::getPhysicalChannel(int apv, int channel) {
 }
 
 int QAUtils::getApv25FromPhysicalChannel(int channel) { 
-    return floor(channel/128);  
+    return 4 - floor(channel/128);  
 }
 
 int QAUtils::getApv25ChannelFromPhysicalChannel(int channel) { 
