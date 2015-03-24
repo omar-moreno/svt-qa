@@ -32,6 +32,7 @@
 #include <BaselineAnalysis.h>
 #include <SimpleBaselineAnalysis.h>
 #include <OccupancyAnalysis.h>
+#include <ThresholdAnalysis.h>
 //#include <CalibrationAnalysis.h>
 
 using namespace std; 
@@ -44,6 +45,7 @@ int main(int argc, char **argv) {
     
     string input_file_name;
     string input_file_list_name;
+    string run_threshold;
     bool run_baseline = false;
     bool run_calibration = false;
     bool run_occupancy = false; 
@@ -69,6 +71,7 @@ int main(int argc, char **argv) {
         { "calibration",     no_argument,       0, 'c' },
         { "threshold",       required_argument, 0, 't' },
         { "occupancy",       no_argument,       0, 'p' },
+        { "thres_analysis",  required_argument, 0, 'a' },
         { "evio",            no_argument,       0, 'e' },
         { "help",            no_argument,       0, 'u' }, 
         { 0, 0, 0, 0 }
@@ -76,7 +79,7 @@ int main(int argc, char **argv) {
 
     int option_index = 0;
     int option_char; 
-    while ((option_char = getopt_long(argc, argv, "i:l:f:h:ron:bct:peu", long_options, &option_index)) != -1) {
+    while ((option_char = getopt_long(argc, argv, "i:l:f:h:ron:bct:peua:", long_options, &option_index)) != -1) {
         switch (option_char) {
             case 'i': 
                 input_file_name = optarg; 
@@ -110,6 +113,9 @@ int main(int argc, char **argv) {
                 break;
             case 'p':
                 run_occupancy = true;
+                break;
+            case 'a': 
+                run_threshold = optarg;
                 break;
             case 'e':
                 evio = true; 
@@ -169,6 +175,7 @@ int main(int argc, char **argv) {
     BaselineAnalysis* baseline_analysis = NULL;
     SimpleBaselineAnalysis* simple_baseline_analysis = NULL;
     OccupancyAnalysis* occupancy_analysis = NULL; 
+    ThresholdAnalysis* threshold_analysis = NULL;
     //CalibrationAnalysis* calibration_analysis = NULL; 
     if (run_baseline) {
 
@@ -199,6 +206,14 @@ int main(int argc, char **argv) {
             occupancy_analysis = new OccupancyAnalysis(feb_id);
         else occupancy_analysis = new OccupancyAnalysis();    
         analyses.push_back(occupancy_analysis); 
+    } else if (!run_threshold.empty()) { 
+        if (feb_id != -1 && hybrid_id != -1)
+            threshold_analysis = new ThresholdAnalysis(feb_id, hybrid_id); 
+        else if (feb_id != -1) 
+            threshold_analysis = new ThresholdAnalysis(feb_id);
+        else threshold_analysis = new ThresholdAnalysis();    
+        threshold_analysis->setThresholdFile(run_threshold);
+        analyses.push_back(threshold_analysis); 
     } 
     /*else if (run_calibration) { 
         

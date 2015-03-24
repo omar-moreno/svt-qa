@@ -76,6 +76,15 @@ target_link_libraries(OccupancyAnalysis
     QAUtils
 )
 
+add_library(ThresholdAnalysis ThresholdAnalysis.cxx)
+target_link_libraries(ThresholdAnalysis
+    ${ROOT_RIO_LIB}
+    ${ROOT_HIST_LIB}
+    PlottingUtils
+    QAUtils
+    ThresholdReader
+)
+
 #add_library(CalibrationAnalysis CalibrationAnalysis.cxx)
 #target_link_libraries(CalibrationAnalysis
 #    ${ROOT_CORE_LIB}
@@ -105,5 +114,6 @@ target_link_libraries(svt_qa
     BaselineAnalysis
     SimpleBaselineAnalysis
     OccupancyAnalysis
+    ThresholdAnalysis
     #    CalibrationAnalysis
 )
