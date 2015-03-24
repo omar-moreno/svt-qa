@@ -35,16 +35,14 @@ void ThresholdReader::loadThresholds(xmlNodePtr node) {
         
         this->parseThresholdNode(node, feb, hybrid, apv, channel, threshold);
 
-        /*
-        std::cout << "FEB: " << feb 
+        /*std::cout << "FEB: " << feb 
                   << " Hybrid: " << hybrid
                   << " APV: " << apv
                   << " channel: " << channel
                   << " Threshold: " << threshold 
                   << " Threshold from map: " << thresholds[feb][hybrid][apv][channel]
                   << " Threshold using get: " << this->getThreshold(feb, hybrid, apv, channel)
-                  << std::endl;
-        */
+                  << std::endl; */
         node = node->next;
     }
 }
@@ -55,10 +53,9 @@ void ThresholdReader::parseThresholdNode(xmlNodePtr node, int &feb, int &hybrid,
     feb = (int) name[3] - '0';
     hybrid = (int) name[10] - '0';
     apv = (int) name[14] - '0';
-    channel = (int) name[22] - '0';
+    channel = atoi(name.substr(22).c_str());
 
-    
-   threshold = atoi((const char*) xmlNodeListGetString(document, node->xmlChildrenNode, 1));  
+    threshold = atoi((const char*) xmlNodeListGetString(document, node->xmlChildrenNode, 1));  
 
     thresholds[feb][hybrid][apv][channel] = threshold;
 }
