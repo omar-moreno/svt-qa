@@ -187,6 +187,10 @@ void SimpleBaselineAnalysis::processBaselinePlot(int feb, int hybrid, TH2S* base
         //this->getSimpleCalibrations(
         //        baseline_sample_plot->ProjectionY("", channel+1, channel+1),
         //        mean_baseline, mean_baseline_error, noise);
+        mean_baseline = 0; 
+        mean_baseline_error = 0; 
+        noise = 0; 
+        if (baseline_plot->ProjectionY("", channel+1, channel+1)->GetEntries() == 0) continue; 
         this->getCalibrations(
                 baseline_plot->ProjectionY("", channel+1, channel+1),
                 mean_baseline, mean_baseline_error, noise);
