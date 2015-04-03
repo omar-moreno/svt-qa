@@ -85,17 +85,14 @@ target_link_libraries(ThresholdAnalysis
     ThresholdReader
 )
 
-#add_library(CalibrationAnalysis CalibrationAnalysis.cxx)
-#target_link_libraries(CalibrationAnalysis
-#    ${ROOT_CORE_LIB}
-#    ${ROOT_GPAD_LIB}
-#    ${ROOT_HIST_LIB}
-#    QAUtils
-#    CalGroupsPlot
-#    PlottingUtils
-#    Apv25Utils
-#    PairHash
-#)
+add_library(CalibrationAnalysis CalibrationAnalysis.cxx)
+target_link_libraries(CalibrationAnalysis
+    ${ROOT_CORE_LIB}
+    ${ROOT_HIST_LIB}
+    QAUtils
+    CalGroupsPlot
+    PlottingUtils
+)
 
 add_executable(svt_qa svt_qa.cxx)
 target_link_libraries(svt_qa 

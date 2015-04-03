@@ -16,12 +16,20 @@
 //--- C++ StdLib ---//
 //------------------//
 #include <string>
+#include <iostream>
+#include <unordered_map>
 
 //--------------//
 //--- SVT QA ---//
 //--------------//
 #include <QAAnalysis.h>
 #include <PlottingUtils.h>
+#include <QAUtils.h>
+
+//------------//
+//--- ROOT ---//
+//------------//
+#include <TH2S.h>
 
 class CalibrationAnalysis : public QAAnalysis { 
 
@@ -32,12 +40,20 @@ class CalibrationAnalysis : public QAAnalysis {
          */
         CalibrationAnalysis(); 
 
-        /**
-         *  Constructor
+		/**
+         *  Parameterized constructor used when data from hybrids associated 
+         *  with a single FEB is going to be processed.
          *
-         *  @param feb_id - FEB ID
-         *  @param hybrid_id - Hybrid ID
-         */    
+         *  @param feb_id : FEB ID
+         */
+        CalibrationAnalysis(int feb_id);
+
+		/**
+         *  Parameterized constructor used when data from hybrids associated 
+         *  with a single FEB is going to be processed.
+         *
+         *  @param feb_id : FEB ID
+         */
         CalibrationAnalysis(int feb_id, int hybrid_id); 
 
         /**
@@ -46,27 +62,63 @@ class CalibrationAnalysis : public QAAnalysis {
         ~CalibrationAnalysis(); 
 
 		/**
-		 */
+		 *  Method called at the beginning of an analysis class.
+         */
         void initialize();
-
+        
 		/**
+         *  Method used to process events.
+         *
+         *  @param event : A trigger event 
 		 */
-		void processEvent(TriggerSample*);
+		void processEvent(TriggerEvent* event);
 
 		/**
+         *  Method used to process sets of samples.
+         *
+         *  @param samples : A set of samples 
+		 */
+        void processSamples(TriggerSample* samples);
+
+        /**
+         *
+         */
+        void setCalibrationGroup(int calibration_group) { 
+            this->calibration_group = calibration_group; }; 
+    
+		/**
+         *  Method called at the end of an analysis when all events have been
+         *  processed.
 		 */
 		void finalize();
 		
 		/**
+         *  String representation of this object
 		 */
 		std::string toString();
 
     private: 
 
-        std::string class_name; 
+        /**
+         *
+         */
+        bool passSlopeCut(TriggerSample* samples); 
 
+        /**
+         *
+         */
+        void bookHistogram(int feb_id, int hybrid_id); 
+
+        std::unordered_map <int, std::vector < std::vector<TH2S* >>> samples_map;
+
+        TriggerSample* trigger_samples; 
+        
+        std::string class_name; 
+        
         int feb_id; 
         int hybrid_id; 
+
+        int calibration_group; 
 
 };  // CalibrationAnalysis
 
