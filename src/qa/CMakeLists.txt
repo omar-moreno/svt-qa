@@ -90,7 +90,6 @@ target_link_libraries(CalibrationAnalysis
     ${ROOT_CORE_LIB}
     ${ROOT_HIST_LIB}
     QAUtils
-    CalGroupsPlot
     PlottingUtils
 )
 
@@ -112,5 +111,5 @@ target_link_libraries(svt_qa
     SimpleBaselineAnalysis
     OccupancyAnalysis
     ThresholdAnalysis
-    #    CalibrationAnalysis
+    CalibrationAnalysis
 )

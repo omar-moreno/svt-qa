@@ -33,7 +33,7 @@
 #include <SimpleBaselineAnalysis.h>
 #include <OccupancyAnalysis.h>
 #include <ThresholdAnalysis.h>
-//#include <CalibrationAnalysis.h>
+#include <CalibrationAnalysis.h>
 
 using namespace std; 
 
@@ -47,7 +47,6 @@ int main(int argc, char **argv) {
     string input_file_list_name;
     string run_threshold;
     bool run_baseline = false;
-    bool run_calibration = false;
     bool run_occupancy = false; 
     bool evio = false; 
     bool readout_order = false;
@@ -55,6 +54,7 @@ int main(int argc, char **argv) {
     int feb_id = -1; 
     int hybrid_id = -1; 
     int total_events = -1; 
+    int calibration = -1;
     double threshold = -1;
 
     // Parse all the command line arguments. If there are no valid command line
@@ -68,7 +68,7 @@ int main(int argc, char **argv) {
         { "fix_apv_order",   no_argument,       0, 'o' },     
         { "total_events",    required_argument, 0, 'n' },
         { "baseline",        no_argument,       0, 'b' },
-        { "calibration",     no_argument,       0, 'c' },
+        { "calibration",     required_argument, 0, 'c' },
         { "threshold",       required_argument, 0, 't' },
         { "occupancy",       no_argument,       0, 'p' },
         { "thres_analysis",  required_argument, 0, 'a' },
@@ -106,7 +106,7 @@ int main(int argc, char **argv) {
                 run_baseline = true; 
                 break;
             case 'c': 
-                run_calibration = true; 
+                calibration = atoi(optarg); 
                 break;
             case 't':
                 threshold = atof(optarg);
@@ -176,7 +176,7 @@ int main(int argc, char **argv) {
     SimpleBaselineAnalysis* simple_baseline_analysis = NULL;
     OccupancyAnalysis* occupancy_analysis = NULL; 
     ThresholdAnalysis* threshold_analysis = NULL;
-    //CalibrationAnalysis* calibration_analysis = NULL; 
+    CalibrationAnalysis* calibration_analysis = NULL; 
     if (run_baseline) {
 
         if (feb_id != -1 && hybrid_id != -1)
@@ -214,14 +214,15 @@ int main(int argc, char **argv) {
         else threshold_analysis = new ThresholdAnalysis();    
         threshold_analysis->setThresholdFile(run_threshold);
         analyses.push_back(threshold_analysis); 
-    } 
-    /*else if (run_calibration) { 
-        
-        if (feb_id != -1 && hybrid_id != -1) 
-            calibration_analysis = new CalibraionAnalysis(feb_id, hybrid_id);
-        else calibration_analysis = new CalibrationAnalysis();    
-        analyses.push_back(calibration_analysis);   
-    }*/
+    } else if (calibration != -1) { 
+        if (feb_id != -1 && hybrid_id != -1)
+            calibration_analysis = new CalibrationAnalysis(feb_id, hybrid_id);
+        else if (feb_id != -1) 
+            calibration_analysis = new CalibrationAnalysis(feb_id);
+        else calibration_analysis = new CalibrationAnalysis(); 
+        calibration_analysis->setCalibrationGroup(calibration);    
+        analyses.push_back(threshold_analysis); 
+    }
 
     // Initialize all QA analyses 
     for (list<QAAnalysis*>::iterator analysis = analyses.begin(); analysis != analyses.end(); ++analysis) {
