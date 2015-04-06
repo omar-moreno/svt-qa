@@ -30,6 +30,7 @@
 //--- ROOT ---//
 //------------//
 #include <TH2S.h>
+#include <TFile.h>
 
 class CalibrationAnalysis : public QAAnalysis { 
 
@@ -113,6 +114,9 @@ class CalibrationAnalysis : public QAAnalysis {
 
         TriggerSample* trigger_samples; 
         
+        // ROOT output file
+        TFile* output_file; 
+   
         std::string class_name; 
         
         int feb_id; 

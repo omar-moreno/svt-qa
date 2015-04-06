@@ -13,29 +13,38 @@
 
 CalibrationAnalysis::CalibrationAnalysis() 
     : trigger_samples(new TriggerSample()),
+      output_file(new TFile("calibration_results.root", "RECREATE")), 
       class_name("CalibrationAnalysis"), 
       feb_id(-1), hybrid_id(-1), calibration_group(0)
 {
+    // TODO: Abstract this out 
     for (int feb = 0; feb < 10; ++feb) {
         for (int hybrid = 0; hybrid < 4; ++hybrid) {
+            this->bookHistogram(feb, hybrid); 
         }
     }
 }
 
 CalibrationAnalysis::CalibrationAnalysis(int feb_id)
     : trigger_samples(new TriggerSample()),
+      output_file(new TFile("calibration_results.root", "RECREATE")), 
       class_name("CalibrationAnalysis"), 
       feb_id(feb_id), hybrid_id(-1), calibration_group(0)
 {
+    // TODO: Abstract this out 
     for (int hybrid = 0; hybrid < 4; ++hybrid) { 
+        this->bookHistogram(feb_id, hybrid); 
     }
 }
 
 CalibrationAnalysis::CalibrationAnalysis(int feb_id, int hybrid_id)
     : trigger_samples(new TriggerSample()), 
+      output_file(new TFile("calibration_results.root", "RECREATE")), 
       class_name("CalibrationAnalysis"), 
       feb_id(feb_id), hybrid_id(hybrid_id), calibration_group(0)
 {
+    // TODO: Abstract this out 
+    this->bookHistogram(feb_id, hybrid_id); 
 }
 
 CalibrationAnalysis::~CalibrationAnalysis() {}
@@ -85,6 +94,31 @@ void CalibrationAnalysis::processSamples(TriggerSample* samples) {
 
 void CalibrationAnalysis::finalize() {
 
+    std::unordered_map <int, std::vector < std::vector<TH2S* >>>::iterator feb_it 
+        = samples_map.begin();
+
+    for (feb_it; feb_it != samples_map.end(); ++feb_it) { 
+        for (int hybrid = 0; hybrid < feb_it->second.size(); ++hybrid) { 
+	        if (feb_it->first == 9 && hybrid >= 2) continue; 
+	        if (feb_it->first == 2 && hybrid >= 2) continue; 
+            
+            std::string file_name = "feb";
+            if (feb_it->first < 10) file_name += "0";
+            file_name 
+                += std::to_string(feb_it->first) + "_hybrid0" + std::to_string(hybrid);
+            
+            output_file->mkdir(file_name.c_str());
+            output_file->cd(file_name.c_str());
+            
+            for (int channel = 0; channel < feb_it->second[hybrid].size(); 
+                    ++channel) {
+
+               feb_it->second[hybrid][channel]->Write(); 
+            }    
+        }
+    }
+
+    output_file->Close(); 
 }
 
 std::string CalibrationAnalysis::toString() { 
