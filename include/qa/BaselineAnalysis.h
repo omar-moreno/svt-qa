@@ -148,6 +148,8 @@ class BaselineAnalysis : public QAAnalysis {
 		int feb_id; 
 		int hybrid_id;
 
+		int current_event; 
+
 		bool readout_order;
 };
 

@@ -15,7 +15,8 @@ BaselineAnalysis::BaselineAnalysis()
      gaussian(new TF1("gaussian", "gaus")), 
      writer(new CalibrationWriter()),
      class_name("BaselineAnalysis"), 
-     feb_id(-1), hybrid_id(-1), readout_order(false)
+     feb_id(-1), hybrid_id(-1), readout_order(false),
+     current_event(0) 
 {
 
     for (int feb = 0; feb < 10; ++feb) {
@@ -31,7 +32,8 @@ BaselineAnalysis::BaselineAnalysis(int feb_id)
       gaussian(new TF1("gaussian", "gaus")), 
       writer(new CalibrationWriter()),
       class_name("BaselineAnalysis"), 
-      feb_id(feb_id), hybrid_id(-1), readout_order(false) 
+      feb_id(feb_id), hybrid_id(-1), readout_order(false), 
+     current_event(0) 
 {
     for (int hybrid = 0; hybrid < 4; ++hybrid) { 
         this->addBaselineHistogram(feb_id, hybrid); 
@@ -44,7 +46,8 @@ BaselineAnalysis::BaselineAnalysis(int feb_id, int hybrid_id)
       gaussian(new TF1("gaussian", "gaus")), 
       writer(new CalibrationWriter()),
       class_name("BaselineAnalysis"), 
-      feb_id(feb_id), hybrid_id(hybrid_id), readout_order(false) 
+      feb_id(feb_id), hybrid_id(hybrid_id), readout_order(false), 
+      current_event(0) 
 {
     this->addBaselineHistogram(feb_id, hybrid_id);
 }
@@ -83,6 +86,16 @@ void BaselineAnalysis::initialize() {
 }
 
 void BaselineAnalysis::processEvent(TriggerEvent* event) {
+
+    if (current_event != event->getEventNumber()) { 
+        current_event = event->getEventNumber();
+        if (current_event != 1) { 
+        
+            if(current_event%500 == 0) 
+            cout << "[ BaselineAnalysis ]: Processing event " << current_event << endl;
+        }
+    }
+
 
     for (uint sample_set_n = 0; sample_set_n < event->count(); ++sample_set_n) {
         event->sample(sample_set_n, trigger_samples); 
@@ -166,11 +179,13 @@ void BaselineAnalysis::processBaselinePlot(int feb, int hybrid, SamplesPlot* bas
         g_noise->SetLineColor(2 + sample_n);
 
         TH2S* baseline_sample_plot = baseline_plot->getPlot(sample_n);
-        PlottingUtils::adjust2DPlotRange(baseline_sample_plot, 2);
+        //PlottingUtils::adjust2DPlotRange(baseline_sample_plot, 2);
         for (int channel = 0; channel < 640; ++channel) {
             //this->getSimpleCalibrations(
             //        baseline_sample_plot->ProjectionY("", channel+1, channel+1),
             //        mean_baseline, mean_baseline_error, noise);
+
+            if (baseline_sample_plot->ProjectionY("", channel+1, channel+1)->GetEntries() == 0) continue; 
             this->getCalibrations(
                     baseline_sample_plot->ProjectionY("", channel+1, channel+1),
                     mean_baseline, mean_baseline_error, noise);
