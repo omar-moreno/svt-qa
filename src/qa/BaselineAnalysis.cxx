@@ -152,9 +152,6 @@ void BaselineAnalysis::finalize() {
 
 void BaselineAnalysis::processBaselinePlot(int feb, int hybrid, SamplesPlot* baseline_plot) {
 
-    
-    TMultiGraph* samples_mean_baseline = new TMultiGraph();
-    TMultiGraph* samples_noise = new TMultiGraph();
     TH1D* projection = NULL;
 
     std::string file_name = "feb";
@@ -168,51 +165,47 @@ void BaselineAnalysis::processBaselinePlot(int feb, int hybrid, SamplesPlot* bas
    
     double mean_baseline =0;
     double mean_baseline_error = 0; 
-    double noise = 0;  
+    double noise = 0;
+    TGraph* g_mean_baseline = NULL;
+    TGraph* g_noise = NULL;  
+    std::string plot_title = "";
     for (int sample_n = 0; sample_n < 6; ++sample_n) { 
+    
+        plot_title = "FEB: " + std::to_string(feb) 
+                    + " Hybrid: " + std::to_string(hybrid) 
+                    + " Mean Baseline - Sample " + std::to_string(sample_n);
+        g_mean_baseline = new TGraphErrors(640);
+        g_mean_baseline->SetNameTitle(plot_title.c_str(), plot_title.c_str());
 
-        TGraphErrors* g_mean_baseline = new TGraphErrors(640);
-        g_mean_baseline->SetMarkerColor(2 + sample_n);
-        g_mean_baseline->SetLineColor(2 + sample_n);
-        TGraph* g_noise = new TGraphErrors(640);    
-        g_noise->SetMarkerColor(2 + sample_n);
-        g_noise->SetLineColor(2 + sample_n);
-
+        
+        plot_title = "FEB: " + std::to_string(feb) 
+                + " Hybrid: " + std::to_string(hybrid) 
+                + " Noise - Sample " + std::to_string(sample_n);
+        g_noise = new TGraphErrors(640);    
+        g_noise->SetNameTitle(plot_title.c_str(), plot_title.c_str());
+       
+        
         TH2S* baseline_sample_plot = baseline_plot->getPlot(sample_n);
-        //PlottingUtils::adjust2DPlotRange(baseline_sample_plot, 2);
+        baseline_sample_plot->Write();
         for (int channel = 0; channel < 640; ++channel) {
-            //this->getSimpleCalibrations(
-            //        baseline_sample_plot->ProjectionY("", channel+1, channel+1),
-            //        mean_baseline, mean_baseline_error, noise);
 
             if (baseline_sample_plot->ProjectionY("", channel+1, channel+1)->GetEntries() == 0) continue; 
             this->getCalibrations(
                     baseline_sample_plot->ProjectionY("", channel+1, channel+1),
                     mean_baseline, mean_baseline_error, noise);
             g_mean_baseline->SetPoint(channel,channel, mean_baseline); 
-            g_mean_baseline->SetPointError(channel, 0, mean_baseline_error); 
             g_noise->SetPoint(channel, channel, noise); 
             writer->writeBaseline(feb, hybrid, channel, sample_n, mean_baseline);
             writer->writeNoise(feb, hybrid, channel, sample_n, noise);
         }
-
-        samples_mean_baseline->Add(g_mean_baseline); 
-        samples_noise->Add(g_noise); 
+         
+        g_mean_baseline->Write();
+        g_noise->Write();
+        delete g_mean_baseline; 
+        delete g_noise; 
     }
 
-    samples_mean_baseline->Draw("a"); 
-    samples_mean_baseline->GetXaxis()->SetTitle("Channel");
-    samples_mean_baseline->GetYaxis()->SetTitle("Mean Baseline [ADC Counts]");
-    samples_mean_baseline->Write();
-    samples_noise->Draw("a");
-    samples_noise->GetXaxis()->SetTitle("Channel");
-    samples_noise->GetYaxis()->SetTitle("Noise [ADC Counts]");
-    samples_noise->Write();
-
     output_file->cd();
-
-    delete samples_mean_baseline; 
-    delete samples_noise;
 }
 
 void BaselineAnalysis::getCalibrations(TH1D* baseline_histogram, 
