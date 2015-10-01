@@ -9,7 +9,7 @@ find_library(ROOT_PHYSICS_LIB Physics $ENV{ROOTSYS}/lib)
 find_library(ROOT_HIST_LIB Hist $ENV{ROOTSYS}/lib)
 find_library(ROOT_GPAD_LIB Gpad $ENV{ROOTSYS}/lib)
 
-find_library(YAML_CPP_LIB yaml-cpp $ENV{YAML_LIB_PATH})
+find_library(YAML_CPP_LIB yaml-cpp $ENV{YAML_CPP_LIB_PATH})
 
 add_library(PairHash PairHash.cxx)
 
