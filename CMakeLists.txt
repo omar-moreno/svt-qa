@@ -27,6 +27,8 @@ include_directories("$ENV{ROOTSYS}/include")
 # Include the libXML headers
 include_directories("$ENV{LIBXML_INCLUDE_PATH}")
 
+include_directories("$ENV{YAML_INCLUDE_PATH}")
+
 # Include tracker headers
 set(TRACKER_HDR_DIR "$ENV{DAQ_HOME}/tracker")
 include_directories("${TRACKER_HDR_DIR}")

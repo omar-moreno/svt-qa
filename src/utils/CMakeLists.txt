@@ -9,6 +9,8 @@ find_library(ROOT_PHYSICS_LIB Physics $ENV{ROOTSYS}/lib)
 find_library(ROOT_HIST_LIB Hist $ENV{ROOTSYS}/lib)
 find_library(ROOT_GPAD_LIB Gpad $ENV{ROOTSYS}/lib)
 
+find_library(YAML_CPP_LIB yaml-cpp $ENV{YAML_LIB_PATH})
+
 add_library(PairHash PairHash.cxx)
 
 # Create the PlotUtils library
@@ -37,10 +39,20 @@ target_link_libraries(RootFileReader
     ${ROOT_HIST_LIB}
 )
 
+add_library(ComparePlots ComparePlots.cxx)
+target_link_libraries(ComparePlots 
+    ${ROOT_CORE_LIB}
+    ${ROOT_GPAD_LIB}
+    ${ROOT_TREE_LIB}
+    ${ROOT_RIO_LIB}
+    ${ROOT_PHYSICS_LIB}
+    ${ROOT_HIST_LIB}
+    ${ROOT_GRAF_LIB}
+    RootFileReader
+)
+
 add_executable(compare_plots compare_plots.cxx)
 target_link_libraries(compare_plots 
-    ${ROOT_CORE_LIB}
-    ${ROOT_RIO_LIB}
-    ${ROOT_HIST_LIB}
-    ${ROOT_GPAD_LIB}
+   ${YAML_CPP_LIB}
+   ComparePlots   
 )
