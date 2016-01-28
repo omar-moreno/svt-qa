@@ -31,5 +31,8 @@ int DataReadEvio::getMinRocBankTag() {
 }
 
 int DataReadEvio::getPhysicsBankTag() {
-    return 193;
+    //return 193;
+    return 160;
+    //return 129;
+    //return 194;
 }

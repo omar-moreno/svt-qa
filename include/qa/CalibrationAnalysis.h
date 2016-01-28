@@ -123,6 +123,7 @@ class CalibrationAnalysis : public QAAnalysis {
         int hybrid_id; 
 
         int calibration_group; 
+	int current_event;
 
 };  // CalibrationAnalysis
 

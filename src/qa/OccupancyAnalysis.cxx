@@ -4,7 +4,7 @@
  *  @author Omar Moreno <omoreno1@ucsc.edu>
  *          Santa Cruz Institute for Particle Physics
  *          University of California, Santa Cruz
- *  @date   March 16, 2014
+ *  @date   March 16, 2015
  */
 
 #include <OccupancyAnalysis.h>
@@ -48,26 +48,27 @@ OccupancyAnalysis::OccupancyAnalysis(int feb_id, int hybrid_id)
 OccupancyAnalysis::~OccupancyAnalysis() {}
 
 void OccupancyAnalysis::initialize() {
+
     PlottingUtils::setPalette(); 
     PlottingUtils::setStyle(); 
             
     total_raw_hit_counts = 
-        new TH1S("raw_hit_counts", "raw_hit_counts", 23100, 0, 23100); 
+        new TH1S("raw_hit_counts", "raw_hit_counts", 1000, 0, 1000); 
     total_raw_hit_counts->GetXaxis()->SetTitle("SVT Hit Count");
-    total_raw_hit_counts->SetTitle("");
 }
 
 void OccupancyAnalysis::processEvent(TriggerEvent* event) {
    
     if (current_event != event->getEventNumber()) { 
         current_event = event->getEventNumber();
-        if (current_event != 1) { 
+        if (current_event != 1) {
+	    std::cout << "Hit Count: " << hit_count << std::endl; 
             total_raw_hit_counts->Fill(hit_count);
    
             std::unordered_map <int, std::vector <int>>::iterator hit_count_it = hit_counts.begin();
             for (hit_count_it; hit_count_it != hit_counts.end(); ++hit_count_it) { 
                 for (int hybrid = 0; hybrid < hit_count_it->second.size(); ++hybrid) { 
-                    hit_counts_map[hit_count_it->first][hybrid]->Fill(
+		    hit_counts_map[hit_count_it->first][hybrid]->Fill(
                         hit_counts[hit_count_it->first][hybrid]);           
                 } 
             }
@@ -146,8 +147,9 @@ void OccupancyAnalysis::addOccupancyHistogram(int feb_id, int hybrid_id) {
     
     hit_counts_map[feb_id].push_back(new TH1S(plot_title.c_str(),
                                           plot_title.c_str(),
-                                          700, 0, 700));         
+                                          640, 0, 640));         
     hit_counts_map[feb_id][hybrid_id]->GetXaxis()->SetTitle("Sensor Hit Count"); 
+    hit_counts_map[feb_id][hybrid_id]->SetMinimum(0);
     hit_counts[feb_id].push_back(0);
 
     plot_title = "FEB: " + std::to_string(feb_id) + 
@@ -157,7 +159,7 @@ void OccupancyAnalysis::addOccupancyHistogram(int feb_id, int hybrid_id) {
     hit_counts_v_channel_map[feb_id].push_back(new TH2S(plot_title.c_str(),
 							plot_title.c_str(), 
 							640, 0, 640,
-							20, 0, 20));
+							5, 0, 5));
     hit_counts_v_channel_map[feb_id][hybrid_id]->GetXaxis()->SetTitle(""); 
     
 

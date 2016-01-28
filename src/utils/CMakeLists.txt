@@ -8,6 +8,7 @@ find_library(ROOT_RIO_LIB RIO $ENV{ROOTSYS}/lib)
 find_library(ROOT_PHYSICS_LIB Physics $ENV{ROOTSYS}/lib)
 find_library(ROOT_HIST_LIB Hist $ENV{ROOTSYS}/lib)
 find_library(ROOT_GPAD_LIB Gpad $ENV{ROOTSYS}/lib)
+find_library(ROOT_GRAF_LIB Graf $ENV{ROOTSYS}/lib)
 
 find_library(YAML_CPP_LIB yaml-cpp $ENV{YAML_CPP_LIB_PATH})
 
@@ -54,5 +55,7 @@ target_link_libraries(ComparePlots
 add_executable(compare_plots compare_plots.cxx)
 target_link_libraries(compare_plots 
    ${YAML_CPP_LIB}
+   ${ROOT_GPAD_LIB}
+   ${ROOT_GRAF_LIB}	
    ComparePlots   
 )

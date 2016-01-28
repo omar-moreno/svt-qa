@@ -79,7 +79,7 @@ int main(int argc, char **argv) {
 
     int option_index = 0;
     int option_char; 
-    while ((option_char = getopt_long(argc, argv, "i:l:f:h:ron:bct:peua:", long_options, &option_index)) != -1) {
+    while ((option_char = getopt_long(argc, argv, "i:l:f:h:ron:bc:t:peua:", long_options, &option_index)) != -1) {
         switch (option_char) {
             case 'i': 
                 input_file_name = optarg; 
@@ -221,7 +221,7 @@ int main(int argc, char **argv) {
             calibration_analysis = new CalibrationAnalysis(feb_id);
         else calibration_analysis = new CalibrationAnalysis(); 
         calibration_analysis->setCalibrationGroup(calibration);    
-        analyses.push_back(threshold_analysis); 
+        analyses.push_back(calibration_analysis); 
     }
 
     // Initialize all QA analyses 
@@ -236,7 +236,6 @@ int main(int argc, char **argv) {
    
         // Open the input file.  If the input file can't be opened, exit the 
         // application
-        cout << "Data reader state " << data_reader->open(*files_it, false) << endl;
         if (!data_reader->open(*files_it, false)) {
             cerr << "\n[ SVT QA ]: Error! File " << *files_it << " cannot be opened." << endl;
             return EXIT_FAILURE; 

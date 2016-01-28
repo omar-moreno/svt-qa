@@ -112,4 +112,5 @@ target_link_libraries(svt_qa
     OccupancyAnalysis
     ThresholdAnalysis
     CalibrationAnalysis
+#   	${DATAREAD_LIB}
 )

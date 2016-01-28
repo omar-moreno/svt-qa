@@ -15,7 +15,7 @@ CalibrationAnalysis::CalibrationAnalysis()
     : trigger_samples(new TriggerSample()),
       output_file(new TFile("calibration_results.root", "RECREATE")), 
       class_name("CalibrationAnalysis"), 
-      feb_id(-1), hybrid_id(-1), calibration_group(0)
+      feb_id(-1), hybrid_id(-1), calibration_group(0), current_event(0)
 {
     // TODO: Abstract this out 
     for (int feb = 0; feb < 10; ++feb) {
@@ -29,7 +29,7 @@ CalibrationAnalysis::CalibrationAnalysis(int feb_id)
     : trigger_samples(new TriggerSample()),
       output_file(new TFile("calibration_results.root", "RECREATE")), 
       class_name("CalibrationAnalysis"), 
-      feb_id(feb_id), hybrid_id(-1), calibration_group(0)
+      feb_id(feb_id), hybrid_id(-1), calibration_group(0), current_event(0)
 {
     // TODO: Abstract this out 
     for (int hybrid = 0; hybrid < 4; ++hybrid) { 
@@ -41,7 +41,7 @@ CalibrationAnalysis::CalibrationAnalysis(int feb_id, int hybrid_id)
     : trigger_samples(new TriggerSample()), 
       output_file(new TFile("calibration_results.root", "RECREATE")), 
       class_name("CalibrationAnalysis"), 
-      feb_id(feb_id), hybrid_id(hybrid_id), calibration_group(0)
+      feb_id(feb_id), hybrid_id(hybrid_id), calibration_group(0), current_event(0)
 {
     // TODO: Abstract this out 
     this->bookHistogram(feb_id, hybrid_id); 
@@ -56,15 +56,29 @@ void CalibrationAnalysis::initialize() {
 }
 
 void CalibrationAnalysis::processEvent(TriggerEvent* event) { 
-    
+  
+    if (current_event != event->getEventNumber()) { 
+        current_event = event->getEventNumber();
+        if (current_event != 1) { 
+        
+            if(current_event%500 == 0) 
+            	std::cout << "[ CalibrationAnalysis ]: Processing event " << current_event << std::endl;
+        
+	    /*if (current_event%3000 == 0) { 
+		std::cout << "[ CalibrationAnalysis ]: Incrementing calibration group " << std::endl;
+	    	calibration_group++;
+            }*/
+	}
+    }
+
     for (uint sample_set_n = 0; sample_set_n < event->count(); ++sample_set_n) {
         event->sample(sample_set_n, trigger_samples); 
         this->processSamples(trigger_samples);        
-    }        
+    }
 }
 
 void CalibrationAnalysis::processSamples(TriggerSample* samples) { 
-    
+ 
     // If a FEB ID has been specified and it doesn't match the FEB ID 
     // associated with the sample, skip the event
     if ((feb_id != -1) && (samples->febAddress() != feb_id)) return;
@@ -76,19 +90,27 @@ void CalibrationAnalysis::processSamples(TriggerSample* samples) {
     // If the sample is a header or a tail event, skip the event
     if(samples->head() || samples->tail()) return;
 
+	/*
+    std::cout << "APV channel: " << samples->channel() << std::endl; 
+    std::cout << "APV: " << samples->apv() << std::endl;
+	*/
 
+    int channel = (samples->apv()*128) + samples->channel(); 
     // Only process channels which are part of the current calibration group
-    if (!(samples->channel() - calibration_group)%8 == 0) return;  
+    if ((channel - calibration_group)%8 == 0) {
 
-    // Get the physical channel number
-	int channel = QAUtils::getPhysicalChannel(samples->apv(), samples->channel()); 
+    	// Get the physical channel number
+    	channel = QAUtils::getPhysicalChannel(samples->apv(), samples->channel());
+    	//std::cout << "Channel: " << channel << std::endl; 
     
-    // For now, use the first sample as the pedesal
-    int pedestal = samples->value(0);   
+    	// For now, use the first sample as the pedesal
+    	int pedestal = samples->value(0);   
         
-    for (int sample_n = 0; sample_n < 6; ++sample_n) {
-        samples_map[feb_id][hybrid_id][channel]->Fill(sample_n*25,
-                samples->value(sample_n) - pedestal); 
+    	for (int sample_n = 0; sample_n < 6; ++sample_n) {
+		int sample = samples->value(sample_n) - pedestal;
+		samples_map[samples->febAddress()][samples->hybrid()][channel]->Fill(sample_n*25, 
+					samples->value(sample_n) - pedestal); 
+   	 }
     }
 }
 
@@ -139,15 +161,15 @@ bool CalibrationAnalysis::passSlopeCut(TriggerSample* samples) {
 void CalibrationAnalysis::bookHistogram(int feb_id, int hybrid_id) { 
 
     std::string plot_title = "FEB: " + std::to_string(feb_id) + 
-                             " Hybrid: " + std::to_string(hybrid_id) + 
-                             " Samples";
-   
+                             " Hybrid: " + std::to_string(hybrid_id);   
+    
     std::vector <TH2S*> samples_plot_vector;
-    for (int channel = 0; channel < 640; ++channel) { 
-        samples_plot_vector.push_back( new TH2S(plot_title.c_str(), 
-                                           plot_title.c_str(), 
+    for (int channel = 0; channel < 640; ++channel) {
+	std::string channel_plot_title = plot_title + " Channel: " + std::to_string(channel) + " Samples";
+        samples_plot_vector.push_back( new TH2S(channel_plot_title.c_str(), 
+                                           channel_plot_title.c_str(), 
                                            6, 0, 150, 
-                                           1200, -400, 2000)); 
+                                           1200, -400, 5000));
         samples_plot_vector[channel]->GetXaxis()->SetTitle("time [ns]"); 
         samples_plot_vector[channel]->GetYaxis()->SetTitle("Pedestal Subtracted Amplitude [ADC Counts]");
 

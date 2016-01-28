@@ -8,7 +8,7 @@ ThresholdAnalysis::ThresholdAnalysis()
       output_file(new TFile("threshold_results.root", "RECREATE")), 
       class_name("ThresholdAnalysis"), 
       feb_id(-1), hybrid_id(-1), hit_count(0), current_event(0),
-      samples_above(3)
+      samples_above(4)
 { 
     for (int feb = 0; feb < 10; ++feb) {
         for (int hybrid = 0; hybrid < 4; ++hybrid) {
@@ -24,7 +24,7 @@ ThresholdAnalysis::ThresholdAnalysis(int feb_id)
       output_file(new TFile("threshold_results.root", "RECREATE")), 
       class_name("ThresholdAnalysis"), 
       feb_id(feb_id), hybrid_id(-1), hit_count(0), current_event(0),
-      samples_above(3)
+      samples_above(4)
 { 
     for (int hybrid = 0; hybrid < 4; ++hybrid) { 
         this->addHistogram(feb_id, hybrid);
@@ -38,7 +38,7 @@ ThresholdAnalysis::ThresholdAnalysis(int feb_id, int hybrid_id)
       output_file(new TFile("threshold_results.root", "RECREATE")), 
       class_name("ThresholdAnalysis"), 
       feb_id(feb_id), hybrid_id(hybrid_id), hit_count(0), current_event(0),
-      samples_above(3)
+      samples_above(4)
 {
     this->addHistogram(feb_id, hybrid_id);    
 }
