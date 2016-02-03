@@ -16,6 +16,15 @@ from ROOT import TFile
 from ROOT import TCanvas
 from ROOT import gROOT
 from ROOT import TDatime
+from ROOT import TLegend
+
+
+def getLegend():
+    leg = TLegend(0.75,0.75,0.95,0.95)
+    leg.SetFillColor(0)
+    #leg.SetBorderSize(0)
+    return leg
+
 
 class RootPlottingUtils:
     
@@ -26,10 +35,15 @@ class RootPlottingUtils:
         if self.name == "": return ""
         else: return "_" + self.name
     
-    def save_to_pdf(self, file, ref_file=None, regexp=None):
+
+
+    def save_to_pdf(self, file, ref_file=None, legend=None, regexp=None):
         
         gROOT.SetBatch()
-        
+
+        # legend will be reference here
+        leg = None
+
         # Check that the file is still opened.  If not, return
         if not file.IsOpen():
              print "[ RootPlottingUtils ]: File is not opened."
@@ -41,6 +55,7 @@ class RootPlottingUtils:
             if not ref_file.IsOpen():
                 print "[ RootPlottingUtils ]: Reference file is not opened."
                 return
+
         
          # create canvas
         canvas = TCanvas("canvas", "canvas", 200, 200)
@@ -80,6 +95,12 @@ class RootPlottingUtils:
                             file_sub_key.ReadObj().SetLineColor(2)
                             file_sub_key.ReadObj().SetMarkerColor(2)
                             file_sub_key.ReadObj().Draw("p,same")
+                            if legend != None:
+                                leg = getLegend()
+                                leg.AddEntry(ref_obj, legend[1],"LP")
+                                leg.AddEntry(file_sub_key.ReadObj(), legend[0],"LP")
+                                print "[ RootPlottingUtils ]: Draw legend [",legend, "]"
+                                leg.Draw()
                         else:
                             file_sub_key.ReadObj().Draw("Ap")
                     else:
@@ -90,6 +111,13 @@ class RootPlottingUtils:
                             ref_obj.Draw("")
                             file_sub_key.ReadObj().SetLineColor(2)
                             file_sub_key.ReadObj().Draw("same")
+                            if legend != None:
+                                leg = getLegend()
+                                leg.AddEntry(ref_obj, legend[1],"LP")
+                                leg.AddEntry(file_sub_key.ReadObj(), legend[0],"LP")
+                                leg.Draw()
+                                print "[ RootPlottingUtils ]: Draw legend [" + legend + "]"
+                        
                         else:
                             file_sub_key.ReadObj().Draw("")
                     canvas.Print(output_file_name + "(")
