@@ -1,6 +1,6 @@
 
 # Installation directory of all packages
-setenv SVTQA_HOME /home/phansson/svt-qa
+setenv SVTQA_HOME /home/phansson/svt-calibration/svt-qa
 setenv PACKAGES_HOME /home/omoreno/packages 
 
 #---------------#
