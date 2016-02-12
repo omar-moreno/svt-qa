@@ -78,7 +78,7 @@ void BaselineAnalysis::initialize() {
     PlottingUtils::setPalette(); 
     PlottingUtils::setStyle(); 
 
-    //writer->open("test.xml");
+    writer->open("test.xml");
 
     for(int n = 0; n < 128; n++){
         int channel = (32*(n%4)) + (8*(n/4)) - (31*(n/16));
@@ -147,7 +147,7 @@ void BaselineAnalysis::finalize() {
        }
     }
 
-    //writer->close();
+    writer->close();
     output_file->Close();
 }
 
@@ -194,8 +194,8 @@ void BaselineAnalysis::processBaselinePlot(int feb, int hybrid, SamplesPlot* bas
             baseline_projection->Write();
             g_mean_baseline->SetPoint(channel,channel, mean_baseline); 
             g_noise->SetPoint(channel, channel, noise); 
-            //writer->writeBaseline(feb, hybrid, channel, sample_n, mean_baseline);
-            //writer->writeNoise(feb, hybrid, channel, sample_n, noise);
+            writer->writeBaseline(feb, hybrid, channel, sample_n, mean_baseline);
+            writer->writeNoise(feb, hybrid, channel, sample_n, noise);
             delete baseline_projection; 
         }
         
