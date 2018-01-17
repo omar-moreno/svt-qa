@@ -13,8 +13,8 @@
 //---------------//
 //--- SVT DAQ ---//
 //---------------//
-#include <TriggerSample.h>
-#include <TriggerEvent.h>
+#include "TriggerSample.h"
+#include "TriggerEvent.h"
 
 class QAAnalysis { 
 

@@ -82,7 +82,7 @@ bool AbstractDataReadEvio::next(Data* data) {
         // EVIO file was reached.
         if ((event = this->getPhysicsEvent()) == NULL) return false;
        
-        data->setEventNumber(++event_n);
+        //data->setEventNumber(++event_n);
         
         /*
         std::cout << "[ AbstractDataReadEvio ]: --------------------------------------" << std::endl;

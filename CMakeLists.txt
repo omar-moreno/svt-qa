@@ -21,13 +21,19 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${SVT_QA_BINARY_DIR}/bin")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${SVT_QA_BINARY_DIR}/lib")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${SVT_QA_BINARY_DIR}/lib")
 
-# Include the ROOT headers
-include_directories("$ENV{ROOTSYS}/include")
+# Tell CMake where to find ROOT
+list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
+
+# Locate the ROOT package
+find_package(ROOT REQUIRED)
+
+# Define ROOT macros
+include(${ROOT_USE_FILE})
 
 # Include the libXML headers
 include_directories("$ENV{LIBXML_INCLUDE_PATH}")
 
-include_directories("$ENV{YAML_CPP_INCLUDE_PATH}")
+#include_directories("$ENV{YAML_CPP_INCLUDE_PATH}")
 
 # Include tracker headers
 set(TRACKER_HDR_DIR "$ENV{DAQ_HOME}/tracker")
@@ -76,4 +82,4 @@ add_subdirectory("${SVT_QA_SOURCE_DIR}/src/qa")
 add_subdirectory("${SVT_QA_SOURCE_DIR}/src/daq")
 
 # Add the test directory to the build
-add_subdirectory("${SVT_QA_SOURCE_DIR}/test")
+#add_subdirectory("${SVT_QA_SOURCE_DIR}/test")
