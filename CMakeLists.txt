@@ -1,9 +1,6 @@
 #
-#   @file   CMakeLists.txt   
-#   @author Omar Moreno <omoreno1@ucsc.edu>
-#           Santa Cruz Institute for Particle Physics
-#           University of California, Santa Cruz
-#   @date   January 09, 2014
+#   CMakeLists.txt
+#   Omar Moreno, SLAC National Accelerator Laboratory
 #
 
 # Specify the minimum CMake version required
