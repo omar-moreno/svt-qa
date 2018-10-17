@@ -18,20 +18,29 @@
 //   DAQ   //
 //---------//
 #include "TrackerSample.h"
-#include "TrackerEvent.h"
 
 //------------//
 //   SVT QA   //
 //------------//
+#include "Processor.h"
 #include "QAUtils.h"
-#include "TupleMaker.h"
+#include "SamplesPlot.h"
+//#include "TupleMaker.h"
 
-class BaselineProcessor { 
+#include "TCanvas.h"
+#include "TGraphErrors.h"
+#include "TF1.h"
+
+class BaselineProcessor : public Processor { 
 
     public: 
 
-        /** Constructor */
-        BaselineProcessor(); 
+        /** 
+         * Class constructor.
+         * @param name Name for this instance of the class.
+         * @param process The Process class associated with Processor, provided by the framework.
+         */
+        BaselineProcessor(const std::string& name, Process& process); 
         
         /** Destructor */
         ~BaselineProcessor(); 
@@ -46,25 +55,30 @@ class BaselineProcessor {
         void finalize();
        
         /** Method that prints this object. */ 
-        std::string toString();
+        //std::string toString();
 
     private: 
 
         /** Print information about a set of samples. */
         void printSamples(TrackerSample* samples); 
 
+
+        void getSimpleCalibrations(TH1D* baseline_histogram, double &mean_baseline, 
+                                             double &mean_baseline_error, double &noise); 
+
+        void getCalibrations(TH1D* baseline_histogram, double &mean_baseline, double &mean_baseline_error, double &noise); 
+
         /** Object that encapsulates channel sample data. */        
-        TrackerSample* _samples{new TrackerSample{}};
+        TrackerSample* samples_{new TrackerSample{}};
+
+        SamplesPlot* plots; 
+        
+        TF1* gaussian{new TF1("gaussian", "gaus")};  
+
 
         /** Utility used to create ROOT ntuples. */
-        TupleMaker* _tuple{new TupleMaker("baseline.root", "results")}; 
+        //TupleMaker* _tuple{new TupleMaker("baseline.root", "results")}; 
        
-        /** Event counter */
-        double _event_counter{0};  
-
-        /** Name of the class */
-        std::string class_name;
-
         /** Mapping between channel number to readout order number. */
         int channel_map[128];
 
