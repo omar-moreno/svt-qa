@@ -18,6 +18,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${SVT_QA_BINARY_DIR}/bin")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${SVT_QA_BINARY_DIR}/lib")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${SVT_QA_BINARY_DIR}/lib")
 
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ldl")
+
 # Tell CMake where to find ROOT
 list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
 
@@ -29,6 +31,10 @@ include(${ROOT_USE_FILE})
 
 # Include the libXML headers
 include_directories("$ENV{LIBXML_INCLUDE_PATH}")
+
+# Python
+find_package(PythonLibs REQUIRED)
+include_directories(${PYTHON_INCLUDE_DIRS})
 
 #include_directories("$ENV{YAML_CPP_INCLUDE_PATH}")
 
