@@ -26,84 +26,48 @@ find_library(BZ2_LIB bz2 $ENV{BZ2_LIB_PATH})
 find_library(EVIO_LIB evio $ENV{EVIO_LIB_PATH})
 find_library(EVIOXX_LIB evioxx $ENV{EVIO_LIB_PATH})
 
-add_library(BaselineProcessor BaselineProcessor.cxx) 
+add_library(Processor Processor.cxx)
+target_link_libraries(Processor
+    ${TRACKER_EVENT_LIB}
+)
+
+add_library(Process Process.cxx) 
+target_link_libraries(Process
+    Processor
+    ${DATA_READ_LIB}
+    ${XMLVARIABLES_LIB}
+    ${BZ2_LIB}
+    ${XML_LIB}
+    ${DATA_LIB}
+    ${TRACKER_SAMPLE_LIB}
+    ${RT_LIB}
+    ${ROOT_LIBRARIES}
+)
+
+add_library(ProcessorFactory ProcessorFactory.cxx)
+
+add_library(ConfigurePython ConfigurePython.cxx)
+target_link_libraries(ConfigurePython 
+    ${PYTHON_LIBRARIES}
+    Process
+    ProcessorFactory
+)
+
+add_library(BaselineProcessor SHARED 
+    BaselineProcessor.cxx
+)
+set_property(TARGET BaselineProcessor PROPERTY POSITION_INDEPENDENT_CODE ON) 
 target_link_libraries(BaselineProcessor
-    TupleMaker
+    Processor
+    SamplesPlot
     QAUtils
     ${TRACKER_EVENT_LIB}
-    ${TRACKER_SAMPLE_LIB}
+    ${DATA_LIB}
+    ${BZ2_LIB}
 )
 
 add_executable(svt_qa svt_qa.cxx)
 target_link_libraries(svt_qa 
-    ${DATA_READ_LIB}
-    ${DATA_LIB}
-    ${XMLVARIABLES_LIB}
-    ${BZ2_LIB}
-    ${XML_LIB}
-    ${RT_LIB}
-    BaselineProcessor
+    ConfigurePython
+    Process
 )
-#    DataReadEvio
-    #    ${TRIGGER_EVENT_LIB}
-    #   ${TRIGGER_SAMPLE_LIB}
-    #${EVIOXX_LIB}
-    #${EVIO_LIB}
-    #${EXPAT_LIB}
-    #BaselineAnalysis
-    #SimpleBaselineAnalysis
-    #OccupancyAnalysis
-    #ThresholdAnalysis
-    #CalibrationAnalysis
-    #)
-
-#add_library(BaselineAnalysis BaselineAnalysis.cxx)
-#target_link_libraries(BaselineAnalysis 
-#    ${ROOT_RIO_LIB}
-#    ${ROOT_TREE_LIB}
-#    ${ROOT_CORE_LIB}
-#    ${ROOT_HIST_LIB}
-#    ${ROOT_GPAD_LIB}
-#    QAUtils
-#    CalibrationWriter
-#    SamplesPlot
-#    PairHash
-#)
-
-#add_library(SimpleBaselineAnalysis SimpleBaselineAnalysis.cxx)
-#target_link_libraries(SimpleBaselineAnalysis 
-#    ${ROOT_RIO_LIB}
-#    ${ROOT_TREE_LIB}
-#    ${ROOT_CORE_LIB}
-#    ${ROOT_HIST_LIB}
-#    ${ROOT_GPAD_LIB}
-#    QAUtils
-#    ThresholdWriter
-#    PairHash
-#)
-
-#add_library(OccupancyAnalysis OccupancyAnalysis.cxx)
-#target_link_libraries(OccupancyAnalysis
-#    ${ROOT_RIO_LIB}
-#    ${ROOT_HIST_LIB}
-#    PlottingUtils
-#    QAUtils
-#)
-
-#add_library(ThresholdAnalysis ThresholdAnalysis.cxx)
-#target_link_libraries(ThresholdAnalysis
-#    ${ROOT_RIO_LIB}
-#    ${ROOT_HIST_LIB}
-#    PlottingUtils
-#    QAUtils
-#    ThresholdReader
-#)
-
-#add_library(CalibrationAnalysis CalibrationAnalysis.cxx)
-#target_link_libraries(CalibrationAnalysis
-#    ${ROOT_CORE_LIB}
-#    ${ROOT_HIST_LIB}
-#    QAUtils
-#    PlottingUtils
-#)
-
