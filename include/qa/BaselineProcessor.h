@@ -19,17 +19,21 @@
 //---------//
 #include "TrackerSample.h"
 
+//----------//
+//   ROOT   //
+//----------//
+#include "TCanvas.h"
+#include "TF1.h"
+#include "TGraphErrors.h"
+#include "TH1D.h"
+#include "TH2S.h"
+
 //------------//
 //   SVT QA   //
 //------------//
 #include "Processor.h"
 #include "QAUtils.h"
-#include "SamplesPlot.h"
 //#include "TupleMaker.h"
-
-#include "TCanvas.h"
-#include "TGraphErrors.h"
-#include "TF1.h"
 
 class BaselineProcessor : public Processor { 
 
@@ -54,9 +58,6 @@ class BaselineProcessor : public Processor {
         /** Method called once after all events have been processed. */
         void finalize();
        
-        /** Method that prints this object. */ 
-        //std::string toString();
-
     private: 
 
         /** Print information about a set of samples. */
@@ -71,7 +72,8 @@ class BaselineProcessor : public Processor {
         /** Object that encapsulates channel sample data. */        
         TrackerSample* samples_{new TrackerSample{}};
 
-        SamplesPlot* plots; 
+        /** Container for baseline plots. */
+        std::vector<TH2S*> plots; 
         
         TF1* gaussian{new TF1("gaussian", "gaus")};  
 
@@ -82,7 +84,7 @@ class BaselineProcessor : public Processor {
         /** Mapping between channel number to readout order number. */
         int channel_map[128];
 
-};
+}; // BaselineProcessor
 
-#endif // __BASELINE_ANALYIS_H__
+#endif // __BASELINE_PRCESSOR_H__
 

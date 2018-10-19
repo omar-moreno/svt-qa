@@ -16,13 +16,16 @@ BaselineProcessor::~BaselineProcessor() {
 
 void BaselineProcessor::initialize() {
 
-    PlottingUtils::setPalette(); 
-    PlottingUtils::setStyle(); 
+    //PlottingUtils::setPalette(); 
+    //PlottingUtils::setStyle(); 
+    
+    std::string name{""}; 
+    for (int isample{0}; isample < 6; ++isample) { 
+        name = "Baseline - Hybrid 0 - Sample: " + std::to_string(isample); 
+        plots.push_back(new TH2S(name.c_str(), name.c_str(), 
+                        640, 0, 640, 16384, 0, 16384)); 
+    }
 
-    plots = new SamplesPlot(6, "Baseline - Hybrid: 0");
-
-    plots->setXAxisTitles("Channel");
-    plots->setYAxisTitles("Baseline [ADC Counts]");
     
     // Create the readout channel map
     for(int n = 0; n < 128; n++){
@@ -55,8 +58,8 @@ void BaselineProcessor::process(TrackerEvent* event) {
         // Get the channel number in readout order
         int rchannel = channel_map[samples_->channel()] + samples_->apv()*128; 
 
-        for (int isample = 0; isample < 6; ++isample) {
-            plots->fill(isample, pchannel, samples_->value(isample)); 
+        for (int isample{0}; isample < 6; ++isample) {
+            plots[isample]->Fill(pchannel, samples_->value(isample)); 
         } 
     }
 }
@@ -80,35 +83,40 @@ void BaselineProcessor::printSamples(TrackerSample* samples) {
 
 void BaselineProcessor::finalize() {
 
-    //TCanvas* canvas{new TCanvas("canvas", 800, 800)}; 
+    // Create a canvas
+    TCanvas* canvas{new TCanvas{"canvas", "canvas", 800, 800}}; 
 
-    TGraph* g_mean_baseline = nullptr;
-    TGraph* g_noise = nullptr;  
-    std::string plot_title = "";
-    for (int sample_n = 0; sample_n < 6; ++sample_n) {
+    //
+    TGraph* g_mean_baseline{nullptr};
+    TGraph* g_noise{nullptr};  
+    std::string title{""};
+
+    for (int isample = 0; isample < 6; ++isample) {
         
-        plot_title = "Hybrid: 0 - Mean Baseline - Sample " + std::to_string(sample_n);
+        title = "Hybrid: 0 - Mean Baseline - Sample " + std::to_string(isample);
         g_mean_baseline = new TGraphErrors(640);
-        g_mean_baseline->SetNameTitle(plot_title.c_str(), plot_title.c_str());
+        g_mean_baseline->SetNameTitle(title.c_str(), title.c_str());
 
 
-        plot_title = "Hybrid: 0 - Noise - Sample " + std::to_string(sample_n);
+        title = "Hybrid: 0 - Noise - Sample " + std::to_string(isample);
         g_noise = new TGraphErrors(640);    
-        g_noise->SetNameTitle(plot_title.c_str(), plot_title.c_str());
+        g_noise->SetNameTitle(title.c_str(), title.c_str());
         
-        TH2S* baseline_sample_plot = plots->getPlot(sample_n);
+
+        TH2S* baseline_sample_plot = plots[isample];
+        
+        
+        double mean_baseline, mean_baseline_error, noise; 
         for (int channel = 0; channel < 640; ++channel) {
-        
-            double mean_baseline = 0;
-            double mean_baseline_error = 0; 
-            double noise = 0;
-            if (baseline_sample_plot->ProjectionY("", channel+1, channel+1)->GetEntries() == 0) continue; 
-            TH1D* baseline_projection = baseline_sample_plot->ProjectionY("", channel+1, channel+1);
-            this->getCalibrations(baseline_projection, mean_baseline, mean_baseline_error, noise);
-            baseline_projection->Write();
+       
+             
+            TH1D* proj = baseline_sample_plot->ProjectionY("", channel+1, channel+1);
+            if (proj->GetEntries() == 0) continue; 
+            this->getCalibrations(proj, mean_baseline, mean_baseline_error, noise);
+            proj->Write();
             g_mean_baseline->SetPoint(channel,channel, mean_baseline); 
             g_noise->SetPoint(channel, channel, noise); 
-            delete baseline_projection; 
+            delete proj; 
         
         }
 
@@ -126,6 +134,7 @@ void BaselineProcessor::finalize() {
         delete g_noise;
 
     } 
+    delete canvas; 
 }
 
 void BaselineProcessor::getSimpleCalibrations(TH1D* baseline_histogram, double &mean_baseline, 
