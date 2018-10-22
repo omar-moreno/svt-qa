@@ -59,7 +59,6 @@ add_library(BaselineProcessor SHARED
 set_property(TARGET BaselineProcessor PROPERTY POSITION_INDEPENDENT_CODE ON) 
 target_link_libraries(BaselineProcessor
     Processor
-    SamplesPlot
     QAUtils
     ${TRACKER_EVENT_LIB}
     ${DATA_LIB}
