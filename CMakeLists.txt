@@ -62,15 +62,15 @@ set(PLOTTING_HDR_DIR "${SVT_QA_SOURCE_DIR}/include/plotting")
 include_directories("${PLOTTING_HDR_DIR}")
 
 # Include the xml headers
-set(XML_HDR_DIR "${SVT_QA_SOURCE_DIR}/include/xml")
-include_directories("${XML_HDR_DIR}")
+#set(XML_HDR_DIR "${SVT_QA_SOURCE_DIR}/include/xml")
+#include_directories("${XML_HDR_DIR}")
 
 # Include the daq headers
 set(DAQ_HDR_DIR "${SVT_QA_SOURCE_DIR}/include/daq")
 include_directories("${DAQ_HDR_DIR}")
 
 # Add the xml directory to the build 
-add_subdirectory("${SVT_QA_SOURCE_DIR}/src/xml")
+#add_subdirectory("${SVT_QA_SOURCE_DIR}/src/xml")
 
 # Add the utils subdirectory to the build
 add_subdirectory("${SVT_QA_SOURCE_DIR}/src/utils")
