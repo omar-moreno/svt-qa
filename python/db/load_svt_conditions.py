@@ -29,12 +29,12 @@ def main():
     pw   = config['password']
 
     # Connect to the database
-    print('Connecting to the database via host %s' % host)
+    print 'Connecting to the database via host %s' % host
     db = MySQLdb.connect(host=host, user=user, 
                          passwd=pw, db='hps_conditions')
 
     # Check that a connection to the database has been established
-    print('Connection to the database hps_conditions has been established')
+    print 'Connection to the database hps_conditions has been established'
 
     # Get a cursor
     cursor = db.cursor()
