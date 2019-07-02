@@ -96,10 +96,10 @@ void ThresholdProcessor::process(Phys2019SvtEvent* event) {
 
         //printSamples(samples); 
         int apv = samples->apv(); 
-        if (feb == 0 || feb == 1) { 
+        /*if (feb == 0 || feb == 1) { 
             if (apv == 0) apv = 1; 
             else if (apv == 1) apv = 0; 
-        } 
+        }*/ 
 
         // Get the physical channel number 
         int channel = samples->channel(); 
