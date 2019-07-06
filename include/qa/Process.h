@@ -13,11 +13,6 @@
 #include <vector>
 #include <stdexcept>
 
-//---------//
-//   DAQ   //
-//---------//
-#include "DataRead.h"
-
 //----------//
 //   ROOT   //
 //----------//
@@ -27,6 +22,8 @@
 //   svt-qa   //
 //------------//
 #include "Processor.h"
+
+class DataRead; 
 
 class Process {
 
