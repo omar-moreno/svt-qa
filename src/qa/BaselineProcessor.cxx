@@ -7,6 +7,9 @@
 
 #include <BaselineProcessor.h>
 
+//---------//
+//   C++   //
+//---------//
 #include <cmath>
 #include <stdio.h>
 
@@ -30,7 +33,9 @@
 #include "TGraphErrors.h"
 
 BaselineProcessor::BaselineProcessor(const std::string& name, Process& process)
-    : Processor(name, process) {    
+    : Processor(name, process), 
+      baseline_map(10, std::vector< std::vector< TH2S* >>(4, std::vector< TH2S* >(6)))      
+{    
 }
 
 BaselineProcessor::~BaselineProcessor() {
@@ -38,15 +43,20 @@ BaselineProcessor::~BaselineProcessor() {
 
 void BaselineProcessor::addBaselineHistogram(int feb_id, int hybrid_id) { 
 
-    std::string plot_title = "FEB: " + std::to_string(feb_id) + " Hybrid: " + std::to_string(hybrid_id) + " Baseline";
+    std::cout << "[ BaselineAnalysis ]: Created baseline histogram for FEB: " 
+              << feb_id << " Hybrid: " << hybrid_id << std::endl;
 
-    baseline_map[feb_id].push_back(
-            new TH2S(plot_title.c_str(), plot_title.c_str(), 640, 0, 640, 16384, 0, 16384));
-    baseline_map[feb_id][hybrid_id]->GetXaxis()->SetTitle("Channel");
-    baseline_map[feb_id][hybrid_id]->GetYaxis()->SetTitle("Baseline [ADC Counts]");
+    std::string prefix = "FEB: " + std::to_string(feb_id) + " Hybrid: " 
+                                 + std::to_string(hybrid_id);
 
-    std::cout << "[ BaselineAnalysis ]: Created baseline histogram for FEB: " << feb_id 
-              << " Hybrid: " << hybrid_id << std::endl;
+    for (int isample{0}; isample < 6; ++isample) {
+        baseline_map[feb_id][hybrid_id][isample] =
+            new TH2S((prefix + " Sample " + std::to_string(isample)).c_str(),
+                     (prefix + " Sample " + std::to_string(isample)).c_str(),
+                     640, 0, 640, 16384, 0, 16384); 
+        baseline_map[feb_id][hybrid_id][isample]->GetXaxis()->SetTitle("Physical Channel");
+        baseline_map[feb_id][hybrid_id][isample]->GetYaxis()->SetTitle("Baseline [ADC Counts]");
+    }
 }
 
 void BaselineProcessor::initialize(TTree* tree) {
@@ -57,7 +67,7 @@ void BaselineProcessor::initialize(TTree* tree) {
         }
     }
 
-    tfile.open("thresholds.dat"); 
+    tfile.open("baseline.dat"); 
 
     // Create a TupleBuilder instance.  The builder class is used to construct
     // an ntuple.
@@ -101,10 +111,11 @@ void BaselineProcessor::process(Phys2019SvtEvent* event) {
         //tuple_->set<int>("hybrid",   hybrid); 
 
         //printSamples(samples); 
-        int apv = samples->apv(); 
-        //if (feb != 0 || feb != 1) apv = int(samples->apv() + 8)%5;
-        //std::cout << "apv old: " << samples->apv() << std::endl;
-        //std::cout << "apv: " << apv << std::endl;
+        int apv = samples->apv();
+        if (feb == 0 || feb == 1) { 
+            if (apv == 0) apv = 1; 
+            else if (apv == 1) apv = 0; 
+        } 
 
         // Get the physical channel number 
         int channel = samples->channel(); 
@@ -116,7 +127,7 @@ void BaselineProcessor::process(Phys2019SvtEvent* event) {
 
         for (int isample{0}; isample < 6; ++isample) {
             //tuple_->set<int>("sample" + std::to_string(isample), samples->value(isample)); 
-            baseline_map[feb][hybrid]->Fill(pchannel, samples->value(isample)); 
+            baseline_map[feb][hybrid][isample]->Fill(pchannel, samples->value(isample)); 
         }
         
         //tuple_->tree()->Fill(); 
@@ -125,114 +136,127 @@ void BaselineProcessor::process(Phys2019SvtEvent* event) {
 
 void BaselineProcessor::finalize() { 
 
+    int baseline[24576][6] = {0}; 
+    int noise[24576][6] = {0};
+    
 
+    int channel_index = 0; 
     for (int feb{0}; feb < 10; ++feb) {
+        int max_channel = 640; 
+        if (feb == 0 || feb == 1) max_channel = 512; 
         for (int hybrid{0}; hybrid < 4; ++hybrid) {
-            std::cout << "[ BaselineProcessor ][ finalize ]: FEB " << feb 
-                      << " Hybrid: " << hybrid << std::endl; 
-            TH2S* baseline_plot = baseline_map[feb][hybrid];
-            if (baseline_plot->GetEntries() == 0) { 
-                std::cout << "[ BaselineProcessor ][ finalize ]: FEB " << feb 
-                          << " Hybrid: " << hybrid 
-                          << " has no calibrations. Skipping ..." << std::endl;
+            for (int sample{0}; sample < 6; ++sample) {
 
-                int max_apv = 5;
-                if (feb == 0 || feb == 1) max_apv = 4;
-                for (int iapv{0}; iapv < max_apv; ++iapv) {
-                    std::cout << feb << " " <<  hybrid << " " << iapv << std::endl; 
-                    tfile << feb << " " << hybrid << " " << iapv << " ";
-                    for (int channel{0}; channel < 128; ++channel) {
-                        tfile << std::hex << 17000 << setw(2) << " ";
-                    }
-                    tfile << "\n"; 
+                int base[640]; 
+                int n[640]; 
+                std::cout << "[ BaselineProcessor ][ finalize ]: Extracting calibrations for " 
+                          << "FEB: " << feb << " " 
+                          << "Hybrid: " << hybrid << " " 
+                          << "Sample: " << sample << std::endl; 
+                TH2S* baseline_plot = baseline_map[feb][hybrid][sample];
+                if (baseline_plot->GetEntries() == 0) {
+                    continue;  
                 }
-                continue;  
+                processBaselinePlot(feb, hybrid, base, n, 
+                            baseline_map[feb][hybrid][sample]); 
+                
+                for (int channel{0}; channel < max_channel; ++channel) { 
+                    baseline[channel_index + channel][sample] = base[channel]; 
+                    noise[channel_index + channel][sample] = n[channel]; 
+                }
             }
-            processBaselinePlot(feb, hybrid, baseline_map[feb][hybrid]); 
+            channel_index += max_channel; 
         }
     }
-    
+
+    for (int id{0}; id < 24576; ++id) { 
+        tfile << id 
+              << " " << baseline[id][0] 
+              << " " << baseline[id][1] 
+              << " " << baseline[id][2]
+              << " " << baseline[id][3] 
+              << " " << baseline[id][4] 
+              << " " << baseline[id][5]
+              << " " << noise[id][0]
+              << " " << noise[id][1] 
+              << " " << noise[id][2]
+              << " " << noise[id][3] 
+              << " " << noise[id][4] 
+              << " " << noise[id][5]
+              << "\n"; 
+    }
+
     tfile.close(); 
 }
 
 
-void BaselineProcessor::processBaselinePlot(int feb, int hybrid, TH2S* baseline_plot) {
+void BaselineProcessor::processBaselinePlot(int feb, int hybrid, int (&baseline)[640],
+       int (&noise)[640], TH2S* baseline_plot) {
 
-    TH1D* projection = NULL;
+    TH1D* projection{nullptr}; 
 
-    std::string file_name = "feb";
-    if (feb < 10) file_name += "0";
-    file_name += std::to_string(feb) + "_hybrid0" + std::to_string(hybrid);
+    std::string file_name = "FEB " + std::to_string(feb) + " Hybrid " 
+                                   + std::to_string(hybrid);
     //output_file->mkdir(file_name.c_str());
     //output_file->cd(file_name.c_str());
 
     double mean_baseline = 0;
     double mean_baseline_error = 0; 
-    double noise = 0;
-    TGraph* g_mean_baseline = nullptr;
+    double noise_value = 0;
     TGraph* g_noise = nullptr;  
-    std::string plot_title = "";
-        int max_channel = 640; 
-        if (feb == 0 || feb == 1) max_channel = 512; 
-    //for (int sample_n = 0; sample_n < 6; ++sample_n) { 
+    
+    int max_channel = 640; 
+    if (feb == 0 || feb == 1) max_channel = 512; 
 
-        plot_title = "FEB: " + std::to_string(feb) + " Hybrid: " + std::to_string(hybrid);
-        //             " Mean Baseline - Sample " + std::to_string(sample_n);
-        g_mean_baseline = new TGraphErrors(max_channel);
-        g_mean_baseline->SetNameTitle(plot_title.c_str(), plot_title.c_str());
+    std::string name = baseline_plot->GetName(); 
+    TGraph* g_mean_baseline = new TGraphErrors(max_channel);
+    g_mean_baseline->SetNameTitle((name + " - Mean Baseline").c_str(),
+                                  (name + " - Mean Baseline").c_str());
 
+    g_noise = new TGraphErrors(max_channel);    
+    g_noise->SetNameTitle((name + " - Noise").c_str(),
+                          (name + " - Noise").c_str());
 
-        plot_title = "FEB: " + std::to_string(feb) + " Hybrid: " + std::to_string(hybrid);
-                     //" Noise - Sample " + std::to_string(sample_n);
-        g_noise = new TGraphErrors(max_channel);    
-        g_noise->SetNameTitle(plot_title.c_str(), plot_title.c_str());
+    int max_apv = 5;
+    if (feb == 0 || feb == 1) max_apv = 4; 
+    //int calibration [max_apv][128] = { 0 };   
+    for (int channel{0}; channel < max_channel; ++channel) {
 
-        TH2S* baseline_sample_plot = baseline_plot; //->getPlot(sample_n);
-        //baseline_sample_plot->Write();
-        int max_apv = 5;
-        if (feb == 0 || feb == 1) max_apv = 4; 
-        int calibration [max_apv][128] = { 0 };   
-        for (int channel = 0; channel < max_channel; ++channel) {
-
-            if (baseline_plot->ProjectionY("", channel+1, channel+1)->GetEntries() == 0) continue; 
-            TH1D* baseline_projection = baseline_plot->ProjectionY("", channel+1, channel+1);
-            this->getCalibrations(baseline_projection, mean_baseline, mean_baseline_error, noise);
-            baseline_projection->SetName(
-                ("FEB: " + std::to_string(feb) + " Hybrid: " + std::to_string(hybrid)).c_str()); 
-                 //" Sample: " + std::to_string(sample_n) + " Channel: " + std::to_string(channel)).c_str()); 
-
-            //baseline_projection->Write();
-            g_mean_baseline->SetPoint(channel,channel, mean_baseline); 
-            g_noise->SetPoint(channel, channel, noise); 
-            //writer->writeBaseline(feb, hybrid, channel, sample_n, mean_baseline);
-            //writer->writeNoise(feb, hybrid, channel, sample_n, noise);
-            delete baseline_projection; 
-            
-            // Get the APV25 number from the physical channel number
-            int apv = QAUtils::getApv25FromPhysicalChannel(channel);
-
-            // Get the APV25 channel number from the physical channel number
-            int apv_channel = QAUtils::getApv25ChannelFromPhysicalChannel(channel);
-            
-            if (feb == 0 || feb == 1) {
-                apv =  (channel - apv_channel)/128; 
-                //std::cout << feb << " " <<  hybrid << " " << apv << " " << " " << channel 
-                //          << " " << apv_channel << std::endl;  
-            }
-            calibration[apv][apv_channel] = mean_baseline + 3*noise;  
+        if (baseline_plot->ProjectionY("", channel+1, channel+1)->GetEntries() == 0) { 
+            std::cout << baseline_plot->GetName() << " Channel: " << channel 
+                      << " doesn't have any entries." << std::endl;
+            continue; 
         }
+        
+        TH1D* baseline_projection = baseline_plot->ProjectionY("", channel+1, channel+1);
+        this->getCalibrations(baseline_projection, mean_baseline, mean_baseline_error, noise_value);
+        
+        baseline[channel] = mean_baseline; 
+        noise[channel] = noise_value; 
+        //baseline_projection->SetName(
+        //    ("FEB: " + std::to_string(feb) + " Hybrid: " + std::to_string(hybrid)).c_str()); 
+        //" Sample: " + std::to_string(sample_n) + " Channel: " + std::to_string(channel)).c_str()); 
+
+        //baseline_projection->Write();
+        g_mean_baseline->SetPoint(channel,channel, mean_baseline); 
+        g_noise->SetPoint(channel, channel, noise_value); 
+        
+        delete baseline_projection; 
+            
+        // Get the APV25 number from the physical channel number
+        //int apv = QAUtils::getApv25FromPhysicalChannel(channel);
+
+        // Get the APV25 channel number from the physical channel number
+        //int apv_channel = QAUtils::getApv25ChannelFromPhysicalChannel(channel);
+            
+        //if (feb == 0 || feb == 1) {
+        //   apv =  (channel - apv_channel)/128; 
+            //std::cout << feb << " " <<  hybrid << " " << apv << " " << " " << channel 
+            //          << " " << apv_channel << std::endl;  
+        //}
+        //calibration[apv][apv_channel] = mean_baseline + 2*noise;  
+    }
        
-        for (int iapv{0}; iapv < max_apv; ++iapv) {
-            std::cout << feb << " " <<  hybrid << " " << iapv << " ";  
-            tfile << feb << " " << hybrid << " " << iapv << " ";
-            for (int ichannel{0}; ichannel < 128; ++ichannel) {
-                std::cout << std::hex << calibration[iapv][ichannel] << setw(2) << " "; 
-                tfile << std::hex << calibration[iapv][ichannel] << setw(2) << " ";
-            }
-            tfile << "\n";
-            std::cout << "\n";  
-        }
-
         g_mean_baseline->Draw("ap"); 
         g_mean_baseline->GetXaxis()->SetTitle("Channel"); 
         g_mean_baseline->GetYaxis()->SetTitle("Mean Baseline (ADC Counts)");
@@ -245,9 +269,6 @@ void BaselineProcessor::processBaselinePlot(int feb, int hybrid, TH2S* baseline_
         
         delete g_mean_baseline; 
         delete g_noise;
-    //}
-    //output_file->cd();
-
 }
 
 void BaselineProcessor::getCalibrations(TH1D* baseline_histogram, double &mean_baseline, double &mean_baseline_error,
