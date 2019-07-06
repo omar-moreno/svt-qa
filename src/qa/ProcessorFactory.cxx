@@ -7,6 +7,11 @@
 
 #include "ProcessorFactory.h"
 
+//----------------//
+//   C++ StdLib   //
+//----------------//
+#include <iostream>
+
 #include <dlfcn.h>
 
 void ProcessorFactory::registerProcessor(const std::string& classname, ProcessorMaker* maker) {
@@ -45,6 +50,7 @@ void ProcessorFactory::loadLibrary(const std::string& libname) {
     if (libs_loaded_.find(libname) != libs_loaded_.end()) {
         return; // already loaded
     }
+    
 
     void* handle = dlopen(libname.c_str(), RTLD_NOW);
     if (handle == NULL) {
