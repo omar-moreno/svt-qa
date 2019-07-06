@@ -10,16 +10,14 @@
 //----------------//
 //   C++ StdLib   //
 //----------------//
-#include <map>
-
-//---------//
-//   DAQ   //
-//---------//
-#include "TrackerEvent.h"
+#include <string>
 
 // Forward declarations
 class Process;
 class Processor;
+class TrackerEvent;
+class Phys2019SvtEvent; 
+class TTree; 
 
 /** Typedef for ProcessorFactory use. */
 typedef Processor* ProcessorMaker(const std::string& name, Process& process);
@@ -51,17 +49,18 @@ class Processor {
         virtual ~Processor() {;}
 
         /**
-         * Process the event and put new data products into it.
          * @param event The Event to process.
+         * Process the event and put new data products into it.
          */
-        virtual void process(TrackerEvent* event) = 0;
+        //virtual void process(TrackerEvent* event) = 0;
+        virtual void process(Phys2019SvtEvent* event) = 0;
 
         /**
          * Callback for the Processor to take any necessary
          * action when the processing of events starts, such as
          * creating histograms.
          */
-        virtual void initialize() = 0;
+        virtual void initialize(TTree* tree) = 0;
 
         /**
          * Callback for the Processor to take any necessary
