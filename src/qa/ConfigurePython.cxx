@@ -33,6 +33,7 @@ static long intMember(PyObject* owner, const std::string& name) {
 
 ConfigurePython::ConfigurePython(const std::string& python_script, char* args[], int nargs) {
 
+
     std::string path(".");
     std::string cmd = python_script;
 
@@ -42,6 +43,7 @@ ConfigurePython::ConfigurePython(const std::string& python_script, char* args[],
         cmd = python_script.substr(python_script.rfind("/") + 1);
     }
     cmd = cmd.substr(0, cmd.find(".py"));
+
 
     // Initialize the python interpreter. 
     Py_Initialize();
@@ -66,7 +68,6 @@ ConfigurePython::ConfigurePython(const std::string& python_script, char* args[],
 
     // Load the python script. 
     script = PyImport_ImportModule(cmd.c_str());
-    Py_DECREF(script);
     
     // If a reference to the python script couldn't be created, raise 
     // an exception.  
@@ -74,6 +75,7 @@ ConfigurePython::ConfigurePython(const std::string& python_script, char* args[],
         PyErr_Print();
         throw std::runtime_error("[ ConfigurePython ]: Problem loading python script."); 
     }
+    Py_DECREF(script);
 
     // Load the script that is used create a processor
     PyObject* pCMod = PyObject_GetAttrString(script, "SvtQAConf");
@@ -88,7 +90,8 @@ ConfigurePython::ConfigurePython(const std::string& python_script, char* args[],
         PyErr_Print();
         throw std::runtime_error("[ ConfigurePython ]: Problem loading Process class"); 
     }
-    
+   
+
     p_process = PyObject_GetAttrString(p_process_class, "lastProcess");
     Py_DECREF(p_process_class);
     if (p_process == 0) {
@@ -104,11 +107,11 @@ ConfigurePython::ConfigurePython(const std::string& python_script, char* args[],
     }
     
     for (Py_ssize_t i = 0; i < PyList_Size(p_sequence); i++) {
+        
         PyObject* processor = PyList_GetItem(p_sequence, i);
         ProcessorInfo pi;
         pi.classname_ = stringMember(processor, "class_name");
         pi.instancename_ = stringMember(processor, "instance_name");
-        std::cout << pi.classname_ << std::endl;
         
         /*
         PyObject* params = PyObject_GetAttrString(processor, "parameters");
