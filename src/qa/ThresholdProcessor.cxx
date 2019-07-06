@@ -109,7 +109,7 @@ void ThresholdProcessor::process(Phys2019SvtEvent* event) {
         //tuple_->set<int>("apv",      apv); 
         //tuple_->set<int>("pchannel", pchannel); 
 
-        for (int isample{0}; isample < 6; ++isample) {
+        for (int isample{1}; isample < 6; ++isample) {
             //tuple_->set<int>("sample" + std::to_string(isample), samples->value(isample)); 
             baseline_map[feb][hybrid]->Fill(pchannel, samples->value(isample)); 
         }
