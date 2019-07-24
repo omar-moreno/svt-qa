@@ -11,7 +11,3 @@ target_link_libraries(TupleBuilder
 add_library(QAUtils QAUtils.cxx)
 
 
-add_executable(csv2tuple Csv2Tuple)
-target_link_libraries(csv2tuple 
-    ${ROOT_LIBRARIES}
-)
