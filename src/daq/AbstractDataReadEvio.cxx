@@ -189,6 +189,7 @@ evioDOMNodeListP AbstractDataReadEvio::getDataBanks(evioDOMNode* roc_bank) {
 
         // Ignore the trigger bank    
         if ((*roc_it)->tag == 57610) continue; 
+        else if ((*roc_it)->tag == 57649) continue; 
 
         result->push_back(*roc_it); 
     }
