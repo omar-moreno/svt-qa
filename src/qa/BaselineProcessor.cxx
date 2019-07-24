@@ -98,7 +98,7 @@ void BaselineProcessor::process(Phys2019SvtEvent* event) {
     // event. Without baseline suppression, this will always be equal to 
     // 5x128 = 640 channels. 
     for (int isamples{0}; isamples < event->count(); ++isamples) {
-        
+       
         // Get a set of samples
         TrackerSample* samples = event->sample(isamples);
    
@@ -136,8 +136,8 @@ void BaselineProcessor::process(Phys2019SvtEvent* event) {
 
 void BaselineProcessor::finalize() { 
 
-    int baseline[24576][6] = {0}; 
-    int noise[24576][6] = {0};
+    double baseline[24576][6] = {0}; 
+    double noise[24576][6] = {0};
     
 
     int channel_index = 0; 
@@ -147,8 +147,8 @@ void BaselineProcessor::finalize() {
         for (int hybrid{0}; hybrid < 4; ++hybrid) {
             for (int sample{0}; sample < 6; ++sample) {
 
-                int base[640]; 
-                int n[640]; 
+                double base[640]; 
+                double n[640]; 
                 std::cout << "[ BaselineProcessor ][ finalize ]: Extracting calibrations for " 
                           << "FEB: " << feb << " " 
                           << "Hybrid: " << hybrid << " " 
@@ -190,8 +190,8 @@ void BaselineProcessor::finalize() {
 }
 
 
-void BaselineProcessor::processBaselinePlot(int feb, int hybrid, int (&baseline)[640],
-       int (&noise)[640], TH2S* baseline_plot) {
+void BaselineProcessor::processBaselinePlot(int feb, int hybrid, double (&baseline)[640],
+       double (&noise)[640], TH2S* baseline_plot) {
 
     TH1D* projection{nullptr}; 
 

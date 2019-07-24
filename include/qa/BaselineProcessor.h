@@ -73,8 +73,8 @@ class BaselineProcessor : public Processor {
 
         void getCalibrations(TH1D* baseline_histogram, double &mean_baseline, double &mean_baseline_error, double &noise); 
 
-        void processBaselinePlot(int feb, int hybrid, int (&baseline)[640], 
-               int (&noise)[640], TH2S* baseline_plot); 
+        void processBaselinePlot(int feb, int hybrid, double (&baseline)[640], 
+               double (&noise)[640], TH2S* baseline_plot); 
 
         /** Event counter */
         int event_count_{0}; 
