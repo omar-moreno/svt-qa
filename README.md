@@ -29,22 +29,7 @@ version greater than 4.8.
 You will first need to install or have available at your site a number of
 external dependencies before building the actual framework.
 
-## LibXML2
-
-The libXML2 library can usually be installed using the package manager that 
-comes with your chosen Linux distribution.  If a package manager is not 
-available, build instructions can be found on the 
-[XML2 webpage](http://xmlsoft.org/FAQ.html). 
-
-Once libXML2 has been installed, the path to headers needs to be set: 
-
-```bash
-export LIBXML_INCLUDE_PATH=/path/to/libxml2
-```
-
 ## EVIO
-
-## HPS DAQ 
 
 ## ROOT
 
