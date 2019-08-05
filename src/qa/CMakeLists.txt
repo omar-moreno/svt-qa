@@ -2,47 +2,20 @@
 
 # Find the required SVT DAQ files
 list(APPEND CMAKE_FIND_LIBRARY_SUFFIXES ".o")
-#find_library(TRIGGER_SAMPLE_LIB TriggerSample.o $ENV{DAQ_HOME}/.obj)
-#find_library(TRIGGER_EVENT_LIB TriggerEvent.o $ENV{DAQ_HOME}/.obj)
-find_library(TRACKER_EVENT_LIB TrackerEvent.o $ENV{DAQ_HOME}/.obj)
-find_library(TRACKER_SAMPLE_LIB TrackerSample.o $ENV{DAQ_HOME}/.obj)
-find_library(DATA_LIB Data.o $ENV{DAQ_HOME}/.obj)
-find_library(XMLVARIABLES_LIB XmlVariables.o $ENV{DAQ_HOME}/.obj)
-
-# Find xml libraries
-find_library(XML_LIB xml2 $ENV{LIBXML_LIB_PATH})
-
-# Find rt libraries
-find_library(RT_LIB rt /usr/lib)
-
-# Find bz2 libraries
-find_library(BZ2_LIB bz2 $ENV{BZ2_LIB_PATH})
 
 # Find the EVIO libraries
 find_library(EVIO_LIB evio $ENV{EVIO_LIB_PATH})
 find_library(EVIOXX_LIB evioxx $ENV{EVIO_LIB_PATH})
 
-find_library(DATA_READ_LIB DataRead.o $ENV{DAQ_HOME}/.obj)
-add_library(DataRead STATIC IMPORTED)
-set_property(TARGET DataRead PROPERTY IMPORTED_LOCATION "${DATA_READ_LIB}")
 
 add_library(Processor Processor.cxx)
-#target_link_libraries(Processor
-#    ${TRACKER_EVENT_LIB}
-#)
 
 add_library(Process Process.cxx) 
 target_link_libraries(Process
+    Data
+    AbstractDataReadEvio
     Phys2019DataReadEvio
     Phys2019SvtEvent
-    #DataRead
-    ${BZ2_LIB}
-    ${DATA_LIB}
-    ${TRACKER_SAMPLE_LIB}
-    ${RT_LIB}
-    ${XML_LIB}
-    ${XMLVARIABLES_LIB}
-    ${TRACKER_EVENT_LIB}
     ${ROOT_LIBRARIES}
     ${EVIO_LIB}
     ${EVIOXX_LIB}
@@ -66,24 +39,17 @@ target_link_libraries(BaselineProcessor
     Processor
     TupleBuilder
     QAUtils
-    #    ${TRACKER_EVENT_LIB#}
-    #    ${DATA_LIB}
-    #    ${BZ2_LIB}
 )
 
 add_library(ThresholdProcessor SHARED 
     ThresholdProcessor.cxx
 )
 
-
 set_property(TARGET ThresholdProcessor PROPERTY POSITION_INDEPENDENT_CODE ON) 
 target_link_libraries(ThresholdProcessor
     Processor
     TupleBuilder
     QAUtils
-    #    ${TRACKER_EVENT_LIB#}
-    #    ${DATA_LIB}
-    #    ${BZ2_LIB}
 )
 
 

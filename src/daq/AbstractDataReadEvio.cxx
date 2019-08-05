@@ -22,7 +22,7 @@ AbstractDataReadEvio::~AbstractDataReadEvio() {
     delete file_channel;
 }
 
-bool AbstractDataReadEvio::open(std::string evio_file_name, bool compressed = false) {
+bool AbstractDataReadEvio::open(std::string evio_file_name) {
     
     try {
 
@@ -60,7 +60,6 @@ void AbstractDataReadEvio::close() {
 
 bool AbstractDataReadEvio::next(Data* data) {
 
-
     // If the list of data banks isn't empty, process them
     if (!data_banks->empty()) {
         
@@ -83,7 +82,7 @@ bool AbstractDataReadEvio::next(Data* data) {
        
         //data->setEventNumber(++event_n);
        
-        /* 
+        /*
         std::cout << "[ AbstractDataReadEvio ]: --------------------------------------" << std::endl;
         std::cout << "[ AbstractDataReadEvio ]: --------------------------------------" << std::endl;
         std::cout << "[ AbstractDataReadEvio ]:\tEevent " << ++event_n << std::endl;
@@ -136,7 +135,7 @@ bool AbstractDataReadEvio::next(Data* data) {
             data_banks->insert(data_banks->end(), result->begin(), result->end()); 
         }
         
-        //std::cout << "[ AbstractDataReadEvio ]: Total number of data banks " 
+        //std::cout << "---- [ AbstractDataReadEvio ]: Total number of data banks " 
         //          << data_banks->size() << std::endl;
 
         /// Get an iterator to the list of data banks

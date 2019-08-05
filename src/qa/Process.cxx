@@ -14,15 +14,15 @@
 //---------//
 //   DAQ   //
 //---------//
-#include "DataRead.h"
 #include "Phys2019DataReadEvio.h"
 #include "Phys2019SvtEvent.h"
-#include "TrackerEvent.h"
 
 //----------//
 //   ROOT   //
 //----------//
 #include "TTree.h"
+
+#include <iostream>
 
 Process::Process() {}
 
@@ -35,16 +35,16 @@ void Process::run() {
         if (input_files_.empty()) 
             throw std::runtime_error("Please specify files to process.");
 
-        data_reader = new Phys2019DataReadEvio();
-        //TrackerEvent event;
+        data_reader = new Phys2019DataReadEvio(); 
         Phys2019SvtEvent event;   
 
         int cfile = 0; 
+
         for (auto ifile : input_files_) { 
             
             // Open the input file.  If the input file can't be opened, exit
             // the application.
-            if (!data_reader->open(ifile, false)) 
+            if (!data_reader->open(ifile)) 
               throw std::runtime_error("Error! File " + ifile + " cannot be opened.");   
         
             std::cout << "---- [ svt-qa ][ Process ]: Processing file " 

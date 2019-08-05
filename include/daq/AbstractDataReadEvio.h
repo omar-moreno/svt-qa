@@ -21,7 +21,6 @@
 //-----------//
 //--- DAQ ---//
 //-----------//
-#include <DataRead.h>
 #include <Data.h>
 
 //------------//
@@ -33,7 +32,7 @@
 
 using namespace evio; 
 
-class AbstractDataReadEvio : public DataRead { 
+class AbstractDataReadEvio { 
 
 	public: 
 
@@ -63,7 +62,7 @@ class AbstractDataReadEvio : public DataRead {
          *  @param compressed : True if the file is compressed, false otherwise
          *  @return True if the file was successfully opened, false otherwise
 		 */
-		bool open(std::string evio_file_name, bool compressed);
+		bool open(std::string evio_file_name);
 		
 		/**
          *  Close the EVIO file channel.

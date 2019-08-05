@@ -14,7 +14,7 @@
 //---------//
 //   DAQ   //
 //---------//
-#include "TrackerEvent.h"
+//#include "TrackerEvent.h"
 #include "TrackerSample.h"
 #include "Phys2019SvtEvent.h" 
 
@@ -209,7 +209,13 @@ void ThresholdProcessor::processThresholdPlot(int feb, int hybrid, TH2S* baselin
                 //std::cout << feb << " " <<  hybrid << " " << apv << " " << " " << channel 
                 //          << " " << apv_channel << std::endl;  
             }
-            calibration[apv][apv_channel] = mean_baseline + 2*noise;  
+            if (feb == 0 && hybrid == 3) { 
+                calibration[apv][apv_channel] = mean_baseline + 1.7*noise;  
+            //} else if (feb == 8) { 
+            //    calibration[apv][apv_channel] = mean_baseline + 1.7*noise;  
+            } else { 
+                calibration[apv][apv_channel] = mean_baseline + 2*noise;  
+            }
         }
        
         for (int iapv{0}; iapv < max_apv; ++iapv) {

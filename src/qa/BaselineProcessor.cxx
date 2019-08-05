@@ -16,7 +16,6 @@
 //---------//
 //   DAQ   //
 //---------//
-#include "TrackerEvent.h"
 #include "TrackerSample.h"
 #include "Phys2019SvtEvent.h" 
 

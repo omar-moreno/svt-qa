@@ -5,7 +5,7 @@
 #ifndef __PHYS2019_DATA_READ_EVIO_H__
 #define __PHYS2019_DATA_READ_EVIO_H__
 
-#include <AbstractDataReadEvio.h>
+#include "AbstractDataReadEvio.h"
 
 class Phys2019DataReadEvio : public AbstractDataReadEvio { 
 

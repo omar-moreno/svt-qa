@@ -22,8 +22,8 @@
 //   svt-qa   //
 //------------//
 #include "Processor.h"
+#include "AbstractDataReadEvio.h"
 
-class DataRead; 
 
 class Process {
 
@@ -72,7 +72,7 @@ class Process {
     private:
 
         /** Reader used to parse either binary or EVIO files. */
-        DataRead* data_reader{nullptr}; 
+        AbstractDataReadEvio* data_reader{nullptr}; 
 
         /** Limit on events to process. */
         int event_limit_{-1};
