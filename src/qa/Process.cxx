@@ -16,7 +16,6 @@
 //---------//
 #include "Phys2019DataReadEvio.h"
 #include "Phys2019SvtEvent.h"
-#include "TrackerEvent.h"
 
 //----------//
 //   ROOT   //
@@ -40,6 +39,7 @@ void Process::run() {
         Phys2019SvtEvent event;   
 
         int cfile = 0; 
+
         for (auto ifile : input_files_) { 
             
             // Open the input file.  If the input file can't be opened, exit
