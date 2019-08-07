@@ -22,18 +22,19 @@ AbstractDataReadEvio::~AbstractDataReadEvio() {
     delete file_channel;
 }
 
-bool AbstractDataReadEvio::open(std::string evio_file_name, bool compressed = false) {
+bool AbstractDataReadEvio::open(std::string evio_file_name) {
     
     try {
 
         // Instatiate the EVIO file channel and open the file for reading.
         // If the file can't be opened, an exception is thrown.
+        std::cout << "---- [ AbstractDataReadEvio ][ open ]: Opening file " << evio_file_name << std::endl;
         file_channel = new evioFileChannel(evio_file_name, "r");
         file_channel->open(); 
 
     } catch(evioException e){ 
         // If the file can't be opened, warn the user and exit.
-        std::cerr << "[ AbstractDataReadEvio ]: Couldn't open file " 
+        std::cerr << ">>>> [ AbstractDataReadEvio ][ open ]: Couldn't open file " 
                   << evio_file_name << "." << std::endl;
         std::cerr << e.toString() << std::endl;
         return false;
@@ -62,11 +63,6 @@ bool AbstractDataReadEvio::next(Data* data) {
     // If the list of data banks isn't empty, process them
     if (!data_banks->empty()) {
         
-        /*
-        std::cout << "[ AbstractDataReadEvio ]: Processing data bank " 
-                  << (*data_iterator)->tag << std::endl; 
-        */
-
         // Use the data enclosed by the data bank to create a Data object 
         this->processDataBank(data, (*data_iterator)->tag, (*data_iterator)->getVector<uint32_t>());
         
@@ -78,12 +74,14 @@ bool AbstractDataReadEvio::next(Data* data) {
 
     try { 
 
+        data->clearSamples(); 
+
         // Get a physics event.  If the physics event is NULL, the end of the
         // EVIO file was reached.
         if ((event = this->getPhysicsEvent()) == NULL) return false;
        
         //data->setEventNumber(++event_n);
-        
+       
         /*
         std::cout << "[ AbstractDataReadEvio ]: --------------------------------------" << std::endl;
         std::cout << "[ AbstractDataReadEvio ]: --------------------------------------" << std::endl;
@@ -95,10 +93,8 @@ bool AbstractDataReadEvio::next(Data* data) {
         // should only be a single physics bank.
         evioDOMNodeP physics_bank = event->getFirstNode(tagEquals(this->getPhysicsBankTag()));
         
-        /*
-        std::cout << "[ AbstractDataReadEvio ]: Physics event with tag " 
-                  << physics_bank->tag << " has been found" << std::endl;
-        */
+        //std::cout << "[ AbstractDataReadEvio ]: Physics event with tag " 
+        //          << physics_bank->tag << " has been found" << std::endl;
 
         // Delete all roc banks that were previously created
         while (!roc_banks->empty()) delete roc_banks->front(), roc_banks->pop_front();
@@ -110,26 +106,20 @@ bool AbstractDataReadEvio::next(Data* data) {
         for (int roc_bank_tag = this->getMinRocBankTag(); 
                  roc_bank_tag <= this->getMaxRocBankTag(); ++roc_bank_tag) {
             
-            /*
-            std::cout << "[ AbstractDataReadEvio ]: Retrieving ROC bank: "
-                      << roc_bank_tag << std::endl;
-            */
+            //std::cout << "[ AbstractDataReadEvio ]: Retrieving ROC bank: "
+            //          << roc_bank_tag << std::endl;
 
             // Retrieve only ROC banks that match the ROC bank tag of interest
             result = physics_bank->getChildren(tagEquals(roc_bank_tag));
             
-            /*
-            std::cout << "[ AbstractDataReadEvio ]: Total ROC banks retrieved: "
-                      << result->size() << std::endl;
-            */
+            //std::cout << "[ AbstractDataReadEvio ]: Total ROC banks retrieved: "
+            //          << result->size() << std::endl;
 
             roc_banks->insert(roc_banks->end(), result->begin(), result->end());
         }
         
-        /*
-        std::cout << "[ AbstractDataReadEvio ]: Total ROC banks found: " 
-                  << roc_banks->size() << std::endl;
-        */
+        //std::cout << "[ AbstractDataReadEvio ]: Total ROC banks found: " 
+        //          << roc_banks->size() << std::endl;
 
         // Loop through each of the ROC banks and traverse them until the data
         // banks (either FPGA or RCE) are found.  This is done because the 
@@ -139,18 +129,14 @@ bool AbstractDataReadEvio::next(Data* data) {
             
             result = this->getDataBanks((*roc_it));
             
-            /* 
-            std::cout << "[ AbstractDataReadEvio ]: Total data banks retrieved: " 
-                      << result->size() << std::endl;
-            */
+            //std::cout << "[ AbstractDataReadEvio ]: Total data banks retrieved: " 
+            //          << result->size() << std::endl;
 
             data_banks->insert(data_banks->end(), result->begin(), result->end()); 
         }
         
-        /*   
-        std::cout << "[ AbstractDataReadEvio ]: Total number of data banks " 
-                  << data_banks->size() << std::endl;
-        */
+        //std::cout << "---- [ AbstractDataReadEvio ]: Total number of data banks " 
+        //          << data_banks->size() << std::endl;
 
         /// Get an iterator to the list of data banks
         data_iterator = data_banks->begin();
@@ -172,10 +158,14 @@ evioDOMTree* AbstractDataReadEvio::getPhysicsEvent() {
 
         // Read an event from the EVIO channel.  If the end of the EVIO file 
         // has been reached, return NULL
-        if(!file_channel->read()) return NULL;
+        if(!file_channel->read()) { 
+            std::cerr << "[ AbstractDataReadEvio ][ getPhysicsEvent ]: End of file reached." << std::endl;
+            return nullptr;
+        }
 
         // Create the event tree from the contents of the channel
         evioDOMTree* event = new evioDOMTree(file_channel);
+        //std::cout << "Tree: " << event->toString() << std::endl;
 
         // If the event is a physics event, return a pointer to the event tree.
         // Otherwise, destroy the object.
@@ -197,7 +187,8 @@ evioDOMNodeListP AbstractDataReadEvio::getDataBanks(evioDOMNode* roc_bank) {
             roc_it != roc_bank->getChildList()->end(); ++roc_it) { 
 
         // Ignore the trigger bank    
-        if ((*roc_it)->tag == 16) continue; 
+        if ((*roc_it)->tag == 57610) continue; 
+        else if ((*roc_it)->tag == 57649) continue; 
 
         result->push_back(*roc_it); 
     }

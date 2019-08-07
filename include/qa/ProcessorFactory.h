@@ -11,6 +11,7 @@
 //----------------//
 //   C++ StdLib   //
 //----------------//
+#include <map>
 #include <set>
 #include <stdexcept>
 #include <string>
