@@ -67,8 +67,9 @@ def main():
         'Pedestals and noise extracted from run %s.', 'svt_calibrations', 'svt_calibrations', '%i')"\
         % (int(args.run.strip()), int(args.run.strip()), col_id)
 
+    #print sql_query
     try: 
-        cursor.exectute(sql_query)
+        cursor.execute(sql_query)
     except: 
         print "[ ERROR ]: Unable to load conditions record."
         db.rollback()
