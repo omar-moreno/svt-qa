@@ -26,12 +26,13 @@ public:
   void
   acceptFrame(std::shared_ptr<rogue::interfaces::stream::Frame> frame);
 
-  void closeCSV() { csv.close(); }
+  //void closeCSV() { csv.close(); }
 
 private:
   int event_index{0};
   // void parseFrame(byte data);
 
+  /*
   int getField(int value, int high_bit, int low_bit) {
     int mask = pow(2, (high_bit - low_bit + 1)) - 1;
     return (value >> low_bit) & mask;
@@ -45,7 +46,7 @@ private:
   }
   std::vector<uint8_t> channels;
 
-  std::ofstream csv;
+  std::ofstream csv;*/
 
 }; // RogueDataReader
 } // namespace reader

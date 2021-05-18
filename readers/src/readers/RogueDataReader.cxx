@@ -1,10 +1,12 @@
 #include "readers/RogueDataReader.h"
 
+//---< C++ >---//
 #include <algorithm>
 #include <bitset>
 #include <cstdlib>
 #include <iostream>
 
+//---< rogue >---//
 #include "rogue/interfaces/stream/Frame.h"
 #include "rogue/interfaces/stream/FrameIterator.h"
 
@@ -15,6 +17,8 @@ typedef unsigned __int128 uint128_t;
 namespace readers {
 
 RogueDataReader::RogueDataReader() {
+  
+  /*
   for (int index{0}; index < 16; ++index)
     channels.push_back(0x10 + index);
   // for (const auto& value : channels) std::cout <<unsigned(value) <<
@@ -22,9 +26,8 @@ RogueDataReader::RogueDataReader() {
   csv.open("test.csv");
   csv << "Event, RCE, FEB, Hybrid, APV, channel, sample0, sample1, sample2, "
          "sample3, sample4, sample5\n";
+  */
 }
-
-RogueDataReader::~RogueDataReader() {}
 
 void RogueDataReader::acceptFrame(std::shared_ptr<ris::Frame> frame) {
 
@@ -104,13 +107,13 @@ void RogueDataReader::acceptFrame(std::shared_ptr<ris::Frame> frame) {
       ris::fromFrame(it, 2, &tail);
       if (getField(tail, 14, 14) == 1)
         continue;
-      csv << event_count << "," << unsigned(rce) << ", " << unsigned(feb)
+      /*csv << event_count << "," << unsigned(rce) << ", " << unsigned(feb)
           << ", " << getField(tail, 11, 10) << ", ";
       csv << getField(tail, 9, 7) << ", " << getField(tail, 6, 0) << ", ";
       for (int nsample{0}; nsample < 6; ++nsample) {
         csv << samples[nsample] << ", ";
       }
-      csv << "\n";
+      csv << "\n";*/
       /*std::cout << "[ RogueDataReader ]: Tail: " << tail << std::endl;
       std::cout << "[ RogueDataReader ]: APV ch: " << getField(tail, 6, 0) <<
       std::endl; std::cout << "[ RogueDataReader ]: APV add: " << getField(tail,
