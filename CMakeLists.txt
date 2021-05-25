@@ -7,6 +7,12 @@ project(SVT_QA
 	DESCRIPTION "Silicon Vertex Tracker Quality Assurance."
 	LANGUAGES CXX)
 
+# Add support for building in conda environment
+if (DEFINED ENV{CONDA_PREFIX})
+  set(CMAKE_PREFIX_PATH "$ENV{CONDA_PREFIX}")
+  link_directories($ENV{CONDA_PREFIX}/lib)
+endif()
+
 # Load additional macro commands 
 list(APPEND CMAKE_MODULE_PATH ${SVT_QA_SOURCE_DIR}/cmake/)
 message(STATUS ${CMAKE_MODULE_PATH})
@@ -31,5 +37,5 @@ if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE "${default_build_type}" CACHE STRING "Choose the type of build." FORCE)
 endif()
 
-
+# Reader library needed to parse files
 add_subdirectory(readers)
