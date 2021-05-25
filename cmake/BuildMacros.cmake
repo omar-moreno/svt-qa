@@ -21,6 +21,9 @@ macro(setup_rogue)
     # Create the Rogue target
     add_library(Rogue::Rogue INTERFACE IMPORTED GLOBAL)
 
+    # Need to remove the keyword PUBLIC from the list of libraries to avoid 
+    # an ld error. 
+    list(REMOVE_ITEM ROGUE_LIBRARIES "PUBLIC")
     # Set the target properties
     set_target_properties(Rogue::Rogue
 	    PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${ROGUE_INCLUDE_DIRS}"
