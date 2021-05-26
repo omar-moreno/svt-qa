@@ -2,13 +2,15 @@
 cmake_minimum_required(VERSION 3.12)
 
 # Set the project name
-project(processing 
-	VERSION 1.0.0          
-	DESCRIPTION "Framework used to define processing pipelines and modules."
+project(rogue 
+	VERSION 0.1      
+	DESCRIPTION "Module containing classes that interface with Rogue" 
         LANGUAGES CXX)
 
 # Setup the Rogue CMake target
 setup_rogue()
 
 # Build the reader library
-setup_library(module readers dependencies Rogue::Rogue)
+setup_library(module rogue dependencies Rogue::Rogue)
+
+setup_test(dependencies rogue::rogue)

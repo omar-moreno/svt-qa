@@ -1,8 +1,10 @@
-#ifndef READERS_ROGUEDATAREADER_H
-#define READERS_ROGUEDATAREADER_H
+#ifndef ROGUE_ROGUEDATARECEIVER_H
+#define ROGUE_ROGUEDATARECEIVER_H
+
+#define BOOST_BIND_GLOBAL_PLACEHOLDERS
 
 //---< C++ >---//
-#include <fstream>
+//#include <fstream>
 
 //---< rogue >---//
 #include "rogue/interfaces/stream/Slave.h"
@@ -12,24 +14,27 @@ namespace rogue::interfaces::stream {
 class Frame;
 } // namespace rogue::interfaces::stream
 
-namespace readers {
+namespace rogue {
 
-class RogueDataReader : public rogue::interfaces::stream::Slave {
+class RogueDataReceiver : public rogue::interfaces::stream::Slave {
 
 public:
   /// Constructor
-  RogueDataReader();
+  RogueDataReceiver();
 
   /// Default destructor
-  ~RogueDataReader() = default;
+  ~RogueDataReceiver() = default;
 
-  void
-  acceptFrame(std::shared_ptr<rogue::interfaces::stream::Frame> frame);
+  void acceptFrame(std::shared_ptr<rogue::interfaces::stream::Frame> frame);
 
-  //void closeCSV() { csv.close(); }
+  // void closeCSV() { csv.close(); }
 
 private:
-  int event_index{0};
+  /// Counter to keep track of the event number
+  int event_index_{0};
+
+  ///
+  std::vector<uint8_t> channels;
   // void parseFrame(byte data);
 
   /*
@@ -44,11 +49,10 @@ private:
       printf("%d", (n & (1 << i)) >> i);
     putchar('\n');
   }
-  std::vector<uint8_t> channels;
 
   std::ofstream csv;*/
 
-}; // RogueDataReader
-} // namespace reader
+}; // RogueDataReceiver
+} // namespace rogue
 
-#endif // __SVT_DATA_READER_H__
+#endif // 
