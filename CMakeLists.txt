@@ -38,4 +38,8 @@ if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 # Reader library needed to parse files
-add_subdirectory(readers)
+add_subdirectory(rogue)
+
+# Build all test. The test are assumed to reside inside of the directory "test"
+# within each module.
+build_test()
