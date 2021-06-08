@@ -33,6 +33,11 @@ void RogueCsvWriter::acceptFrame(
   if (frame->getChannel() >= 0x10 + 16)
     return;
 
-  parser->parse(frame);
+  // Extract the sample blocks from the file
+  std::vector<SampleBlock> blocks = parser->parse(frame);
+
+  // If there aren't any sample blocks, skip the rest of processing
+  if (blocks.empty()) return; 
+
 }
 } // namespace rogue
