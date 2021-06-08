@@ -40,6 +40,9 @@ endif()
 # Reader library needed to parse files
 add_subdirectory(rogue)
 
+# Reader library needed to parse files
+add_subdirectory(qa)
+
 # Build all test. The test are assumed to reside inside of the directory "test"
 # within each module.
 build_test()
