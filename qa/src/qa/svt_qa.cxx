@@ -14,17 +14,28 @@ using namespace std;
 
 int main(int argc, char **argv) {
 
-  try {
-    boost::program_options::options_description desc("Available options");
-    desc.add_options()("help", "Print usage");
+  // Arguments
+  string config;
 
+  try {
+    // NOTE: The same options needs to be declared here and in positionals
+    boost::program_options::options_description desc("Available options");
+    desc.add_options()
+        ("help", "Print usage")
+        ("config", boost::program_options::value(&config), "Configuration");  
+
+    // Configure the positional arguments
+    boost::program_options::positional_options_description positionals; 
+    positionals.add("config", 1);
+
+    // Parse command line arguments
     boost::program_options::variables_map var_map;
     boost::program_options::store(
-        boost::program_options::parse_command_line(argc, argv, desc), var_map);
+        boost::program_options::parse_command_line(argc, argv).positional(positionals).options(desc).run(), var_map);
     boost::program_options::notify(var_map);
 
-    if (var_map.count("help")) { 
-      cout << desc << endl;
+    if (var_map.count("help") || !var_map.count("config")) { 
+      cerr << desc << endl;
       return EXIT_FAILURE;
     }
   } catch (exception &e) {
@@ -32,30 +43,11 @@ int main(int argc, char **argv) {
     return EXIT_FAILURE;
   }
 
-  /*
 
-          if (argc < 2) {
-      displayUsage();
-      return EXIT_FAILURE;
-    }
+  try {
+    std::cout << "---- [ svt-qa ]: Loading configuration --------" << std::endl;
 
-    int ptrpy = 1;
-    for (ptrpy = 1; ptrpy < argc; ptrpy++) {
-      if (strstr(argv[ptrpy], ".py"))
-        break;
-    }
-
-    if (ptrpy == argc) {
-      displayUsage();
-      printf("  ** No python script provided. **\n");
-      return EXIT_FAILURE;
-    }
-
-    try {
-      std::cout << "---- [ svt-qa ]: Loading configuration --------" <<
-    std::endl;
-
-      // ConfigurePython cfg(argv[ptrpy], argv + ptrpy + 1, argc - ptrpy);
+    ConfigurePython cfg(argv[ptrpy], argv + ptrpy + 1, argc - ptrpy);
 
       std::cout << "---- [ svt-qa ]: Configuration load complete  --------"
                 << std::endl;
