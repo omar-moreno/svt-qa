@@ -4,6 +4,7 @@
 #define BOOST_BIND_GLOBAL_PLACEHOLDERS
 
 //---< C++ >---//
+#include <fstream>
 #include <memory>
 
 //---< rogue >---//
@@ -28,9 +29,19 @@ public:
 
   void acceptFrame(std::shared_ptr<rogue::interfaces::stream::Frame> frame);
 
+  //
+  void open(const std::string &file_path);
+  
+  // 
+  void close();  
+
 private:
   // Parser used to extract samples
   std::unique_ptr<RogueFileParser> parser;
+
+  // Output file stream used to write to a CSV file
+  std::ofstream csv; 
+
 }; // RogueCsvWriter
 } // namespace rogue
 

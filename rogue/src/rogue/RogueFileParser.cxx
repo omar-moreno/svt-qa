@@ -58,15 +58,18 @@ std::vector<SampleBlock> RogueFileParser::parse(
     SampleBlock block;
 
     // Each sample block contains 6 samples
+    uint16_t sample; 
     for (auto isample{0}; isample < 6; ++isample) {
-      rogue::interfaces::stream::fromFrame(it, 2, &block.samples[isample]);
-      // std::cout << "[ RogueFileParser ]: Sample " << isample << ": " <<
-      // rogue::toBinary<int>(block.samples[isample]) << std::endl;
+      rogue::interfaces::stream::fromFrame(it, 2, &sample); 
+      block.samples[isample] = static_cast<int>(sample);
     }
     uint16_t tail;
+    uint8_t rce, feb; 
     // Extract information of the sample block origin from the tail
-    rogue::interfaces::stream::fromFrame(it, 1, &block.rce);
-    rogue::interfaces::stream::fromFrame(it, 1, &block.feb);
+    rogue::interfaces::stream::fromFrame(it, 1, &rce);
+    rogue::interfaces::stream::fromFrame(it, 1, &feb);
+    block.rce = static_cast<int>(rce); 
+    block.feb = static_cast<int>(feb); 
     rogue::interfaces::stream::fromFrame(it, 2, &tail);
     block.channel = rogue::getField(tail, 6, 0);
     block.apv = rogue::getField(tail, 9, 7);
