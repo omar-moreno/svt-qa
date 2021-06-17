@@ -24,10 +24,15 @@ TEST_CASE("CSV Writer", "[rogue]") {
   // Now connect the two streams
   rogueStreamConnect(reader, receiver);
 
+  // Open the CSV file to write the data to
+  receiver->open("test.csv"); 
+
   // Open the file for reading
-  reader->open("/home/omoreno/projects/hps/data/febs/data_20210406_145159.dat");  
+  reader->open("");  
 
   // Close the streams
   reader->closeWait(); 
+  
+  receiver->close(); 
 }
 }
