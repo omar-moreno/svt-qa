@@ -29,6 +29,11 @@ if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     message(STATUS "Install directory set to ${CMAKE_INSTALL_PREFIX}")
 endif()
 
+message(STATUS ${CMAKE_INSTALL_PREFIX})
+
+# Set the python installation path
+set(PYTHON_PACKAGE_NAME SVT)
+
 # Set the default release type to "Release". If a release type is specified 
 # at the command line, it's respected.
 set(default_build_type "Release")
@@ -42,6 +47,9 @@ add_subdirectory(rogue)
 
 # Reader library needed to parse files
 add_subdirectory(qa)
+
+# Reader library needed to parse files
+add_subdirectory(processing)
 
 # Build all test. The test are assumed to reside inside of the directory "test"
 # within each module.
