@@ -2,33 +2,37 @@
 #include <cstdlib>
 #include <exception>
 #include <iostream>
+#include <signal.h>
 #include <string>
 
 //---< boost >---//
 #include <boost/program_options.hpp>
 
-//#include "ConfigurePython.h"
-//#include "Process.h"
+//---< processing >---//
+#include "processing/Exception.h"
+#include "processing/Process.h"
+#include "processing/config/ConfigurePython.h"
 
 using namespace std;
 
 int main(int argc, char **argv) {
 
-  // Arguments
-  string config;
-
+  boost::program_options::variables_map var_map;
   try {
     // NOTE: The same options needs to be declared here and in positionals
     boost::program_options::options_description desc("Available options");
     desc.add_options()("help", "Print usage")(
-        "config", boost::program_options::value(&config), "Configuration");
+        "config, c", boost::program_options::value<vector<string>>(),
+        "Configuration");
 
-    // Configure the positional arguments
+    // Configure the positional arguments.
+    // The config option is configured to take any number of arguments.
+    // This is needed to allow passing of the python script and any
+    // commands passed to it.
     boost::program_options::positional_options_description positionals;
-    positionals.add("config", 1);
+    positionals.add("config", -1);
 
     // Parse command line arguments
-    boost::program_options::variables_map var_map;
     boost::program_options::store(
         boost::program_options::command_line_parser(argc, argv)
             .positional(positionals)
@@ -46,56 +50,44 @@ int main(int argc, char **argv) {
     return EXIT_FAILURE;
   }
 
-  cout << "< svt-qa >: Loading configuration from " << config << endl;
+  vector<string> config{var_map["config"].as<vector<string>>()};
+  cout << "-----< svt-qa > Loading configuration from " << config[0] << " -----"
+       << endl;
 
-  //try {
+  processing::ProcessHandle p;
+  try {
+    processing::config::ConfigurePython cfg(config);
+    p = cfg.makeProcess();
+  } catch (processing::Exception &e) {
+    cerr << "Configuration Error [" << e.name() << "] : " << e.message()
+         << endl;
+    cerr << "  at " << e.module() << ":" << e.line() << " in " << e.function()
+         << endl;
+    cerr << "Stack trace: " << endl << e.stackTrace();
+    return EXIT_FAILURE;
+  }
 
-    // ConfigurePython cfg(argv[ptrpy], argv + ptrpy + 1, argc - ptrpy);
+  cout << "-----< svt-qa > Configuration load complete -----" << endl;
 
-    //  std::cout << "---- [ svt-qa ]: Configuration load complete  --------"
-    //<< std::endl;
+  // If Ctrl-c is used, immediately exit the application.
+  struct sigaction act;
+  memset(&act, '\0', sizeof(act));
+  if (sigaction(SIGINT, &act, NULL) < 0) {
+    perror("sigaction");
+    return 1;
+  }
 
-    // Process* p = cfg.makeProcess();
+  cout << "-----< svt-qa > Starting event processing -----" << endl;
 
-    //  std::cout << "---- [ svt-qa ]: Process initialized.  --------" <<
-    // std::endl;
+  try {
+    p->run();
+  } catch (processing::Exception &e) {
+    cerr << "-----< svt-qa > [" << e.name() << "] : " << e.message() << "\n"
+         << "  at " << e.module() << ":" << e.line() << " in " << e.function()
+         << "\nStack trace: " << std::endl
+         << e.stackTrace();
+  }
+  cout << "-----< svt-qa > Event processing complete  -------" << endl;
 
-    // If Ctrl-c is used, immediately exit the application.
-    //   struct sigaction act;
-    //   memset(&act, '\0', sizeof(act));
-    //   if (sigaction(SIGINT, &act, NULL) < 0) {
-    //     perror("sigaction");
-    //     return 1;
-  //}
-  // See comment above for reason why this code is commented out.
-  /* Use the sa_sigaction field because the handles has two additional
-   * parameters */
-  // act.sa_sigaction = &softFinish;
-
-  /* The SA_SIGINFO flag tells sigaction() to use the sa_sigaction field, not
-   * sa_handler. */
-  // act.sa_flags = SA_SIGINFO;
-
-  /*
-      std::cout << "---- [ svt-qa ]: Starting event processing --------"
-                << std::endl;
-
-      p->run();
-
-      std::cout << "---- [ svt-qa ]: Event processing complete  --------"
-                << std::endl;
-
-    } catch (exception &e) {
-      // std::cerr << "Error! [" << e.name() << "] : " << e.message() <<
-      // std::endl; std::cerr << "  at " << e.module() << ":" << e.line() << "
-    in "
-      // << e.function() << std::endl;
-    }
-  */
   return EXIT_SUCCESS;
 }
-
-/*void displayUsage() {
-  printf("Usage: svt-qa [application arguments] {configuration_script.py} "
-         "[arguments to configuration script]\n");
-}*/

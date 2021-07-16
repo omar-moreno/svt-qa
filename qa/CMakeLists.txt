@@ -12,8 +12,18 @@ find_package(
   Boost REQUIRED
   COMPONENTS program_options)
 
+# Setup the Rogue CMake target
+setup_rogue()
+
 add_executable(svt-qa ${PROJECT_SOURCE_DIR}/src/qa/svt_qa.cxx)
 
-target_link_libraries(svt-qa PRIVATE Boost::program_options)
+target_link_libraries(svt-qa 
+		      PRIVATE Boost::program_options processing::processing) 
 
 install(TARGETS svt-qa DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+
+set_target_properties(
+  svt-qa
+  PROPERTIES CXX_STANDARD 17
+             CXX_STANDARD_REQUIRED YES
+             CXX_EXTENSIONS NO)
