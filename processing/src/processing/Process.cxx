@@ -84,7 +84,7 @@ void Process::run() {
     rogue_reader_ = std::make_shared<rogue::utilities::fileio::StreamReader>(); 
     receiver_ = std::make_shared<rogue::RogueCsvWriter>();
     // Now connect the two streams
-    rogueStreamConnect(reader, receiver);
+    rogueStreamConnect(rogue_reader_, receiver_);
   }
   // data_reader = new Phys2019DataReadEvio();
   // Phys2019SvtEvent event;
@@ -93,12 +93,20 @@ void Process::run() {
 
   for (auto& ifile : input_files_) {
 
-     if (mode_.compare() == 0) {
+     if (mode_.compare("rogue") == 0) {
       // Open the file for reading
-      receiver_->open("");  
+      receiver_->open(ifile);  
   
       // Open the CSV file to write the data to
-      reader_->open(""); 
+      rogue_reader_->open(output_files_[cfile]); 
+    
+      rogue_reader_->closeWait(); 
+
+      receiver_->close(); 
+
+      ++cfile;
+
+      continue;
      }
 
 
