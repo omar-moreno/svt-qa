@@ -77,7 +77,10 @@ void Process::run() {
   /// TODO: Switch to using Exception class
   if (input_files_.empty())
     throw std::runtime_error("Please specify files to process.");
- 
+
+  if (output_files_.empty())
+    throw std::runtime_error("Please specify output paths.");
+	
   if (mode_.compare("rogue") == 0) {
     // Instantiate the reader used to stream frames from a file created 
     // by rogue
@@ -95,10 +98,10 @@ void Process::run() {
 
      if (mode_.compare("rogue") == 0) {
       // Open the file for reading
-      receiver_->open(ifile);  
+      rogue_reader_->open(ifile);  
   
       // Open the CSV file to write the data to
-      rogue_reader_->open(output_files_[cfile]); 
+      receiver_->open(output_files_[cfile]); 
     
       rogue_reader_->closeWait(); 
 
